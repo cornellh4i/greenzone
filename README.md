@@ -33,3 +33,6 @@ The following GitHub settings are enabled:
 
 - **General > Allow auto-merge**
 - **Branches > Branch protection > Require status checks to pass before merging (pull_request_build)**
+
+So I have realised you need to open in Dev Containers and then run
+`yarn install` for the computer to recognise or build the package.json, now I haven't figured out as yet how that will work for the python package.
