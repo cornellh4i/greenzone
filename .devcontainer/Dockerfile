@@ -18,6 +18,9 @@ RUN apt install -y git vim wget && \
     nvm install --lts && \
     npm install --global yarn
 
+# # Install Leaflet, d3 and d3-hexbin via Yarn or npm
+# RUN npm install leaflet d3 d3-hexbin
+
 # Make terminal nicer
 RUN echo 'LC_ALL="C.UTF-8"' >> /root/.bash_profile && \
     echo 'PS1="\[\033[01;32m\]\u\[\033[00m\] ➜ \[\033[01;34m\]\W\[\033[00m\] \[\033[01;31m\](\h)\[\033[00m\] $ "' >> /root/.bash_profile
