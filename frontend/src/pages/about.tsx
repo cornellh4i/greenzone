@@ -1,6 +1,7 @@
 import React from "react";
 import ScatterLinePlot from "@/components/charts/scatter-line-plot";
 import data from "@/components/charts/data/mongolia-province-data.json";
+import { Props } from "@/components/charts/scatter-line-plot";
 
 /** An About page */
 const About = () => {
@@ -15,14 +16,24 @@ const About = () => {
     Sheep: number;
   }
 
+  interface Provinces {
+    Aimag: string;
+    Year: number[];
+    Camel: number[];
+    Cattle: number[];
+    Goat: number[];
+    Horse: number[];
+    Sheep: number[];
+  }
+
   interface Mongolia {
     [Aimag: string]: Province[];
   };
 
   const organizedData: Mongolia = data;
 
-  function extractData(province: Mongolia): {Aimag: string, Year: number[], Camel: number[], Cattle: number[], Goat: number[], Horse: number[], Sheep: number[]}[] {
-    const result: {Aimag: string, Year: number[], Camel: number[], Cattle: number[], Goat: number[], Horse: number[], Sheep: number[]}[] = [];
+  function extractData(province: Mongolia): Provinces[] {
+    const result: Provinces[] = [];
 
     for (const Aimag in province) {
       if (province.hasOwnProperty(Aimag)) {
@@ -39,33 +50,48 @@ const About = () => {
       return result;
     }
 
-  function groupByYear(province: Province[], field: keyof Province): { x: number; y: number }[] {
+  function groupByYear(data: number[], yearValues: number[]): { x: number; y: number }[] {
     const result: { x: number; y: number }[] = [];
-
-    const year: { [Year: number]: Province[] } = {};
-    province.forEach((aimag) => {
-      if (!year[aimag.Year]) {
-        year[aimag.Year] = [];
+  
+    const years: { [year: number]: number[] } = {};
+  
+    for (let i = 0; i < data.length; i++) {
+      const value = data[i];
+      const year = yearValues[i];
+      
+      if (years[year] === undefined) {
+        years[year] = [];
       }
-      year[aimag.Year].push(aimag);
+      years[year].push(value);
+    }
+  
+    Object.entries(years).forEach(([year, values]) => {
+      const average = values.reduce((acc, curr) => acc + curr, 0) / values.length;
+      result.push({ x: Number(year), y: average });
     });
-
-    Object.entries(year).map(([Year, province]) => {
-      const sum = province.reduce((acc, curr) => acc + (curr[field] as number), 0);
-      const average = sum / province.length;
-      result.push({ x: Number(Year), y: average });
-    });
+  
     return result;
   }
+    
 
-    const extractedDataWithKeys = extractData(organizedData);
-    const SuhbaatarGoats = groupByYear(organizedData.Suhbaatar, "Goat");
-    console.log(extractedDataWithKeys);
+  function createMultipleDatasets(provinces: Provinces[], field: keyof Provinces): Props["datasets"] {
+    const datasets: { aimag: string; data: { x: number; y: number; }[]}[] = [];
+    provinces.map((province) => (datasets.push({
+        aimag: province.Aimag,
+        data: groupByYear(province[field] as number[], province.Year)
+    })));
+    return datasets;
+  };
+
+
+  const extractedDataWithKeys = extractData(organizedData);
+  const goats = createMultipleDatasets(extractedDataWithKeys, "Goat");
+  console.log(goats);
 
 
   return (
   <div>
-    <ScatterLinePlot info={SuhbaatarGoats} minRange={2002} maxRange={2014}/>
+    <ScatterLinePlot datasets={goats}/>
   </div>
   );
 };
