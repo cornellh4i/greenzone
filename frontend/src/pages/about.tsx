@@ -91,7 +91,7 @@ const About = () => {
 
   return (
   <div>
-    <ScatterLinePlot datasets={goats}/>
+    <ScatterLinePlot datasets={goats} livestock={"Goats"}/>
   </div>
   );
 };
