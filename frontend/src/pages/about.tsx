@@ -1,7 +1,9 @@
 import React from "react";
 import ScatterLinePlot from "@/components/charts/scatter-line-plot";
 import data from "@/components/charts/data/mongolia-province-data.json";
-import { Props } from "@/components/charts/scatter-line-plot";
+import { Prop } from "@/components/charts/scatter-line-plot";
+import { Props } from "@/components/charts/barchart";
+import BarChart from "@/components/charts/barchart";
 
 /** An About page */
 const About = () => {
@@ -72,9 +74,25 @@ const About = () => {
   
     return result;
   }
+
+  function groupByLivestockAndYear(year: number, livestock: string[], provinces: Provinces[]): Props["datasets"] {
+    return provinces
+    .filter(province => province.Year.includes(year))
+    .map(province => {
+      const yearIndex = province.Year.indexOf(year);
+
+      return {
+        aimag: province.Aimag,
+        data: livestock.map(livestockType => ({
+          x: livestockType,
+          y: (province[livestockType as keyof Provinces]?.[yearIndex] ?? 0) as number
+        }))
+      };
+    });
+}
     
 
-  function createMultipleDatasets(provinces: Provinces[], field: keyof Provinces): Props["datasets"] {
+  function createMultipleDatasets(provinces: Provinces[], field: keyof Provinces): Prop["datasets"] {
     const datasets: { aimag: string; data: { x: number; y: number; }[]}[] = [];
     provinces.map((province) => (datasets.push({
         aimag: province.Aimag,
@@ -86,12 +104,13 @@ const About = () => {
 
   const extractedDataWithKeys = extractData(organizedData);
   const goats = createMultipleDatasets(extractedDataWithKeys, "Goat");
-  console.log(goats);
+  const testingGroupedBars = groupByLivestockAndYear(2014, ["Cattle", "Horse", "Goat"], extractedDataWithKeys);
 
 
   return (
   <div>
     <ScatterLinePlot datasets={goats} livestock={"Goats"}/>
+    <BarChart datasets={testingGroupedBars} livestock={["Cattle", "Horse", "Goat"]}/>
   </div>
   );
 };

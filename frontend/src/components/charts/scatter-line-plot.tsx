@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-export interface Props {
+export interface Prop {
   datasets: { aimag: string; data: { x: number; y: number }[] }[];
   livestock: string;
 }
 
-const LineGraph: React.FC<Props> = ({ datasets, livestock }) => {
+const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const LineGraph: React.FC<Props> = ({ datasets, livestock }) => {
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("viewBox", `0 0 ${w + 100} ${h}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("preserveAspectRatio", "xMinYMin meet")
       .style("background-color", "#ffffff")
 
 
