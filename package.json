@@ -1,0 +1,10 @@
+{
+    "name": "greenzone",
+    "private": true,
+    "scripts": {
+        "setup": "(cd frontend && yarn run setup)",
+        "test": "cd backend && yarn run test",
+        "start": " (cd frontend && yarn run start)"
+    },
+    "packageManager": "yarn@4.5.0"
+}
