@@ -58,7 +58,7 @@ const DropDown = ({ label, data }: { label: string; data: any }) => {
           // Map through each region's array of data and extract the year
           data[region].map(
             (
-              item: { Year: string | number | readonly string[] | undefined },
+              item: { Year: string | number | undefined },
               index: React.Key | null | undefined
             ) => (
               <MenuItem key={index} value={item.Year}>
