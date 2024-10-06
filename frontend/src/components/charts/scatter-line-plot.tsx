@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-export interface Props {
-  datasets: { aimag: string; data: { x: string; y: number }[] }[];
-  livestock: string[];
+export interface Prop {
+  datasets: { aimag: string; data: { x: number; y: number }[] }[];
+  livestock: string;
 }
 
-const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
+const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -15,32 +15,28 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
     const w = 500;
     const h = 500;
     const m = { top: 40, right: 30, bottom: 50, left: 60 };
+
+    const allData = datasets.flatMap(d => d.data);
+
         
     const d3svg = d3
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("viewBox", `0 0 ${w + 100} ${h}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("preserveAspectRatio", "xMinYMin meet")
       .style("background-color", "#ffffff")
 
 
     //setting the scales of the graph
     const xScale = d3
-      .scaleBand()
-      .domain(datasets.map(d => d.aimag))
-      .range([m.left, w - m.right])
-      .padding(0.2);
-
-    const xSubgroupScale = d3
-      .scaleBand()
-      .domain(livestock)
-      .range([0, xScale.bandwidth()])
-      .padding(0.05);
+      .scaleLinear()
+      .domain([d3.min(allData, d => d.x)!, d3.max(allData, d => d.x)!])
+      .range([m.left, w - m.right]);
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(datasets, d => d3.max(d.data, dataPoint => dataPoint.y)) || 0])
+      .domain([d3.min(allData, d => d.y)!, d3.max(allData, d => d.y)!])
       .range([h - m.bottom, m.top]);
 
     const makeXGridlines = () => d3.axisBottom(xScale).ticks(5);
@@ -48,11 +44,11 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
 
 
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(livestock);
+      .domain(datasets.map(d => d.aimag));
 
     d3svg.append("g")
       .attr("transform", `translate(0, ${h - m.bottom})`)
-      .call(d3.axisBottom(xScale));
+      .call(d3.axisBottom(xScale))
 
     d3svg
       .append("text")
@@ -61,12 +57,12 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .attr("x", w / 2)
       .attr("y", h - 10)
       .style("font-size", "14px")
-      .text("Provinces");
+      .text("Year");
 
     d3svg
       .append("g")
       .attr("class", "grid")
-      .attr("transform", `translate(0, ${h - m.bottom})`)
+      .attr("transform", `translate(0,${h - m.bottom})`)
       .call(
         makeXGridlines()
           .tickSize(-h + m.top + m.bottom)
@@ -89,12 +85,12 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .attr("x", -h / 2)
       .attr("y", 20)
       .style("font-size", "14px")
-      .text("# of Livestock");
+      .text(livestock);
 
     d3svg
       .append("g")
       .attr("class", "grid")
-      .attr("transform", `translate(${m.left}, 0)`)
+      .attr("transform", `translate(${m.left},0)`)
       .call(
         makeYGridlines()
           .tickSize(-w + m.left + m.right)
@@ -104,27 +100,32 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .style("stroke", "#e0e0e0")
       .style("stroke-opacity", "0.3");
   
-    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(livestock);
+    datasets.forEach(dataset => {
+      const color = colorScale(dataset.aimag);
     
-    const groups = d3svg
-    .selectAll(".group")
-    .data(datasets)
-    .enter()
-    .append("g")
-    .attr("class", "group")
-    .attr("transform", d => `translate(${xScale(d.aimag)}, 0)`);
+      d3svg
+        .selectAll(`circle-${dataset.aimag}`)
+        .data(dataset.data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => yScale(d.y))
+        .attr("r", 4)
+        .attr("fill", color);
 
+      const lineGenerator = d3.line<{ x: number, y: number }>()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .curve(d3.curveMonotoneX);
 
-    groups.selectAll("rect")
-      .data(d => d.data.map(dataPoint => ({ key: dataPoint.x, value: dataPoint.y })))
-      .enter()
-      .append("rect")
-      .attr("x", d => xSubgroupScale(d.key)!)
-      .attr("y", d => yScale(d.value))
-      .attr("width", xSubgroupScale.bandwidth())
-      .attr("height", d => yScale(0) - yScale(d.value))
-      .attr("fill", d => color(d.key));
-   
+      d3svg
+        .append("path")
+        .datum(dataset.data)
+        .attr("fill", "none")
+        .attr("stroke", colorScale(dataset.aimag))
+        .attr("stroke-width", 2)
+        .attr("d", lineGenerator); // Comment out for scatter plot
+      });
 
     const legend = d3svg
       .append("g")
@@ -148,14 +149,14 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
         .text(aimag);
     });
 
-    }, [datasets, livestock]);
+    }, [datasets]);
 
 
   return (
-    <div className="barchart" style={{ width: "100%", height: "100vh", maxHeight: "500px", maxWidth: "600px" }}>
+    <div className="line-graph" style={{ width: "100%", height: "100vh", maxHeight: "500px", maxWidth: "600px" }}>
       <svg ref={svgRef}></svg>
     </div>
   );
 };
 
-export default BarChart;
+export default LineGraph;
