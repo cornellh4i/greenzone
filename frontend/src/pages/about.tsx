@@ -137,9 +137,7 @@ const About = () => {
     <div>
       <div style={{ display: "flex", alignItems: "center" }}>
         <div style={{ flex: 11, marginRight: "1rem" }}>
-          {/* <TextBox textLabel="Search" on children={""} /> */}
           <SearchBar />
-          {/* <DropDown /> */}
         </div>
       </div>
       <ScatterLinePlot datasets={goats} livestock={"Goats"} />
