@@ -7,6 +7,7 @@ import BarChart from "@/components/charts/barchart";
 import TextBox from "@/components/atoms/TextBox";
 import DropDown from "@/components/atoms/DropDown";
 import Button from "@/components/atoms/Button";
+import SearchBar from "@/components/molecules/SearchBar";
 
 /** An About page */
 const About = () => {
@@ -136,13 +137,11 @@ const About = () => {
     <div>
       <div style={{ display: "flex", alignItems: "center" }}>
         <div style={{ flex: 11, marginRight: "1rem" }}>
-          <TextBox textLabel="Search" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <Button children={"Search"} color="dark-gray" />
+          {/* <TextBox textLabel="Search" on children={""} /> */}
+          <SearchBar />
+          {/* <DropDown /> */}
         </div>
       </div>
-      <DropDown label="Year" data={data} />
       <ScatterLinePlot datasets={goats} livestock={"Goats"} />
       <BarChart
         datasets={testingGroupedBars}
