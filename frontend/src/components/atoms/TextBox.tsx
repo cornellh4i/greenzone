@@ -1,71 +1,62 @@
-// import React, { useEffect } from "react";
-// import { TextField } from "@mui/material";
-// // import { RegisterOptions, UseFormRegisterReturn } from "react-hook-form";
+// // import { SetStateAction, useState } from "react";
 
-// interface TextFieldProps {
-//   label: string;
-//   name: string;
-//   required?: boolean;
-//   type?: string;
-//   disabled?: boolean;
-//   requiredMessage?: string;
-//   // register: (name: any, options?: RegisterOptions) => UseFormRegisterReturn;
+// // interface TextBoxProps {
+// //   onChange: (value: string) => void;
+// // }
+
+// // export default function TextBox({ onChange }: TextBoxProps) {
+// //   const [value, setValue] = useState("");
+
+// //   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+// //     const newValue = event.target.value;
+// //     setValue(newValue);
+// //     onChange(newValue); // Update the parent with the new value
+// //   };
+
+// //   return (
+// //     <div>
+// //       <input type="text" value={value} onChange={handleChange} />
+// //     </div>
+// //   );
+// // }
+
+// import React from "react";
+
+// interface TextBoxProps {
+//   value: string;
+//   onChange: (value: string) => void;
 // }
 
-// const CustomTextField = ({
-//   label,
-//   name,
-//   required,
-//   type = "text",
-//   requiredMessage = "",
-//   disabled = false,
-// }: // register,
-// TextFieldProps) => {
+// export default function TextBox({ value, onChange }: TextBoxProps) {
+//   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     onChange(event.target.value);
+//   };
+
 //   return (
 //     <div>
-//       <div>
-//         {label} <span className="text-red-500">{requiredMessage}</span>
-//       </div>
-//       <TextField
-//         type={type}
-//         disabled={disabled}
-//         size="small"
-//         margin="dense"
-//         fullWidth={true}
-//         {...register(name, {
-//           required: required,
-//         })}
-//         sx={{ borderRadius: 2, borderColor: "primary.main" }}
-//       />
+//       <input type="text" value={value} onChange={handleChange} />
 //     </div>
 //   );
-// };
+// }
 
-// export default CustomTextField;
+import React from "react";
+import { TextField } from "@mui/material";
 
-import React, { useState } from "react";
-import TextField from "@mui/material/TextField";
+interface TextBoxProps {
+  value: string | null;
+  onChange: (value: string | null) => void;
+  label: string;
+}
 
-const TextBox = ({ textLabel }: { textLabel: string }) => {
-  const [value, setValue] = useState("");
-
-  const handleChange = (event: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
-    setValue(event.target.value);
-  };
-
+const TextBox: React.FC<TextBoxProps> = ({ value, onChange, label }) => {
   return (
-    <div>
-      <TextField
-        label={textLabel}
-        variant="outlined"
-        value={value}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-      />
-    </div>
+    <TextField
+      value={value || ""}
+      onChange={(e) => onChange(e.target.value)}
+      label={label}
+      variant="outlined"
+      fullWidth
+    />
   );
 };
 
