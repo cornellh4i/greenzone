@@ -15,45 +15,49 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
     const w = 500;
     const h = 500;
     const m = { top: 40, right: 30, bottom: 50, left: 60 };
-        
+
+    const aggregatedData = livestock.map(livestockType => {
+      const totalLivestockCount = datasets.reduce((total, dataset) => {
+        if (Array.isArray(dataset.data)) {
+          const livestockEntry = dataset.data.find(d => d.x === livestockType);
+          return total + (livestockEntry ? livestockEntry.y : 0);
+        }
+        return total;
+      }, 0);
+    
+      return { livestockType, totalLivestockCount };
+    });
+
     const d3svg = d3
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("viewBox", `0 0 ${w + 100} ${h}`)
       .attr("preserveAspectRatio", "xMidYMid meet")
-      .style("background-color", "#ffffff")
+      .style("background-color", "#ffffff");
 
-
-    //setting the scales of the graph
+    // xScale based on livestock types
     const xScale = d3
       .scaleBand()
-      .domain(datasets.map(d => d.aimag))
+      .domain(livestock)  // Livestock types as x-axis labels
       .range([m.left, w - m.right])
       .padding(0.2);
 
-    const xSubgroupScale = d3
-      .scaleBand()
-      .domain(livestock)
-      .range([0, xScale.bandwidth()])
-      .padding(0.05);
-
+    // yScale based on total livestock counts
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(datasets, d => d3.max(d.data, dataPoint => dataPoint.y)) || 0])
+      .domain([0, d3.max(aggregatedData, d => d.totalLivestockCount) || 0])
       .range([h - m.bottom, m.top]);
 
-    const makeXGridlines = () => d3.axisBottom(xScale).ticks(5);
+    // Gridlines
     const makeYGridlines = () => d3.axisLeft(yScale).ticks(5);
 
-
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(livestock);
-
+    // Draw x-axis
     d3svg.append("g")
       .attr("transform", `translate(0, ${h - m.bottom})`)
       .call(d3.axisBottom(xScale));
 
+    // Add x-axis label
     d3svg
       .append("text")
       .attr("class", "x-axis-label")
@@ -61,26 +65,14 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .attr("x", w / 2)
       .attr("y", h - 10)
       .style("font-size", "14px")
-      .text("Provinces");
+      .text("Types of Livesstock");
 
-    d3svg
-      .append("g")
-      .attr("class", "grid")
-      .attr("transform", `translate(0, ${h - m.bottom})`)
-      .call(
-        makeXGridlines()
-          .tickSize(-h + m.top + m.bottom)
-          .tickFormat(() => "")
-      )
-      .style("stroke-dasharray", "3,3")
-      .style("stroke", "#e0e0e0")
-      .style("stroke-opacity", "0.3");
-      
-
+    // Draw y-axis
     d3svg.append("g")
       .attr("transform", `translate(${m.left}, 0)`)
       .call(d3.axisLeft(yScale));
 
+    // Add y-axis label
     d3svg
       .append("text")
       .attr("class", "y-axis-label")
@@ -91,6 +83,7 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .style("font-size", "14px")
       .text("# of Livestock");
 
+    // Add gridlines
     d3svg
       .append("g")
       .attr("class", "grid")
@@ -103,53 +96,20 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .style("stroke-dasharray", "3,3")
       .style("stroke", "#e0e0e0")
       .style("stroke-opacity", "0.3");
-  
-    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(livestock);
-    
-    const groups = d3svg
-    .selectAll(".group")
-    .data(datasets)
-    .enter()
-    .append("g")
-    .attr("class", "group")
-    .attr("transform", d => `translate(${xScale(d.aimag)}, 0)`);
 
-
-    groups.selectAll("rect")
-      .data(d => d.data.map(dataPoint => ({ key: dataPoint.x, value: dataPoint.y })))
+    // Draw bars
+    d3svg.selectAll(".bar")
+      .data(aggregatedData)
       .enter()
       .append("rect")
-      .attr("x", d => xSubgroupScale(d.key)!)
-      .attr("y", d => yScale(d.value))
-      .attr("width", xSubgroupScale.bandwidth())
-      .attr("height", d => yScale(0) - yScale(d.value))
-      .attr("fill", d => color(d.key));
-   
+      .attr("class", "bar")
+      .attr("x", d => xScale(d.livestockType)!)
+      .attr("y", d => yScale(d.totalLivestockCount))
+      .attr("width", xScale.bandwidth())
+      .attr("height", d => yScale(0) - yScale(d.totalLivestockCount))
+      .attr("fill", "#69b3a2");
 
-    const legend = d3svg
-      .append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${w}, ${m.top})`);
-
-    colorScale.domain().forEach((aimag, i) => {
-      const legendRow = legend.append("g")
-        .attr("transform", `translate(0, ${i * 20})`);
-    
-      legendRow.append("rect")
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr("fill", colorScale(aimag));
-    
-      legendRow.append("text")
-        .attr("x", 20)
-        .attr("y", 10)
-        .attr("text-anchor", "start")
-        .style("font-size", "12px")
-        .text(aimag);
-    });
-
-    }, [datasets, livestock]);
-
+  }, [datasets, livestock]);
 
   return (
     <div className="barchart" style={{ width: "100%", height: "100vh", maxHeight: "500px", maxWidth: "600px" }}>

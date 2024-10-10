@@ -2,12 +2,15 @@ import React from "react";
 import ScatterLinePlot from "@/components/charts/scatter-line-plot";
 import data from "@/components/charts/data/mongolia-province-data.json";
 import { Prop } from "@/components/charts/scatter-line-plot";
-import { Props } from "@/components/charts/barchart";
-import BarChart from "@/components/charts/barchart";
-import TextBox from "@/components/atoms/TextBox";
+import { Props } from "@/components/charts/groupedbarchart";
+import GroupedBarChart from "@/components/charts/groupedbarchart";
 import DropDown from "@/components/atoms/DropDown";
 import Button from "@/components/atoms/Button";
 import SearchBar from "@/components/molecules/SearchBar";
+import { useState } from "react";
+import SidePanel from "@/components/organisms/SidePanel";
+import BarChart from "@/components/charts/barchart";
+
 
 /** An About page */
 const About = () => {
@@ -36,6 +39,7 @@ const About = () => {
   }
 
   const organizedData: Mongolia = data;
+
 
   function extractData(province: Mongolia): Provinces[] {
     const result: Provinces[] = [];
@@ -124,27 +128,103 @@ const About = () => {
     );
     return datasets;
   }
+  
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+    const handlePanelToggle = () => {
+      setIsPanelOpen(!isPanelOpen);
+      setSelectedAimag(null);
+    };
+
+
+  function extractYearRange(provinces: Provinces[]): Set<number> {
+    let rangeEntries = new Set<number>();
+
+    provinces.map((province) =>
+      province.Year.map((year) => rangeEntries.add(year))
+    );
+    return rangeEntries;
+  }
 
   const extractedDataWithKeys = extractData(organizedData);
   const goats = createMultipleDatasets(extractedDataWithKeys, "Goat");
-  const testingGroupedBars = groupByLivestockAndYear(
-    2014,
-    ["Cattle", "Horse", "Goat"],
-    extractedDataWithKeys
-  );
+
+
+  const yearRange = Array.from(extractYearRange(extractedDataWithKeys)).sort((a, b) => a - b);
+  const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
+
+  const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
+
+  const [selectedYear, setSelectedYear] = useState<number | null>(Math.max(...yearRange));
+
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+
+
+
+  const handleSearchResult = (aimag: string | null) => {
+    if (aimag) {
+      setSelectedAimag(aimag);
+      const yearToUse = selectedYear || Math.max(...yearRange);
+
+      const filtered = groupByLivestockAndYear(
+        yearToUse,
+        livestockTypes,
+        extractedDataWithKeys.filter(dataset => dataset.Aimag === aimag && dataset.Year.includes(yearToUse))
+      );
+      setFilteredData(filtered);
+    } else {
+      setSelectedAimag(null);
+      setFilteredData([]);
+    }
+  };
+
+  const handleYearChange = (year: string | null) => {
+    if (year) {
+      const yearAsNumber = Number(year);
+      setSelectedYear(yearAsNumber);
+      const aimagToUse = selectedAimag;
+
+      const filtered = groupByLivestockAndYear(
+        yearAsNumber,
+        livestockTypes,
+        extractedDataWithKeys.filter(
+          dataset => (!aimagToUse || dataset.Aimag === aimagToUse) && dataset.Year.includes(yearAsNumber)
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setSelectedYear(null);
+      setFilteredData([]);
+    }
+  };
+
+  
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <div style={{ flex: 11, marginRight: "1rem" }}>
-          <SearchBar />
-        </div>
-      </div>
-      <ScatterLinePlot datasets={goats} livestock={"Goats"} />
-      <BarChart
-        datasets={testingGroupedBars}
-        livestock={["Cattle", "Horse", "Goat"]}
-      />
+      <Button onClick={handlePanelToggle} label="Toggle SidePanel" />
+        <SidePanel isOpen={isPanelOpen} onClose={handlePanelToggle}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ flex: 11, marginRight: "1rem" }}>
+              <SearchBar onSearch={handleSearchResult}/>
+            </div>
+          </div>
+          {/* <ScatterLinePlot datasets={goats} livestock={"Goats"} /> */}
+          <div style={{ display: "flex", alignItems: "center", marginTop: "20px"}}>
+            <div style={{ flex: 11, marginRight: "1rem" }}>
+              <DropDown options={yearRange.map((year) => year.toString())} value={selectedOption} onChange={handleYearChange} label="Select a year" />
+            </div>
+          </div>
+          {selectedAimag && filteredData.length > 0 && (
+          <div>
+          <BarChart
+            datasets={filteredData}
+            livestock={livestockTypes}
+          />
+          </div>)}
+        </SidePanel>
     </div>
   );
 };

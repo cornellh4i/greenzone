@@ -19,7 +19,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <Autocomplete
       options={options}
-      getOptionLabel={(option) => option}
+      getOptionLabel={(option) => option.toString()}
       value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string" || newValue === null) {

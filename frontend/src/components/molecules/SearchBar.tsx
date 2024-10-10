@@ -5,7 +5,7 @@ import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
 import data from "@/components/charts/data/mongolia-province-data.json";
 
-const SearchBar: React.FC = () => {
+const SearchBar: React.FC<{ onSearch: (selectedAimag: string | null, selectedYear: string | null) => void }> = ({onSearch}) => {
   const uniqueAimag = Array.from(
     new Set(
       Object.values(data)
@@ -15,24 +15,37 @@ const SearchBar: React.FC = () => {
   );
 
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+
 
   const handleSearch = () => {
-    console.log("Searching for:", { selectedAimag, searchTerm });
+    onSearch(selectedAimag, selectedYear);
   };
 
+
   return (
-    <Box display="flex" alignItems="center" gap={2} width="100%">
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
       {" "}
-      <Dropdown
-        options={uniqueAimag}
-        value={selectedAimag}
-        onChange={setSelectedAimag}
-        label="Select Aimag"
-        sx={{ flexGrow: 1, minWidth: 200 }}
-      />
+      <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px"}}>
+        <Dropdown
+          options={uniqueAimag}
+          value={selectedAimag}
+          onChange={setSelectedAimag}
+          label="Select Aimag"
+          sx={{ width: "100%" }}
+        />
+      </Box>
       {/* <TextBox value={searchTerm} onChange={setSearchTerm} label="Search" /> */}
-      <Button onClick={handleSearch} label="Search" />
+      <Button
+        onClick={handleSearch} label="Search" sx={{ height: "50px", width: "150px", marginLeft: "auto" , flexShrink: 0}} disabled={!selectedAimag}
+      />
+
     </Box>
   );
 };
