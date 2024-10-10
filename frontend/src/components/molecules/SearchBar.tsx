@@ -84,15 +84,14 @@ import { Box } from "@mui/material";
 import TextBox from "../atoms/TextBox";
 import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
-import data from "@/components/charts/data/mongolia-province-data.json"; // Import your JSON data
+import data from "@/components/charts/data/mongolia-province-data.json";
 
 const SearchBar: React.FC = () => {
-  // Extract unique Aimags from the imported data
   const uniqueAimag = Array.from(
     new Set(
       Object.values(data)
         .flat()
-        .map((item) => item.Aimag) // Map to the Aimag property
+        .map((item) => item.Aimag)
     )
   );
 
@@ -101,19 +100,17 @@ const SearchBar: React.FC = () => {
 
   const handleSearch = () => {
     console.log("Searching for:", { selectedAimag, searchTerm });
-    // Add your search logic here
   };
 
   return (
     <Box display="flex" alignItems="center" gap={2} width="100%">
       {" "}
-      {/* Ensure the Box takes full width */}
       <Dropdown
         options={uniqueAimag}
         value={selectedAimag}
         onChange={setSelectedAimag}
         label="Select Aimag"
-        sx={{ flexGrow: 1, minWidth: 200 }} // Now valid if you use Solution 1
+        sx={{ flexGrow: 1, minWidth: 200 }}
       />
       {/* <TextBox value={searchTerm} onChange={setSearchTerm} label="Search" /> */}
       <Button onClick={handleSearch} label="Search" />
