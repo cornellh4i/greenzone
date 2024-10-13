@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
-import TextBox from "../atoms/TextBox";
+
 import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
 import data from "@/components/charts/data/mongolia-province-data.json";
@@ -17,6 +17,7 @@ const SearchBar: React.FC<{
   );
 
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
   const handleSearch = () => {

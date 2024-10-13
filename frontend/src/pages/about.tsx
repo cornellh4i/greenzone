@@ -1,9 +1,9 @@
 import React from "react";
-import ScatterLinePlot from "@/components/charts/scatter-line-plot";
+
 import data from "@/components/charts/data/mongolia-province-data.json";
 import { Prop } from "@/components/charts/scatter-line-plot";
 import { Props } from "@/components/charts/groupedbarchart";
-import GroupedBarChart from "@/components/charts/groupedbarchart";
+
 import DropDown from "@/components/atoms/DropDown";
 import Button from "@/components/atoms/Button";
 import SearchBar from "@/components/molecules/SearchBar";
@@ -127,7 +127,7 @@ const About = () => {
     return datasets;
   }
 
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const selectedOption: string | null = null;
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -137,7 +137,7 @@ const About = () => {
   };
 
   function extractYearRange(provinces: Provinces[]): Set<number> {
-    let rangeEntries = new Set<number>();
+    const rangeEntries = new Set<number>();
 
     provinces.map((province) =>
       province.Year.map((year) => rangeEntries.add(year))
@@ -146,6 +146,7 @@ const About = () => {
   }
 
   const extractedDataWithKeys = extractData(organizedData);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const goats = createMultipleDatasets(extractedDataWithKeys, "Goat");
 
   const yearRange = Array.from(extractYearRange(extractedDataWithKeys)).sort(
@@ -159,6 +160,7 @@ const About = () => {
     Math.max(...yearRange)
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const handleSearchResult = (aimag: string | null) => {
