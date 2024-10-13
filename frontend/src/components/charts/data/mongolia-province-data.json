@@ -1,0 +1,597 @@
+{
+  "Bayan-Ulgii": [
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2002,
+      "Camel": 14.6225,
+      "Cattle": 84.28999999999999,
+      "Goat": 542.8340000000001,
+      "Horse": 60.611999999999995,
+      "Sheep": 540.571
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2003,
+      "Camel": 14.342500000000001,
+      "Cattle": 87.502,
+      "Goat": 614.248,
+      "Horse": 62.108,
+      "Sheep": 546.168
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2004,
+      "Camel": 13.5335,
+      "Cattle": 86.033,
+      "Goat": 640.7869999999999,
+      "Horse": 60.762,
+      "Sheep": 554.299
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2005,
+      "Camel": 13.053500000000001,
+      "Cattle": 80.53,
+      "Goat": 620.593,
+      "Horse": 57.62,
+      "Sheep": 557.4590000000001
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2006,
+      "Camel": 13.024500000000002,
+      "Cattle": 88.804,
+      "Goat": 712.353,
+      "Horse": 61.83,
+      "Sheep": 603.011
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2007,
+      "Camel": 13.055500000000002,
+      "Cattle": 94.843,
+      "Goat": 791.558,
+      "Horse": 65.663,
+      "Sheep": 640.987
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2008,
+      "Camel": 12.7155,
+      "Cattle": 82.2,
+      "Goat": 778.701,
+      "Horse": 59.677,
+      "Sheep": 605.038
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2009,
+      "Camel": 12.634500000000001,
+      "Cattle": 70.703,
+      "Goat": 651.596,
+      "Horse": 50.953,
+      "Sheep": 524.34
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2010,
+      "Camel": 12.5355,
+      "Cattle": 66.04899999999999,
+      "Goat": 553.759,
+      "Horse": 43.451,
+      "Sheep": 459.834
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2011,
+      "Camel": 3.992,
+      "Cattle": 80.815,
+      "Goat": 662.5360000000001,
+      "Horse": 48.532,
+      "Sheep": 506.911
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2012,
+      "Camel": 4.192,
+      "Cattle": 95.9675,
+      "Goat": 701.9055,
+      "Horse": 60.4745,
+      "Sheep": 583.1455
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2013,
+      "Camel": 13.1175,
+      "Cattle": 113.8485,
+      "Goat": 782.1555,
+      "Horse": 67.2095,
+      "Sheep": 671.5965
+    },
+    {
+      "Aimag": "Bayan-Ulgii",
+      "Year": 2014,
+      "Camel": 13.4405,
+      "Cattle": 136.2125,
+      "Goat": 890.8425,
+      "Horse": 78.3315,
+      "Sheep": 808.6305
+    }
+  ],
+  "Darhan-Uul": [
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2002,
+      "Camel": 0.131,
+      "Cattle": 24.523,
+      "Goat": 53.587,
+      "Horse": 10.673,
+      "Sheep": 77.12299999999999
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2003,
+      "Camel": 0.044,
+      "Cattle": 17.299,
+      "Goat": 40.429,
+      "Horse": 8.628,
+      "Sheep": 55.838
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2004,
+      "Camel": 0.036000000000000004,
+      "Cattle": 17.144,
+      "Goat": 42.669,
+      "Horse": 8.116,
+      "Sheep": 57.089
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2005,
+      "Camel": 0.103,
+      "Cattle": 19.37,
+      "Goat": 50.541,
+      "Horse": 7.463,
+      "Sheep": 65.392
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2006,
+      "Camel": 0.337,
+      "Cattle": 21.137999999999998,
+      "Goat": 68.245,
+      "Horse": 7.808,
+      "Sheep": 82.66499999999999
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2007,
+      "Camel": 0.384,
+      "Cattle": 26.073,
+      "Goat": 93.842,
+      "Horse": 7.914999999999999,
+      "Sheep": 102.16499999999999
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2008,
+      "Camel": 9.2705,
+      "Cattle": 32.591,
+      "Goat": 138.765,
+      "Horse": 10.427,
+      "Sheep": 163.008
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2009,
+      "Camel": 0.44,
+      "Cattle": 37.548,
+      "Goat": 135.963,
+      "Horse": 11.053999999999998,
+      "Sheep": 176.527
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2010,
+      "Camel": 9.486500000000001,
+      "Cattle": 32.47,
+      "Goat": 78.82499999999999,
+      "Horse": 10.195,
+      "Sheep": 127.614
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2011,
+      "Camel": 9.2765,
+      "Cattle": 33.861,
+      "Goat": 86.483,
+      "Horse": 10.972000000000001,
+      "Sheep": 124.987
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2012,
+      "Camel": 9.2035,
+      "Cattle": 35.609,
+      "Goat": 85.107,
+      "Horse": 11.253,
+      "Sheep": 135.966
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2013,
+      "Camel": 8.954500000000001,
+      "Cattle": 39.24,
+      "Goat": 81.892,
+      "Horse": 12.812,
+      "Sheep": 144.924
+    },
+    {
+      "Aimag": "Darhan-Uul",
+      "Year": 2014,
+      "Camel": 8.858500000000001,
+      "Cattle": 46.601,
+      "Goat": 95.76100000000001,
+      "Horse": 14.173,
+      "Sheep": 167.617
+    }
+  ],
+  "Dundgovi": [
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2002,
+      "Camel": 28.4965,
+      "Cattle": 41.423500000000004,
+      "Goat": 632.4245,
+      "Horse": 122.1785,
+      "Sheep": 694.3205
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2003,
+      "Camel": 29.1495,
+      "Cattle": 45.6335,
+      "Goat": 714.5365,
+      "Horse": 119.86749999999999,
+      "Sheep": 732.7785
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2004,
+      "Camel": 30.075499999999998,
+      "Cattle": 50.8485,
+      "Goat": 818.6695,
+      "Horse": 129.4635,
+      "Sheep": 795.7205
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2005,
+      "Camel": 29.4965,
+      "Cattle": 52.5495,
+      "Goat": 834.1965,
+      "Horse": 128.2325,
+      "Sheep": 828.4315
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2006,
+      "Camel": 28.5035,
+      "Cattle": 49.0385,
+      "Goat": 879.4785,
+      "Horse": 116.0405,
+      "Sheep": 875.8635
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2007,
+      "Camel": 28.582500000000003,
+      "Cattle": 51.3205,
+      "Goat": 1007.0145,
+      "Horse": 113.4825,
+      "Sheep": 953.0725
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2008,
+      "Camel": 28.6905,
+      "Cattle": 42.920500000000004,
+      "Goat": 993.3584999999999,
+      "Horse": 92.7925,
+      "Sheep": 926.6745
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2009,
+      "Camel": 29.4255,
+      "Cattle": 42.5155,
+      "Goat": 1045.6725,
+      "Horse": 90.7475,
+      "Sheep": 982.5464999999999
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2010,
+      "Camel": 27.6295,
+      "Cattle": 27.3535,
+      "Goat": 501.8285,
+      "Horse": 60.060500000000005,
+      "Sheep": 538.4845
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2011,
+      "Camel": 28.4355,
+      "Cattle": 29.7985,
+      "Goat": 633.5765,
+      "Horse": 68.4615,
+      "Sheep": 632.2605
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2012,
+      "Camel": 31.747500000000002,
+      "Cattle": 36.3435,
+      "Goat": 782.3885,
+      "Horse": 80.7485,
+      "Sheep": 784.5655
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2013,
+      "Camel": 33.6685,
+      "Cattle": 44.3655,
+      "Goat": 937.2115,
+      "Horse": 93.7525,
+      "Sheep": 931.1105
+    },
+    {
+      "Aimag": "Dundgovi",
+      "Year": 2014,
+      "Camel": 36.7995,
+      "Cattle": 54.6955,
+      "Goat": 1150.5595,
+      "Horse": 113.9145,
+      "Sheep": 1123.6175
+    }
+  ],
+  "Orhon": [
+    {
+      "Aimag": "Orhon",
+      "Year": 2002,
+      "Camel": 17.657,
+      "Cattle": 38.141000000000005,
+      "Goat": 71.168,
+      "Horse": 29.172,
+      "Sheep": 91.274
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2003,
+      "Camel": 17.650000000000002,
+      "Cattle": 29.465000000000003,
+      "Goat": 62.867000000000004,
+      "Horse": 25.311,
+      "Sheep": 60.334
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2004,
+      "Camel": 26.3975,
+      "Cattle": 28.957,
+      "Goat": 66.355,
+      "Horse": 27.258000000000003,
+      "Sheep": 62.702000000000005
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2005,
+      "Camel": 26.392500000000002,
+      "Cattle": 30.778000000000002,
+      "Goat": 77.918,
+      "Horse": 25.337000000000003,
+      "Sheep": 73.32900000000001
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2006,
+      "Camel": 26.427500000000002,
+      "Cattle": 33.044,
+      "Goat": 95.364,
+      "Horse": 26.717,
+      "Sheep": 89.34
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2007,
+      "Camel": 26.419500000000003,
+      "Cattle": 35.82,
+      "Goat": 111.001,
+      "Horse": 28.067,
+      "Sheep": 105.13000000000001
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2008,
+      "Camel": 17.712,
+      "Cattle": 38.669000000000004,
+      "Goat": 142.845,
+      "Horse": 28.846000000000004,
+      "Sheep": 128.524
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2009,
+      "Camel": 17.705000000000002,
+      "Cattle": 39.391000000000005,
+      "Goat": 128.494,
+      "Horse": 28.968000000000004,
+      "Sheep": 129.315
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2010,
+      "Camel": 17.721,
+      "Cattle": 35.306,
+      "Goat": 84.986,
+      "Horse": 28.252000000000002,
+      "Sheep": 90.629
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2011,
+      "Camel": 26.4765,
+      "Cattle": 36.343,
+      "Goat": 86.49000000000001,
+      "Horse": 29.314,
+      "Sheep": 86.177
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2012,
+      "Camel": 17.720000000000002,
+      "Cattle": 38.085,
+      "Goat": 89.357,
+      "Horse": 29.305000000000003,
+      "Sheep": 97.738
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2013,
+      "Camel": 17.684,
+      "Cattle": 39.168,
+      "Goat": 83.28800000000001,
+      "Horse": 29.108,
+      "Sheep": 97.40299999999999
+    },
+    {
+      "Aimag": "Orhon",
+      "Year": 2014,
+      "Camel": 17.592000000000002,
+      "Cattle": 29.379,
+      "Goat": 49.122,
+      "Horse": 23.664,
+      "Sheep": 50.084
+    }
+  ],
+  "Suhbaatar": [
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2002,
+      "Camel": 29.959000000000003,
+      "Cattle": 157.892,
+      "Goat": 481.038,
+      "Horse": 206.375,
+      "Sheep": 728.5
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2003,
+      "Camel": 30.477,
+      "Cattle": 168.869,
+      "Goat": 558.737,
+      "Horse": 212.231,
+      "Sheep": 740.065
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2004,
+      "Camel": 30.121000000000002,
+      "Cattle": 155.973,
+      "Goat": 554.664,
+      "Horse": 203.01500000000001,
+      "Sheep": 723.9060000000001
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2005,
+      "Camel": 29.346,
+      "Cattle": 142.836,
+      "Goat": 529.83,
+      "Horse": 195.254,
+      "Sheep": 713.5310000000001
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2006,
+      "Camel": 28.788000000000004,
+      "Cattle": 146.116,
+      "Goat": 584.69,
+      "Horse": 193.882,
+      "Sheep": 768.375
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2007,
+      "Camel": 28.367,
+      "Cattle": 142.097,
+      "Goat": 649.0740000000001,
+      "Horse": 183.553,
+      "Sheep": 793.797
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2008,
+      "Camel": 27.161,
+      "Cattle": 115.299,
+      "Goat": 600.754,
+      "Horse": 136.31900000000002,
+      "Sheep": 750.663
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2009,
+      "Camel": 27.683000000000003,
+      "Cattle": 127.664,
+      "Goat": 701.827,
+      "Horse": 149.047,
+      "Sheep": 871.209
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2010,
+      "Camel": 28.406000000000002,
+      "Cattle": 145.499,
+      "Goat": 749.191,
+      "Horse": 165.628,
+      "Sheep": 978.762
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2011,
+      "Camel": 28.217000000000002,
+      "Cattle": 154.193,
+      "Goat": 794.77,
+      "Horse": 182.405,
+      "Sheep": 1009.514
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2012,
+      "Camel": 27.291000000000004,
+      "Cattle": 168.671,
+      "Goat": 862.836,
+      "Horse": 201.108,
+      "Sheep": 1108.37
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2013,
+      "Camel": 26.442,
+      "Cattle": 189.572,
+      "Goat": 908.353,
+      "Horse": 220.589,
+      "Sheep": 1234.162
+    },
+    {
+      "Aimag": "Suhbaatar",
+      "Year": 2014,
+      "Camel": 26.110000000000003,
+      "Cattle": 213.432,
+      "Goat": 1019.227,
+      "Horse": 248.787,
+      "Sheep": 1398.32
+    }
+  ]
+}
