@@ -12,7 +12,7 @@ const cors = require("cors");
 const app = express();
 
 function createServer() {
-  // const routes = require("./routes")();
+  const routes = require("./routes");
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,7 +21,7 @@ function createServer() {
   app.use(express.static(path.resolve("..", "client", "build")));
 
   // /**** Add routes ****/
-  // app.use("/api", routes);
+  app.use("/api", routes);
 
   // "Redirect" all non-API GET requests to React's entry point (index.html)
   app.get("*", (req: Express.Request, res: Express.Response) =>

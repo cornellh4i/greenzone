@@ -1,6 +1,8 @@
 const appName = "Server API";
 const port = process.env.PORT || 8080;
 const serverInit = require("./server");
+const importHexagon = require("./importHexagon");
+
 const server = serverInit();
 // get driver connection
 const dbo = require("./db/conn");
