@@ -5,10 +5,10 @@ Early Warning platform to visualise rangeland health for herders in Mongolia
 
 ### Built With
 
-* ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-* [![Next][Next.js]][Next-url]
-* ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
-* ![D3](https://img.shields.io/badge/D3-%234ea94b.svg?style=for-the-badge&logo=d3&logoColor=orange)
+* ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=green)
+* [![Next.js](https://img.shields.io/badge/next-%234ea94b.svg?style=for-the-badge&logo=next&logoColor=green)
+* ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94c.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+* ![D3](https://img.shields.io/badge/D3-%234ea94b.svg?style=for-the-badge&logo=D3&logoColor=orange)
 * ![Leaflet](https://img.shields.io/badge/Leaflet-%234ea94b.svg?style=for-the-badge&logo=leaflet&logoColor=blue)
 
 ### Application
@@ -21,7 +21,8 @@ The Hack4Impact team at Cornell aims to help GreenZone by **designing & developi
 
 ### Project Structure
 
-> Folder structure 
+> Folder structure
+ 
     .
     ├── frontend      # Next.js App Router (leveraging server and client sided environments)
     ├── backend       # Express.js App Server
