@@ -12,7 +12,7 @@ const cors = require("cors");
 const app = express();
 
 function createServer() {
-  // const routes = require("./routes")();
+  // const routes = require("./routes");
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
