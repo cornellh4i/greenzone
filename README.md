@@ -32,7 +32,7 @@ These visualizations will provide the most up-to-date information about how heal
 ### Built With
 
 * ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=green)
-* [!Next.js](https://img.shields.io/badge/next-%232ea94b.svg?style=for-the-badge&logo=next&logoColor=green)
+* ![Next.js](https://img.shields.io/badge/next-%232ea94b.svg?style=for-the-badge&logo=next&logoColor=green)
 * ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94c.svg?style=for-the-badge&logo=mongodb&logoColor=white)
 * ![D3](https://img.shields.io/badge/D3-%231ea94b.svg?style=for-the-badge&logo=D3&logoColor=orange)
 * ![Leaflet](https://img.shields.io/badge/Leaflet-%234wa94b.svg?style=for-the-badge&logo=leaflet&logoColor=blue)
