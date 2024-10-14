@@ -1,38 +1,24 @@
-# web-template
+# GreenZone 
 
-An opinionated web application project template.
+Early Warning platform to visualise rangeland health for herders in Mongolia
+![Frame 1(5)](https://natureconservancy-h.assetsadobe.com/is/image/content/dam/tnc/nature/en/photos/mongolia/herder-khovd.jpg?crop=0%2C0%2C1500%2C937&wid=640&hei=400&scl=2.34375)
 
-![Frame 1(5)](https://github.com/jasozh/web-template/assets/48730262/62733269-c19d-4078-920f-d301af1c9593)
+### Built With
 
-## Getting started
+* ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+* [![Next][Next.js]][Next-url]
+* ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+* ![D3](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkMqCBa0BhMEDFzZOr_9yQVB1Vecm7QgTTrg&s)
+* ![Leaflet](https://camo.githubusercontent.com/21bde99de8822cfb3badba8e8fdf5e62630d2d14a2195edf0d7d542c0c4754cf/68747470733a2f2f7261776769742e636f6d2f4c6561666c65742f4c6561666c65742f6d61696e2f7372632f696d616765732f6c6f676f2e737667)
 
-### Install Docker
 
-- [Install Docker Desktop for macOS](https://docs.docker.com/desktop/install/mac-install/)
-- [Install Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+### Project Structure
 
-### Install Dev Containers
+> Folder structure 
 
-In VS Code, install the **Dev Containers** extension.
+    .
+    ├── frontend      # Next.js App Router (leveraging server and client sided environments)
+    ├── backend       # Express.js App Server
+    └── README.md
+  
 
-### Build container
-
-1. Clone the GitHub repo.
-2. Open the folder in VS Code.
-3. A button should appear in the bottom right corner asking to reopen the folder in a Dev Container. Click **Yes**.
-
-## CI/CD
-
-The repository is configured with automatic monthly updates using Dependabot and automatic build testing before each pull request. The CI/CD pipeline consists of the following workflows:
-
-- `pull_request.yml` runs a sanity check on every opened pull request to make sure the app still builds. NOTE: the frontend requires a proper Firebase connection to build correctly. Copy the contents of `frontend/.env.local` to the `FRONTEND_ENV` GitHub Actions secret and Dependabot secret. During the build step, a `.env.production` file is created with this secret. Keep in mind that `.env.local` must be copied to both locations since Dependabot does not have access to secrets from GitHub Actions.
-- `dependabot.yml` automatically updates dependencies on a monthly basis. Major updates have individual pull requests while all minor and patch updates are grouped together.
-- `dependabot_auto_merge.yml` automatically merges pull requests by Dependabot if it passes the sanity check.
-
-The following GitHub settings are enabled:
-
-- **General > Allow auto-merge**
-- **Branches > Branch protection > Require status checks to pass before merging (pull_request_build)**
-
-So I have realised you need to open in Dev Containers and then run
-`yarn install` for the computer to recognise or build the package.json, now I haven't figured out as yet how that will work for the python package.
