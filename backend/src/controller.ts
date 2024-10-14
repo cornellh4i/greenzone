@@ -3,9 +3,12 @@ const Hexagon = require("./models/Hexagon");
 
 // POST /hexagons - Create and save hexagons from GeoJSON data
 const createHexagons = async (req: any, res: any) => {
+  console.log("HEYYYYYYYYY");
   try {
-    const { feature } = req.body; // Extract GeoJSON features
-
+    console.log(req);
+    console.log("HEYYYYYYYYY");
+    const feature = req.body; // Extract GeoJSON features
+    console.log(feature);
     // Iterate through each feature and save to database
     const hexagons = {
       geometry: feature.geometry,
