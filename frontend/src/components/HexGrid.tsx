@@ -66,7 +66,8 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
 
     const colorScale = d3
       .scaleSequential(d3.interpolateBlues)
-      .domain([0, d3.max(hexData, (d) => d.length)]);
+      // d3.max can be undefined (ex: no points) so we need 1 to make sure that the function will still be valid
+      .domain([0, d3.max(hexData, (d) => d.length) || 1]);
 
     // Draw hexagons
     svg
@@ -82,7 +83,7 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
       .attr("stroke-width", 0.5);
   }, [geoData, width, height, radius]);
 
-  return <svg ref={svgRef}></svg>;
+  return <svg ref={svgRef} />;
 };
 
 export default HexbinGrid;
