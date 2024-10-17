@@ -1,4 +1,4 @@
-import { Mongolia, Provinces } from "@/pages/about";
+import { Mongolia, Provinces } from "@/utils/interfaces";
 import { Props } from "@/components/charts/groupedbarchart";
 import { Prop } from "@/components/charts/scatter-line-plot";
 
