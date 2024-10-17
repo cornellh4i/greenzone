@@ -1,5 +1,5 @@
 
-export type Province = {
+interface Province {
   Aimag: string;
   Year: number;
   Camel: number;
