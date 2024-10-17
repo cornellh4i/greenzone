@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { hexbin } from "d3-hexbin";
 import * as d3Geo from "d3-geo";
-import GeoJSON from "geojson";
+import { GeoJSON, FeatureCollection, GeoJsonObject } from "geojson";
 
 type Params = {
   geoData: GeoJSON.GeoJSON;
@@ -12,7 +12,9 @@ type Params = {
 };
 
 const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
-  const svgRef = useRef();
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  // cast it as a feature collection
+  geoData = geoData as FeatureCollection;
 
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
@@ -39,7 +41,7 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
         (bounds[1][0] - bounds[0][0]) / width,
         (bounds[1][1] - bounds[0][1]) / height
       );
-    const translate = [
+    const translate: [number, number] = [
       (width - scale * (bounds[1][0] + bounds[0][0])) / 2,
       (height - scale * (bounds[1][1] + bounds[0][1])) / 2,
     ];
@@ -47,7 +49,7 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
     projection.scale(scale).translate(translate);
 
     // Convert GeoJSON to points using centroids of each feature
-    const points = geoData.features.map((feature) => {
+    const points: [number, number][] = geoData.features.map((feature) => {
       const [x, y] = path.centroid(feature);
       return [x, y];
     });
