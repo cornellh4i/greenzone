@@ -1,27 +1,28 @@
-import React, { useRef, useState, useEffect } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import React, { useRef } from "react";
+import { MapContainer, TileLayer, Pane } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import HexbinGrid from "@/components/HexGrid";
-import { GeoJSON, FeatureCollection, GeoJsonObject } from "geojson";
+// import { GeoJSON } from "geojson";
 
 const SimpleMap = () => {
   console.log("hello");
   const mapRef = useRef(null);
+
   // location of Mongolia
   const latitude = 46.8625;
   const longitude = 103.8467;
 
   // // try to the get the geojson data
-  const [geojsonData, setGeojsonData] = useState(null);
-  useEffect(() => {
-    fetch("frontend/src/components/charts/data/green_zone_hex_map.geojson")
-      .then((response) => response.json())
-      .then((data) => setGeojsonData(data))
-      .catch((error) => console.error("Error fetching GeoJSON:", error));
-  }, []);
+  // const [geojsonData, setGeojsonData] = useState(null);
+  // useEffect(() => {
+  //   fetch("frontend/src/components/charts/data/green_zone_hex_map.geojson")
+  //     .then((response) => response.json())
+  //     .then((data) => setGeojsonData(data))
+  //     .catch((error) => console.error("Error fetching GeoJSON:", error));
+  // }, []);
 
   // this is a test
-  let dataTest: GeoJSON.GeoJSON = {
+  const dataTest: GeoJSON.GeoJSON = {
     type: "FeatureCollection",
     features: [
       {
@@ -67,13 +68,15 @@ const SimpleMap = () => {
         attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?name=en"
       />
-      <HexbinGrid
-        geoData={dataTest}
-        width={3000}
-        height={3000}
-        radius={10000}
-      />
-      {/* <HexbinLayer data={geojsonData} /> */}
+      {/* We use a pane here since it acts like the z-index. Resource linked here: https://leafletjs.com/examples/map-panes/*/}
+      <Pane name="hexbinPane">
+        <HexbinGrid
+          geoData={dataTest}
+          width={3000}
+          height={3000}
+          radius={100}
+        />
+      </Pane>
       {/* <GeoJSON
         data={greenZoneData}
         style={() => ({

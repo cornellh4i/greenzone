@@ -2,16 +2,25 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { hexbin } from "d3-hexbin";
 import * as d3Geo from "d3-geo";
-import { GeoJSON, FeatureCollection, GeoJsonObject } from "geojson";
+import { GeoJSON, FeatureCollection } from "geojson";
 
 type Params = {
   geoData: GeoJSON.GeoJSON;
   width: number;
   height: number;
   radius: number;
+  // xCenter: number;
+  // yCenter: number;
 };
 
-const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
+const HexbinGrid = ({
+  geoData,
+  width,
+  height,
+  radius,
+}: // xCenter,
+// yCenter,
+Params) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   // cast it as a feature collection
   geoData = geoData as FeatureCollection;
@@ -27,7 +36,7 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
     // Set up projection to match your GeoJSON coordinate system (UTM Zone 46N here)
     const projection = d3Geo
       .geoTransverseMercator()
-      .center([84, 27.5]) // Adjust as needed for your data's region
+      .center([0, 0]) // Adjust as needed for your data's region
       .scale(1)
       .translate([0, 0]);
 
@@ -77,7 +86,7 @@ const HexbinGrid = ({ geoData, width, height, radius }: Params) => {
       .enter()
       .append("path")
       .attr("d", hexbinGenerator.hexagon())
-      .attr("transform", (d) => `translate(${d.x}, ${d.y})`)
+      .attr("transform", (d) => `translate(${d.x + 200}, ${d.y + 100})`)
       .attr("fill", (d) => colorScale(d.length))
       .attr("stroke", "#000")
       .attr("stroke-width", 0.5);

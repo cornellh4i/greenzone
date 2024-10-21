@@ -1,5 +1,4 @@
 import React from "react";
-import Button from "@/components/Button";
 import SimpleMap from "@/components/MapWrapper";
 /** An About page */
 /*const About = () => {
@@ -15,12 +14,7 @@ export default About;*/
 /** An About page */
 const About = () => {
   console.log("about!");
-
-  return (
-    <>
-      <SimpleMap />
-    </>
-  );
+  return <>{<SimpleMap />}</>;
 };
 
 export default About;
