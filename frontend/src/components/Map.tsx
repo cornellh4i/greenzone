@@ -70,12 +70,7 @@ const SimpleMap = () => {
       />
       {/* We use a pane here since it acts like the z-index. Resource linked here: https://leafletjs.com/examples/map-panes/*/}
       <Pane name="hexbinPane">
-        <HexbinGrid
-          geoData={dataTest}
-          width={3000}
-          height={3000}
-          radius={100}
-        />
+        <HexbinGrid geoData={dataTest} width={3000} height={3000} radius={10} />
       </Pane>
       {/* <GeoJSON
         data={greenZoneData}

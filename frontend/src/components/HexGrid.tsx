@@ -45,7 +45,7 @@ Params) => {
     // Calculate bounds and scale for fitting the data within SVG
     const bounds = path.bounds(geoData);
     const scale =
-      0.95 /
+      1.95 /
       Math.max(
         (bounds[1][0] - bounds[0][0]) / width,
         (bounds[1][1] - bounds[0][1]) / height
@@ -86,7 +86,7 @@ Params) => {
       .enter()
       .append("path")
       .attr("d", hexbinGenerator.hexagon())
-      .attr("transform", (d) => `translate(${d.x + 200}, ${d.y + 100})`)
+      .attr("transform", (d) => `translate(${d.x - 20}, ${d.x - 20})`)
       .attr("fill", (d) => colorScale(d.length))
       .attr("stroke", "#000")
       .attr("stroke-width", 0.5);
