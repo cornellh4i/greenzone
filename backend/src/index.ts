@@ -1,13 +1,16 @@
-const appName = "Server API";
+import express from "express";
+import connectToServer from "./db/conn";
+import hexagonRoutes from "./routes";
+
+const app = express();
 const port = process.env.PORT || 8080;
-const serverInit = require("./server");
-const server = serverInit();
-// get driver connection
-const dbo = require("./db/conn");
-server.listen(port, () => {
-  // perform a database connection when server starts
-  dbo.connectToServer(function (err: Error) {
-    if (err) console.error(err);
-  });
-  console.log(`${appName} running on port ${port}!`);
+
+app.use(express.json());
+app.use("/api", hexagonRoutes);
+
+app.listen(port, () => {
+    connectToServer((err) => {
+        if (err) console.error(err);
+    });
+    console.log(`Server running on port ${port}!`);
 });
