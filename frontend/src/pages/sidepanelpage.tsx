@@ -1,16 +1,14 @@
 import React from "react";
 import SidePanel from "@/components/organisms/SidePanel";
 
-
-
 /** An About page */
 
-const About = () => {
-
-
+const SidePanelPage = () => {
   return (
-    <></>
+    <div>
+      <SidePanel></SidePanel>
+    </div>
   );
 };
 
-export default About;
+export default SidePanelPage;
