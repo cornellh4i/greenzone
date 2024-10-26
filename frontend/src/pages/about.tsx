@@ -11,6 +11,8 @@ import { useState } from "react";
 import SidePanel from "@/components/organisms/SidePanel";
 import BarChart from "@/components/charts/barchart";
 
+import NavBar from "../components/molecules/NavBar";
+
 /** An About page */
 const About = () => {
   interface Province {
@@ -207,6 +209,7 @@ const About = () => {
 
   return (
     <div>
+      <NavBar />
       <Button onClick={handlePanelToggle} label="Toggle SidePanel" />
       <SidePanel isOpen={isPanelOpen} onClose={handlePanelToggle}>
         <div style={{ display: "flex", alignItems: "center" }}>
