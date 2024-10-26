@@ -1,88 +1,68 @@
-import React, { useRef } from "react";
-import { MapContainer, TileLayer, Pane } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import HexbinGrid from "@/components/HexGrid";
-// import { GeoJSON } from "geojson";
+// Map.tsx
+import React, { useState, useEffect } from "react";
+import { Map } from "react-map-gl/maplibre";
+import { PolygonLayer } from "deck.gl";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import * as d3 from "d3";
+import * as d3Geo from "d3-geo";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-const SimpleMap = () => {
-  console.log("hello");
-  const mapRef = useRef(null);
+const INITIAL_VIEW_STATE = {
+  latitude: 37.8,
+  longitude: -96,
+  zoom: 4,
+  bearing: 0,
+  pitch: 0,
+};
 
-  // location of Mongolia
-  const latitude = 46.8625;
-  const longitude = 103.8467;
+const MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-  // // try to the get the geojson data
-  // const [geojsonData, setGeojsonData] = useState(null);
-  // useEffect(() => {
-  //   fetch("frontend/src/components/charts/data/green_zone_hex_map.geojson")
-  //     .then((response) => response.json())
-  //     .then((data) => setGeojsonData(data))
-  //     .catch((error) => console.error("Error fetching GeoJSON:", error));
-  // }, []);
+const MapComponent = () => {
+  const [hexagons, setHexagons] = useState([]);
 
-  // this is a test
-  const dataTest: GeoJSON.GeoJSON = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {
-          grid_id: 19,
-          grid_area: 58030217.764913522,
-          aid: 82,
-          sid: 7,
-          asid: 8207,
-          soum_utm_crs: 32646,
-          attribute_1: 0.5986584841970366,
-          area_km2: 5842.9575386325523,
-          livestock: 8270,
-          herders: 24,
-        },
-        geometry: {
-          type: "Polygon",
-          coordinates: [
-            [
-              [595731.121438624104485, 5187583.217247241176665],
-              [600457.202397706802003, 5187583.217247241176665],
-              [602820.24287724820897, 5191676.123418148607016],
-              [600457.202397706802003, 5195769.029589056037366],
-              [595731.121438624104485, 5195769.029589056037366],
-              [593368.080959082697518, 5191676.123418148607016],
-              [595731.121438624104485, 5187583.217247241176665],
-            ],
-          ],
-        },
-      },
-    ],
+  useEffect(() => {
+    d3.json(
+      "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/us_states_hexgrid.geojson.json"
+    ).then((geojsonData) => {
+      const projection = d3Geo.geoMercator();
+
+      const deckHexProj = geojsonData.features.map((feature) => {
+        const projectedPolygon =
+          feature.geometry.coordinates[0].map(projection);
+        const invertedPolygon = projectedPolygon.map(projection.invert);
+        return { vertices: invertedPolygon };
+      });
+      setHexagons(deckHexProj);
+    });
+  }, []);
+
+  const hexagonLayer = new PolygonLayer({
+    id: "d3-hexagon-layer",
+    data: hexagons,
+    getPolygon: (d) => d.vertices,
+    stroked: true,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [0, 150, 136, 180],
+    lineWidthMinPixels: 1,
+    autoHighlight: true,
+  });
+
+  const handleMapLoad = (event) => {
+    const map = event.target;
+    const overlay = new MapboxOverlay({ layers: [hexagonLayer] });
+    map.addControl(overlay);
   };
 
   return (
-    <MapContainer
-      center={[latitude, longitude]}
-      zoom={5.5}
-      ref={mapRef}
-      style={{ height: "100vh", width: "100vw" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?name=en"
-      />
-      {/* We use a pane here since it acts like the z-index. Resource linked here: https://leafletjs.com/examples/map-panes/*/}
-      <Pane name="hexbinPane">
-        <HexbinGrid geoData={dataTest} width={3000} height={3000} radius={10} />
-      </Pane>
-      {/* <GeoJSON
-        data={greenZoneData}
-        style={() => ({
-          color: "#3388ff", // Border color of polygons
-          weight: 1, // Border thickness
-          fillColor: "#cb1dd1", // Fill color of polygons
-          fillOpacity: 0.5, // Transparency of polygons
-        })}
-      /> */}
-    </MapContainer>
+    <Map
+      initialViewState={INITIAL_VIEW_STATE}
+      mapStyle={MAP_STYLE}
+      style={{ width: "100vw", height: "100vh" }}
+      onLoad={handleMapLoad}
+    />
   );
 };
 
-export default SimpleMap;
+export default MapComponent;
