@@ -51,4 +51,5 @@ const hexagonSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("Hexagon", hexagonSchema);
+const HexagonModel = module.exports = mongoose.model("Hexagon", hexagonSchema);
+export default HexagonModel;
