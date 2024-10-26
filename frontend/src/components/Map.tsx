@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { MapContainer, TileLayer, Pane } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import HexbinGrid from "@/components/HexGrid";
-// import { GeoJSON } from "geojson";
+import "@/components/charts/data/green_zone_hex_map.json";
 
 const SimpleMap = () => {
   console.log("hello");
@@ -12,14 +12,28 @@ const SimpleMap = () => {
   const latitude = 46.8625;
   const longitude = 103.8467;
 
-  // // try to the get the geojson data
-  // const [geojsonData, setGeojsonData] = useState(null);
-  // useEffect(() => {
-  //   fetch("frontend/src/components/charts/data/green_zone_hex_map.geojson")
-  //     .then((response) => response.json())
-  //     .then((data) => setGeojsonData(data))
-  //     .catch((error) => console.error("Error fetching GeoJSON:", error));
-  // }, []);
+  // try to the get the geojson data
+  const [geojsonData, setGeojsonData] = useState(null);
+  useEffect(() => {
+    const fetchGeoJSON = async () => {
+      try {
+        const geoData = await import(
+          "@/components/charts/data/green_zone_hex_map.json"
+        ); // Adjust path as needed
+        console.log("hi");
+        console.log(geoData);
+        setGeojsonData(geoData);
+      } catch (error) {
+        console.error("Error fetching GeoJSON data:", error);
+      }
+    };
+
+    fetchGeoJSON();
+  }, []);
+
+  // console.log("hi");
+  // console.log(geojsonData);
+  // console.log("hi2");
 
   // this is a test
   const dataTest: GeoJSON.GeoJSON = {
