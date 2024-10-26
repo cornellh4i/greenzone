@@ -8,9 +8,9 @@ import * as d3Geo from "d3-geo";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const INITIAL_VIEW_STATE = {
-  latitude: 37.8,
-  longitude: -96,
-  zoom: 4,
+  latitude: 46.8625,
+  longitude: 103.8467,
+  zoom: 5.5,
   bearing: 0,
   pitch: 0,
 };
@@ -22,12 +22,14 @@ const MapComponent = () => {
   const [hexagons, setHexagons] = useState([]);
 
   useEffect(() => {
-    d3.json(
+    console.log("hi");
+    d3.json<any>(
       "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/us_states_hexgrid.geojson.json"
+      // "frontend/src/components/charts/data/green_zone_hex_map.geojson.json"
     ).then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
-      const deckHexProj = geojsonData.features.map((feature) => {
+      const deckHexProj = geojsonData.features.map((feature: any) => {
         const projectedPolygon =
           feature.geometry.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
@@ -49,7 +51,7 @@ const MapComponent = () => {
     autoHighlight: true,
   });
 
-  const handleMapLoad = (event) => {
+  const handleMapLoad = (event: any) => {
     const map = event.target;
     const overlay = new MapboxOverlay({ layers: [hexagonLayer] });
     map.addControl(overlay);
