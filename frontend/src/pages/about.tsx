@@ -3,13 +3,17 @@ import SidePanel from "@/components/organisms/SidePanel";
 
 
 
+
+
 /** An About page */
 
 const About = () => {
 
 
   return (
+
     <></>
+
   );
 };
 
