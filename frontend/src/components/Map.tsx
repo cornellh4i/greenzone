@@ -23,7 +23,6 @@ const MapComponent = () => {
   const [hexagons, setHexagons] = useState([]);
 
   useEffect(() => {
-    console.log(process.cwd());
     d3.json<any>(
       "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/us_states_hexgrid.geojson.json"
       // "frontend/src/components/charts/data/green_zone_hex_map.geojson.json"
