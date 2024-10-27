@@ -1,4 +1,3 @@
-// this is the converted geojson data from EPSG:32646 to WGS84 coordinates
 {
   "type": "FeatureCollection",
   "name": "test_output",
