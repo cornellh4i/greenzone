@@ -6,7 +6,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3 from "d3";
 import * as d3Geo from "d3-geo";
 import "maplibre-gl/dist/maplibre-gl.css";
-import geoData from "@/components/charts/data/convertedData.json";
+//import geoData from "@/components/charts/data/convertedData.json";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -28,7 +28,7 @@ const MapComponent = () => {
       // "frontend/src/components/charts/data/green_zone_hex_map.geojson.json"
       // "/workspaces/greenzone/frontend/src/components/charts/data/convertedData.json"
     ).then((geojsonData) => {
-      geojsonData = geoData;
+      //geojsonData = geoData;
       const projection = d3Geo.geoMercator();
 
       const deckHexProj = geojsonData.features.map((feature: any) => {
