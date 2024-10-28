@@ -1,28 +1,16 @@
-import wss from "./utils/websocket";
-import app from "./utils/server";
+import express from "express";
+import connectToServer from "./db/conn";
+import hexagonRoutes from "./routes";
 
-// Express server
-const server = app.listen(process.env.PORT || 8000);
+const app = express();
+const port = process.env.PORT || 8080;
 
-server.on("listening", () => {
-  console.log("✅ Server is up and running at http://localhost:8000");
-});
+app.use(express.json());
+app.use("/api", hexagonRoutes);
 
-server.on("error", (error) => {
-  console.log("❌ Server failed to start due to error: %s", error);
-});
-
-// WebSocket server
-wss.on("connection", (ws) => {
-  // Error handling
-  ws.on("error", console.error);
-
-  // What happens when the server receives data
-  ws.on("message", (data) => {
-    console.log("received: %s", data);
-    ws.send("server received your message!");
-  });
-
-  // Default message to send when connected
-  ws.send("something");
+app.listen(port, () => {
+    connectToServer((err) => {
+        if (err) console.error(err);
+    });
+    console.log(`Server running on port ${port}!`);
 });

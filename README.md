@@ -1,38 +1,50 @@
-# web-template
+### GreenZone 
 
-An opinionated web application project template.
+Early Warning platform to visualise rangeland health for herders in Mongolia
+![Frame 1(5)](https://borgenproject.org/wp-content/uploads/Nomads-in-Mongolia-1030x686.jpg)
 
-![Frame 1(5)](https://github.com/jasozh/web-template/assets/48730262/62733269-c19d-4078-920f-d301af1c9593)
+### What is GreenZone?
+Knowledge of where the next major rangeland degradation will occur is crucial to the herders and policymakers that depend on this information. GreenZone aims to create a Carrying Capacity Early Warning System for Mongolian rangelands to combat degradation caused by overgrazing and climate change. 
 
-## Getting started
+### What is this Fancy Github Stuff? 
+The Hack4Impact team at Cornell aims to help GreenZone by **designing & developing a web-application** that will: 
+1. Collect and organize geoJSON map data from partners, ensuring **accurate** and up-to-date **information**.
+2. **Display** **data** as heat maps or graphs on an interactive map of Mongolia, with customizable layers based on user filters - Using Leaflet and D3
+3. **Optimize** the web app for reliable **performance** in **areas** with **limited** **internet** connectivity, to allow access for nomadic herders in remote locations. - Using Next.js
+4. Enable data persistence, allowing users to **view** **historical** **trends** in rangeland health over time. -Using MongoDB
 
-### Install Docker
 
-- [Install Docker Desktop for macOS](https://docs.docker.com/desktop/install/mac-install/)
-- [Install Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+### Why is this Project Useful?
+These visualizations will provide the most up-to-date information about how healthy the rangelands are. Herders, government officials, NGO officers, insurance risk analysts, and data analysts will use this information to make informed decisions regarding rangeland management and how to prevent overexploitation (overgrazing & desertification). This will make this data more easily accessible to the public.
 
-### Install Dev Containers
+### How to get Started with Project
+1. Git clone the repo
+2. Yarn Build && Yarn run dev to get started
 
-In VS Code, install the **Dev Containers** extension.
+### Project Structure
+> Folder structure
+ 
+    .
+    ├── frontend      # Next.js App Router (leveraging server and client sided environments)
+    ├── backend       # Express.js App Server
+    └── README.md
 
-### Build container
+### Built With
 
-1. Clone the GitHub repo.
-2. Open the folder in VS Code.
-3. A button should appear in the bottom right corner asking to reopen the folder in a Dev Container. Click **Yes**.
+* ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=green)
+* ![Next.js](https://img.shields.io/badge/next-%232ea94b.svg?style=for-the-badge&logo=next&logoColor=green)
+* ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94c.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+* ![D3](https://img.shields.io/badge/D3-%231ea94b.svg?style=for-the-badge&logo=D3&logoColor=orange)
+* ![Leaflet](https://img.shields.io/badge/Leaflet-%234wa94b.svg?style=for-the-badge&logo=leaflet&logoColor=blue)
 
-## CI/CD
+### Built By:
 
-The repository is configured with automatic monthly updates using Dependabot and automatic build testing before each pull request. The CI/CD pipeline consists of the following workflows:
-
-- `pull_request.yml` runs a sanity check on every opened pull request to make sure the app still builds. NOTE: the frontend requires a proper Firebase connection to build correctly. Copy the contents of `frontend/.env.local` to the `FRONTEND_ENV` GitHub Actions secret and Dependabot secret. During the build step, a `.env.production` file is created with this secret. Keep in mind that `.env.local` must be copied to both locations since Dependabot does not have access to secrets from GitHub Actions.
-- `dependabot.yml` automatically updates dependencies on a monthly basis. Major updates have individual pull requests while all minor and patch updates are grouped together.
-- `dependabot_auto_merge.yml` automatically merges pull requests by Dependabot if it passes the sanity check.
-
-The following GitHub settings are enabled:
-
-- **General > Allow auto-merge**
-- **Branches > Branch protection > Require status checks to pass before merging (pull_request_build)**
-
-So I have realised you need to open in Dev Containers and then run
-`yarn install` for the computer to recognise or build the package.json, now I haven't figured out as yet how that will work for the python package.
+* Selena Zheng
+* Sneha Rajaraman
+* Ella Keen Allee
+* Bella Besuud
+* Brianna Liu
+* Sonia Mar
+* Srija Ghosh
+* Tanya Aravind
+* Daniel Thorne
