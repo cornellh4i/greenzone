@@ -1,20 +1,20 @@
 import React from "react";
-import SidePanel from "@/components/organisms/SidePanel";
+import SimpleMap from "@/components/MapWrapper";
+/** An About page */
+/*const About = () => {
+  return <>Hello there</>;
+};
 
+export default About;*/
 
-
-
+// // Uncomment for Button Onboarding
+// import React from "react";
+// import Button from "@/components/Button";
 
 /** An About page */
-
 const About = () => {
-
-
-  return (
-
-    <></>
-
-  );
+  console.log("about!");
+  return <>{<SimpleMap />}</>;
 };
 
 export default About;

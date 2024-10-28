@@ -1,0 +1,75 @@
+// Map.tsx
+import React, { useState, useEffect } from "react";
+import { Map } from "react-map-gl/maplibre";
+import { PolygonLayer } from "deck.gl";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import * as d3 from "d3";
+import * as d3Geo from "d3-geo";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+const INITIAL_VIEW_STATE = {
+  latitude: 46.8625,
+  longitude: 103.8467,
+  zoom: 5.5,
+  bearing: 0,
+  pitch: 0,
+};
+
+interface Hexagon {
+  vertices: [number, number][];
+}
+
+const MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+
+const MapComponent = () => {
+  const [hexagons, setHexagons] = useState<Hexagon[]>([]);
+
+  const loadGeoData = async () => {
+    const geoData = await import("@/components/charts/data/convertedData.json"); // this is the converted geojson data from EPSG:32646 to WGS84 coordinates
+    return geoData;
+  };
+
+  useEffect(() => {
+    loadGeoData().then((geojsonData) => {
+      const projection = d3Geo.geoMercator();
+
+      const deckHexProj = geojsonData.features.map((feature: any) => {
+        const projectedPolygon =
+          feature.geometry.coordinates[0].map(projection);
+        const invertedPolygon = projectedPolygon.map(projection.invert);
+        return { vertices: invertedPolygon };
+      });
+      setHexagons(deckHexProj);
+    });
+  }, []);
+
+  const hexagonLayer = new PolygonLayer({
+    id: "d3-hexagon-layer",
+    data: hexagons,
+    getPolygon: (d) => d.vertices,
+    stroked: true,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [0, 150, 136, 180],
+    lineWidthMinPixels: 1,
+    autoHighlight: true,
+  });
+
+  const handleMapLoad = (event: any) => {
+    const map = event.target;
+    const overlay = new MapboxOverlay({ layers: [hexagonLayer] });
+    map.addControl(overlay);
+  };
+
+  return (
+    <Map
+      initialViewState={INITIAL_VIEW_STATE}
+      mapStyle={MAP_STYLE}
+      style={{ width: "100vw", height: "100vh" }}
+      onLoad={handleMapLoad}
+    />
+  );
+};
+
+export default MapComponent;
