@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const hexagonSchema = new Schema({
+  grid_id: {
+    type: Number,
+    required: true,
+  },
   geometry: {
     type: {
       type: String,
@@ -51,5 +55,8 @@ const hexagonSchema = new Schema({
   },
 });
 
-const HexagonModel = module.exports = mongoose.model("Hexagon", hexagonSchema);
+const HexagonModel = (module.exports = mongoose.model(
+  "Hexagon",
+  hexagonSchema
+));
 export default HexagonModel;

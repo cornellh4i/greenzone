@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-// Province schema
 const provinceSchema = new Schema({
   aid: {
     type: Number,
@@ -23,18 +22,18 @@ const provinceSchema = new Schema({
     type: Number,
     required: true,
   },
-  province_number_of_herders: {
+  // province_number_of_herders: {
+  //   type: Number,
+  //   required: true,
+  // },
+  province_livestock_mortality_rate: {
     type: Number,
     required: true,
   },
-  province_livestock_mortality_rate: {
-    type: Number,
-    required: true, // Optional field for livestock mortality rate
-  },
-  province_population: {
-    type: Number,
-    required: true, // Optional population field
-  },
+  // province_population: {
+  //   type: Number,
+  //   required: true,
+  // },
 });
 
 const ProvinceModel = mongoose.model("Province", provinceSchema);
