@@ -22,18 +22,10 @@ const provinceSchema = new Schema({
     type: Number,
     required: true,
   },
-  // province_number_of_herders: {
-  //   type: Number,
-  //   required: true,
-  // },
   province_livestock_mortality_rate: {
     type: Number,
     required: true,
   },
-  // province_population: {
-  //   type: Number,
-  //   required: true,
-  // },
 });
 
 const ProvinceModel = mongoose.model("Province", provinceSchema);
