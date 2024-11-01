@@ -22,7 +22,7 @@ router.post("/province", createProvince);
 router.get("/province", getProvinces);
 
 // Route to update a province
-router.put("province/:province_id", updateProvince);
+router.put("/province/:province_id", updateProvince);
 
 // Route to create a new county
 router.post("/counties", createCounty);

@@ -42,7 +42,12 @@ export const updateProvince = async (
         runValidators: true,
       }
     );
-    res.status(200).json(province);
+
+    if (!province) {
+      res.status(404).json({ message: "Province not found" });
+    } else {
+      res.status(200).json(province);
+    }
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
