@@ -6,7 +6,12 @@ import {
   getProvinces,
   updateProvince,
 } from "./controller/Province";
-import { createCounty, getCounties } from "./controller/County";
+import {
+  createCounty,
+  deleteCounty,
+  getCounties,
+  updateCounty,
+} from "./controller/County";
 
 const router = express.Router();
 
@@ -29,9 +34,15 @@ router.put("/province/:province_id", updateProvince);
 router.delete("/province/:province_id", deleteProvince);
 
 // Route to create a new county
-router.post("/counties", createCounty);
+router.post("/county", createCounty);
 
 // Route to get all counties
-router.get("/counties", getCounties);
+router.get("/county", getCounties);
+
+// Route to update a county
+router.put("/county/:county_id", updateCounty);
+
+// Route to delete a county
+router.delete("/county/:county_id", deleteCounty);
 
 export default router;
