@@ -1,7 +1,22 @@
 import express from "express";
-import { createHexagon, getHexagons, updateHexagon, deleteHexagon } from "./controller/Hexagon";
-import { createProvince, deleteProvince, getProvinces, updateProvince } from "./controller/Province";
-import { createCounty, deleteCounty, getCounties, updateCounty } from "./controller/County";
+import {
+  createHexagon,
+  getHexagons,
+  updateHexagon,
+  deleteHexagon,
+} from "./controller/Hexagon";
+import {
+  createProvince,
+  deleteProvince,
+  getProvinces,
+  updateProvince,
+} from "./controller/Province";
+import {
+  createCounty,
+  deleteCounty,
+  getCounties,
+  updateCounty,
+} from "./controller/County";
 
 const router = express.Router();
 
@@ -12,10 +27,10 @@ router.post("/hexagons", createHexagon);
 router.get("/hexagons", getHexagons);
 
 // Route to update a hexagon
-router.get("/hexagons/:hexagon_id", updateHexagon);
+router.put("/hexagons/:hexagon_id", updateHexagon);
 
 // Route to delete a hexagon
-router.get("/hexagons/:hexagon_id", deleteHexagon);
+router.delete("/hexagons/:hexagon_id", deleteHexagon);
 
 // Route to create a new province
 router.post("/province", createProvince);
