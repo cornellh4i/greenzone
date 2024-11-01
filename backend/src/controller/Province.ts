@@ -52,3 +52,22 @@ export const updateProvince = async (
     res.status(400).json({ message: error.message });
   }
 };
+
+export const deleteProvince = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { province_id } = req.params;
+
+    const province = await Province.findByIdAndDelete(province_id);
+
+    if (!province) {
+      res.status(404).json({ message: "Province not found" });
+    } else {
+      res.status(200).json(province);
+    }
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};

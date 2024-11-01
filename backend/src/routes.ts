@@ -2,6 +2,7 @@ import express from "express";
 import { createHexagon, getHexagons } from "./controller/Hexagon";
 import {
   createProvince,
+  deleteProvince,
   getProvinces,
   updateProvince,
 } from "./controller/Province";
@@ -23,6 +24,9 @@ router.get("/province", getProvinces);
 
 // Route to update a province
 router.put("/province/:province_id", updateProvince);
+
+// Route to delete a province
+router.delete("/province/:province_id", deleteProvince);
 
 // Route to create a new county
 router.post("/counties", createCounty);
