@@ -71,7 +71,7 @@ export const deleteHexagon = async (
     if (!hexagon) {
       res.status(404).json({ message: "Hexagon not found" });
     } else {
-      res.status(200).json({ message: "Hexagon deleted successfully" });
+      res.status(200).json(hexagon);
     }
   } catch (error: any) {
     // Use 'any' type
