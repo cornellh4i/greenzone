@@ -22,6 +22,22 @@ const provinceSchema = new Schema({
     type: Number,
     required: true,
   },
+  province_number_of_cattle: {
+    type: Number,
+    required: true,
+  },
+  province_number_of_goat: {
+    type: Number,
+    required: true,
+  },
+  province_number_of_sheep: {
+    type: Number,
+    required: true,
+  },
+  province_number_of_camel: {
+    type: Number,
+    required: true,
+  },
 });
 
 const ProvinceModel = mongoose.model("Province", provinceSchema);

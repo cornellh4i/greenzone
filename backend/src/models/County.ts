@@ -26,6 +26,22 @@ const countySchema = new Schema({
     type: Number,
     required: true,
   },
+  county_number_of_cattle: {
+    type: Number,
+    required: true,
+  },
+  county_number_of_goat: {
+    type: Number,
+    required: true,
+  },
+  county_number_of_sheep: {
+    type: Number,
+    required: true,
+  },
+  county_number_of_camel: {
+    type: Number,
+    required: true,
+  },
 });
 
 const CountyModel = mongoose.model("County", countySchema);
