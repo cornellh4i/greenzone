@@ -29,13 +29,16 @@ const MAP_STYLE =
 
 const MapComponent = () => {
   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
+  const [country, setCountry] = useState<Geometry[]>([]);
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [counties, setCounties] = useState<Geometry[]>([]);
-  const [states, setStates] = useState<Geometry[]>([]);
+
   const [showHexagons, setShowHexagons] = useState(false);
+  const [showCountry, setShowCountry] = useState(false);
   const [showProvinces, setShowProvinces] = useState(false);
   const [showCounties, setShowCounties] = useState(false);
   const [hoverInfo, setHoverInfo] = useState(null);
+
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
 
   const loadGeoData = async () => {
@@ -43,7 +46,7 @@ const MapComponent = () => {
     return geoData;
   };
 
-  const loadState = async () => {
+  const loadCountryData = async () => {
     const stateData = await import(
       "@/components/charts/data/mng_admbnda_adm0_nso_20201019.json"
     );
@@ -77,30 +80,27 @@ const MapComponent = () => {
       setHexagons(deckHexProj);
     });
 
-    loadState().then((geojsonData) => {
+    loadCountryData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
-      const deckHexProj: Geometry[] = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates.map(projection); // Use the appropriate index for your geometry type
+      const deckHexProj = geojsonData.geometries.map((feature: any) => {
+        const projectedPolygon =
+          feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
-
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
           coordinates: [invertedPolygon] // Wrap in an array if it's a Polygon
         };
       });
-
-      setStates(deckHexProj);
+      setCountry(deckHexProj);
     });
-
-
 
     loadProvinceData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
       const deckHexProj = geojsonData.geometries.map((feature: any) => {
         const projectedPolygon =
-          feature.coordinates.map(projection);
+          feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
@@ -115,9 +115,12 @@ const MapComponent = () => {
 
       const deckHexProj = geojsonData.geometries.map((feature: any) => {
         const projectedPolygon =
-          feature.coordinates.map(projection);
+          feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
-        return { vertices: invertedPolygon };
+        return {
+          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
+          coordinates: [invertedPolygon] // Wrap in an array if it's a Polygon
+        };
       });
       setCounties(deckHexProj);
     });
@@ -158,10 +161,10 @@ const MapComponent = () => {
     },
   });
 
-  const provinceLayer = new PolygonLayer({
-    id: "province-layer",
-    data: provinces,
-    getPolygon: (d) => d.geometry.coordinates[0],
+  const countryLayer = new PolygonLayer({
+    id: "country-layer",
+    data: country,
+    getPolygon: (d) => d.coordinates[0],
     stroked: true,
     filled: false,
     getLineColor: [255, 0, 0],
@@ -170,15 +173,18 @@ const MapComponent = () => {
     onHover: handleHover,
     onClick: handleClick,
     getLineWidth: 2,
+    updateTriggers: {
+      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
+    },
     parameters: {
-      depthTest: false, // Ensures lines appear above other layers
+      blend: true,
     },
   });
 
-  const countyLayer = new PolygonLayer({
-    id: "county-layer",
-    data: counties,
-    getPolygon: (d) => d.geometry.coordinates[0],
+  const provienceLayer = new PolygonLayer({
+    id: "province-layer",
+    data: provinces,
+    getPolygon: (d) => d.coordinates[0],
     stroked: true,
     filled: false,
     getLineColor: [0, 0, 255],
@@ -187,7 +193,26 @@ const MapComponent = () => {
     onHover: handleHover,
     onClick: handleClick,
     getLineWidth: 2,
+    updateTriggers: {
+      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
+    },
+    parameters: {
+      blend: true,
+    },
+  });
+
+  const countyLayer = new PolygonLayer({
+    id: "county-layer",
+    data: counties,
+    getPolygon: (d) => d.coordinates[0],
+    stroked: true,
+    filled: false,
     getLineColor: [0, 0, 255],
+    lineWidthMinPixels: 1,
+    pickable: true,
+    onHover: handleHover,
+    onClick: handleClick,
+    getLineWidth: 2,
     updateTriggers: {
       getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
     },
@@ -199,57 +224,62 @@ const MapComponent = () => {
   const handleMapLoad = (event: any) => {
     const map = event.target;
     const layers = [];
-    if (showHexagons) layers.push(hexagonLayer);
-    if (showProvinces) layers.push(provinceLayer);
-    if (showCounties) layers.push(countyLayer);
+    if (showHexagons) layers.push(hexagonLayer); // works
+    if (showCountry) layers.push(countryLayer); // works
+    if (showProvinces) layers.push(provienceLayer); // works
+    if (showCounties) layers.push(countyLayer); // works
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
   };
 
   return (
-    <Map
-      initialViewState={INITIAL_VIEW_STATE}
-      mapStyle={MAP_STYLE}
-      style={{ width: "100vw", height: "100vh" }}
-      onLoad={handleMapLoad}
-    />
-    // <>
-    //   <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
-    //     <Button
-    //       text="Toggle Hexagons"
-    //       onClick={() => setShowHexagons(!showHexagons)}
-    //     />
-    //     <Button
-    //       text="Toggle Provinces"
-    //       onClick={() => setShowProvinces(!showProvinces)}
-    //     />
-    //     <Button
-    //       text="Toggle Counties"
-    //       onClick={() => setShowCounties(!showCounties)}
-    //     />
-    //   </div>
-    //   <Map
-    //     initialViewState={INITIAL_VIEW_STATE}
-    //     mapStyle={MAP_STYLE}
-    //     style={{ width: "100vw", height: "100vh" }}
-    //     onLoad={handleMapLoad}
-    //   />
-    //   {hoverInfo && (
-    //     <div
-    //       style={{
-    //         position: "absolute",
-    //         left: hoverInfo.x,
-    //         top: hoverInfo.y,
-    //         backgroundColor: "white",
-    //         padding: "5px",
-    //         pointerEvents: "none",
-    //         border: "1px solid black",
-    //       }}
-    //     >
-    //       Hovering over: {hoverInfo.feature.properties.name || "Unknown"}
-    //     </div>
-    //   )}
-    // </>
+    // <Map
+    //   initialViewState={INITIAL_VIEW_STATE}
+    //   mapStyle={MAP_STYLE}
+    //   style={{ width: "100vw", height: "100vh" }}
+    //   onLoad={handleMapLoad}
+    // />
+    <>
+      <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
+        <Button
+          text="Toggle Hexagons"
+          onClick={() => setShowHexagons(!showHexagons)}
+        />
+        <Button
+          text="Toggle Country"
+          onClick={() => setShowCountry(!showCountry)}
+        />
+        <Button
+          text="Toggle Provinces"
+          onClick={() => setShowProvinces(!showProvinces)}
+        />
+        <Button
+          text="Toggle Counties"
+          onClick={() => setShowCounties(!showCounties)}
+        />
+      </div>
+      <Map
+        initialViewState={INITIAL_VIEW_STATE}
+        mapStyle={MAP_STYLE}
+        style={{ width: "100vw", height: "100vh" }}
+        onLoad={handleMapLoad}
+      />
+      {hoverInfo && (
+        <div
+          style={{
+            position: "absolute",
+            left: hoverInfo.x,
+            top: hoverInfo.y,
+            backgroundColor: "white",
+            padding: "5px",
+            pointerEvents: "none",
+            border: "1px solid black",
+          }}
+        >
+          Hovering over: {hoverInfo.feature.properties.name || "Unknown"}
+        </div>
+      )}
+    </>
   );
 };
 
