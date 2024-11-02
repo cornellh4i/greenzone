@@ -1,6 +1,22 @@
 import express from "express";
-import { createHexagon, getHexagons } from "./controller/Hexagon";
-import { createProvince, getProvinces } from "./controller/Province";
+import {
+  createHexagon,
+  getHexagons,
+  updateHexagon,
+  deleteHexagon,
+} from "./controller/Hexagon";
+import {
+  createProvince,
+  deleteProvince,
+  getProvinces,
+  updateProvince,
+} from "./controller/Province";
+import {
+  createCounty,
+  deleteCounty,
+  getCounties,
+  updateCounty,
+} from "./controller/County";
 
 const router = express.Router();
 
@@ -10,10 +26,34 @@ router.post("/hexagons", createHexagon);
 // Route to get all hexagons
 router.get("/hexagons", getHexagons);
 
+// Route to update a hexagon
+router.put("/hexagons/:hexagon_id", updateHexagon);
+
+// Route to delete a hexagon
+router.delete("/hexagons/:hexagon_id", deleteHexagon);
+
 // Route to create a new province
-router.post("/provinces", createProvince);
+router.post("/province", createProvince);
 
 // Route to get all provinces
-router.get("/provinces", getProvinces);
+router.get("/province", getProvinces);
+
+// Route to update a province
+router.put("/province/:province_id", updateProvince);
+
+// Route to delete a province
+router.delete("/province/:province_id", deleteProvince);
+
+// Route to create a new county
+router.post("/county", createCounty);
+
+// Route to get all counties
+router.get("/county", getCounties);
+
+// Route to update a county
+router.put("/county/:county_id", updateCounty);
+
+// Route to delete a county
+router.delete("/county/:county_id", deleteCounty);
 
 export default router;

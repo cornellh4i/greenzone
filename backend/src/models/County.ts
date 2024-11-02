@@ -1,44 +1,48 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-const provinceSchema = new Schema({
+const countySchema = new Schema({
+  sid: {
+    type: Number,
+    required: true,
+  },
   aid: {
     type: Number,
     required: true,
   },
-  province_name: {
+  asid: {
+    type: Number,
+    required: true,
+  },
+  county_name: {
     type: String,
     required: true,
   },
-  province_counties: {
-    type: [Number],
-    required: true,
-  },
-  province_land_area: {
+  county_land_area: {
     type: Number,
     required: true,
   },
-  province_number_of_livestock: {
+  county_number_of_livestock: {
     type: Number,
     required: true,
   },
-  province_number_of_cattle: {
+  county_number_of_cattle: {
     type: Number,
     required: true,
   },
-  province_number_of_goat: {
+  county_number_of_goat: {
     type: Number,
     required: true,
   },
-  province_number_of_sheep: {
+  county_number_of_sheep: {
     type: Number,
     required: true,
   },
-  province_number_of_camel: {
+  county_number_of_camel: {
     type: Number,
     required: true,
   },
 });
 
-const ProvinceModel = mongoose.model("Province", provinceSchema);
-export default ProvinceModel;
+const CountyModel = mongoose.model("County", countySchema);
+export default CountyModel;

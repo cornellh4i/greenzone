@@ -19,9 +19,55 @@ export const getProvinces = async (
   res: Response
 ): Promise<void> => {
   try {
-    const hexagons = await Province.find();
-    res.status(200).json(Province);
+    const province = await Province.find();
+    res.status(200).json(province);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateProvince = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { province_id } = req.params;
+    const updatedData = req.body;
+
+    const province = await Province.findByIdAndUpdate(
+      province_id,
+      updatedData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!province) {
+      res.status(404).json({ message: "Province not found" });
+    } else {
+      res.status(200).json(province);
+    }
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteProvince = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { province_id } = req.params;
+
+    const province = await Province.findByIdAndDelete(province_id);
+
+    if (!province) {
+      res.status(404).json({ message: "Province not found" });
+    } else {
+      res.status(200).json(province);
+    }
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
 };
