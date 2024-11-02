@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
 import * as d3Geo from "d3-geo";
-import { GeoJSON } from "geojson";
+
 
 const HexGrid = () => {
   const [hexagons, setHexagons] = useState([]);
