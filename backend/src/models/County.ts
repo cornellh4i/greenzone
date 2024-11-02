@@ -26,10 +26,6 @@ const countySchema = new Schema({
     type: Number,
     required: true,
   },
-  county_livestock_mortality_rate: {
-    type: Number,
-    required: true,
-  },
 });
 
 const CountyModel = mongoose.model("County", countySchema);
