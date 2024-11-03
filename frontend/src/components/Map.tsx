@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Map } from "react-map-gl/maplibre";
+import { Map, MapRef } from "react-map-gl/maplibre";
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import * as d3 from "d3";
 import * as d3Geo from "d3-geo";
 import "maplibre-gl/dist/maplibre-gl.css";
-import Button from "./Button"; // Adjust path based on your structure
+import Button from "./atoms/Button";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -40,6 +39,7 @@ const MapComponent = () => {
   const [hoverInfo, setHoverInfo] = useState(null);
 
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
+  const [map, setMap] = useState<MapRef | null>(null);
 
   const loadGeoData = async () => {
     const geoData = await import("@/components/charts/data/convertedData.json"); // this is the converted geojson data from EPSG:32646 to WGS84 coordinates
@@ -84,12 +84,11 @@ const MapComponent = () => {
       const projection = d3Geo.geoMercator();
 
       const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon =
-          feature.coordinates[0].map(projection);
+        const projectedPolygon = feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon] // Wrap in an array if it's a Polygon
+          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
         };
       });
       setCountry(deckHexProj);
@@ -99,12 +98,11 @@ const MapComponent = () => {
       const projection = d3Geo.geoMercator();
 
       const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon =
-          feature.coordinates[0].map(projection);
+        const projectedPolygon = feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon] // Wrap in an array if it's a Polygon
+          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
         };
       });
       setProvinces(deckHexProj);
@@ -114,17 +112,15 @@ const MapComponent = () => {
       const projection = d3Geo.geoMercator();
 
       const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon =
-          feature.coordinates[0].map(projection);
+        const projectedPolygon = feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon] // Wrap in an array if it's a Polygon
+          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
         };
       });
       setCounties(deckHexProj);
     });
-
   }, []);
 
   const handleHover = ({ object, x, y }) => {
@@ -221,16 +217,29 @@ const MapComponent = () => {
     },
   });
 
-  const handleMapLoad = (event: any) => {
-    const map = event.target;
-    const layers = [];
-    if (showHexagons) layers.push(hexagonLayer); // works
-    if (showCountry) layers.push(countryLayer); // works
-    if (showProvinces) layers.push(provienceLayer); // works
-    if (showCounties) layers.push(countyLayer); // works
-    const overlay = new MapboxOverlay({ layers });
-    map.addControl(overlay);
+  const handleMapLoad = (event: mapboxgl.MapboxEvent) => {
+    setMap(event.target as MapRef); // Store the map instance with correct type
   };
+
+  useEffect(() => {
+    if (!map) return; // Ensure map is loaded
+
+    const layers = [];
+    if (showHexagons) layers.push(hexagonLayer);
+    if (showCountry) layers.push(countryLayer);
+    if (showProvinces) layers.push(provienceLayer);
+    if (showCounties) layers.push(countyLayer);
+
+    const overlay = new MapboxOverlay({ layers });
+
+    // Clear any existing overlays and add the new one
+    map.addControl(overlay);
+
+    // Cleanup previous overlay
+    return () => {
+      map.removeControl(overlay);
+    };
+  }, [showHexagons, showCountry, showProvinces, showCounties, map]);
 
   return (
     // <Map
@@ -242,20 +251,20 @@ const MapComponent = () => {
     <>
       <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
         <Button
-          text="Toggle Hexagons"
-          onClick={() => setShowHexagons(!showHexagons)}
+          label="Toggle Hexagons"
+          onClick={() => setShowHexagons((prev) => !prev)}
         />
         <Button
-          text="Toggle Country"
-          onClick={() => setShowCountry(!showCountry)}
+          label="Toggle Country"
+          onClick={() => setShowCountry((prev) => !prev)}
         />
         <Button
-          text="Toggle Provinces"
-          onClick={() => setShowProvinces(!showProvinces)}
+          label="Toggle Provinces"
+          onClick={() => setShowProvinces((prev) => !prev)}
         />
         <Button
-          text="Toggle Counties"
-          onClick={() => setShowCounties(!showCounties)}
+          label="Toggle Counties"
+          onClick={() => setShowCounties((prev) => !prev)}
         />
       </div>
       <Map
