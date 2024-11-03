@@ -7,6 +7,7 @@ import {
 } from "./controller/Hexagon";
 import {
   createProvince,
+  createAllProvinces,
   deleteProvince,
   getProvinces,
   updateProvince,
@@ -34,6 +35,9 @@ router.delete("/hexagons/:hexagon_id", deleteHexagon);
 
 // Route to create a new province
 router.post("/province", createProvince);
+
+// Route to create all provinces
+router.post("/province/all", createAllProvinces);
 
 // Route to get all provinces
 router.get("/province", getProvinces);

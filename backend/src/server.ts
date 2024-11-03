@@ -19,6 +19,7 @@ function createServer() {
   // app.use(morgan("combined"));
   app.use(cors());
   app.use(express.static(path.resolve("..", "client", "build")));
+  app.use(express.json({ limit: "50mb" }));
 
   // /**** Add routes ****/
   // app.use("/api", routes);
