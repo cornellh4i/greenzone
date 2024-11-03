@@ -52,7 +52,7 @@ const MapComponent = () => {
 
   const loadProvinceData = async () => {
     const provinceData = await import(
-      "@/components/charts/data/proviences.json"
+      "@/components/charts/data/provinces.json"
     );
     return provinceData;
   };
