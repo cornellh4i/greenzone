@@ -225,8 +225,8 @@ const MapComponent = () => {
     if (!map) return; // Ensure map is loaded
 
     const layers = [];
+    layers.push(countryLayer);
     if (showHexagons) layers.push(hexagonLayer);
-    if (showCountry) layers.push(countryLayer);
     if (showProvinces) layers.push(provienceLayer);
     if (showCounties) layers.push(countyLayer);
 
@@ -253,10 +253,6 @@ const MapComponent = () => {
         <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
-        />
-        <Button
-          label="Toggle Country"
-          onClick={() => setShowCountry((prev) => !prev)}
         />
         <Button
           label="Toggle Provinces"
