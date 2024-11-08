@@ -6,7 +6,6 @@ let TileLayer: React.ComponentType<any>;
 let GeoJSON: React.ComponentType<any>;
 
 if (typeof window !== "undefined") {
-  // Dynamically import the components only on the client side
   const leaflet = require("react-leaflet");
   MapContainer = leaflet.MapContainer as React.ComponentType<any>;
   TileLayer = leaflet.TileLayer as React.ComponentType<any>;
