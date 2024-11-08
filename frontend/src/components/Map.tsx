@@ -62,7 +62,19 @@ const MapComponent = () => {
     return countyData;
   };
 
+  const getData = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/hexagons");
+      console.log("nwjnfjenfiun ");
+      const json_object = await response.json();
+      console.log(json_object);
+    } catch (error) {
+      console.error("Error fetching data from Express:", error);
+    }
+  };
+
   useEffect(() => {
+    getData();
     loadGeoData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
