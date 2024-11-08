@@ -1,16 +1,14 @@
-import express from "express";
-import connectToServer from "./db/conn";
-import routes from "./routes";
-
-const app = express();
+const appName = "Server API";
 const port = process.env.PORT || 8080;
-
-app.use(express.json());
-app.use("/api", routes);
-
-app.listen(port, () => {
-  connectToServer((err) => {
+const createServer = require("./server");
+import connectToServer from "./db/conn";
+const server = createServer();
+// get driver connection
+// const dbo = require("./db/conn");
+server.listen(port, () => {
+  // perform a database connection when server starts
+  connectToServer((err?: Error) => {
     if (err) console.error(err);
   });
-  console.log(`Server running on port ${port}!`);
+  console.log(`${appName} running on port ${port}!`);
 });

@@ -8,9 +8,18 @@ const HexGrid = () => {
   const [hexagons, setHexagons] = useState([]);
 
   useEffect(() => {
+    try{
+      const response = await fetch('http://localhost:8080/api/hexagons') 
+      let json_object = await response.json()
+      console.log(json_object.message)
+
+    }catch (error){
+      console.error('Error fetching data from Express:', error);
+    }
     d3.json(
       "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/us_states_hexgrid.geojson.json"
     ).then((geojsonData) => {
+      console.log("sjv jh hjb vhjerbhjvhw")
       const geoDarta = geojsonData as GeoJSON.FeatureCollection;
       const projection = d3Geo.geoMercator();
 

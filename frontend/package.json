@@ -1,4 +1,7 @@
-{
+{"options": {
+    "allowedHosts": ["localhost", ".localhost"],
+    "proxy": "https://localhost:8080/api"
+  },
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
