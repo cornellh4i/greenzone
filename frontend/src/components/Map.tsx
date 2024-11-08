@@ -3,6 +3,7 @@ import { Map, MapRef } from "react-map-gl/maplibre";
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3Geo from "d3-geo";
+import proj4 from "proj4";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Button from "./atoms/Button";
 
@@ -25,6 +26,9 @@ interface Geometry {
 
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+
+// Define the projection transformation from EPSG:32646 (UTM Zone 46N) to WGS84
+proj4.defs("EPSG:32646", "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs");
 
 const MapComponent = () => {
   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
@@ -65,9 +69,17 @@ const MapComponent = () => {
   const getData = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/hexagons");
-      console.log("nwjnfjenfiun ");
       const json_object = await response.json();
+      const geojsonData = json_object;
       console.log(json_object);
+      const projection = d3Geo.geoMercator();
+      const deckHexProj = geojsonData.map((feature: any) => {
+        const projectedPolygon =
+          feature.geometry.coordinates[0].map(projection);
+        const invertedPolygon = projectedPolygon.map(projection.invert);
+        return { vertices: invertedPolygon };
+      });
+      setHexagons(deckHexProj);
     } catch (error) {
       console.error("Error fetching data from Express:", error);
     }
@@ -75,17 +87,17 @@ const MapComponent = () => {
 
   useEffect(() => {
     getData();
-    loadGeoData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
+    // loadGeoData().then((geojsonData) => {
+    //   const projection = d3Geo.geoMercator();
 
-      const deckHexProj = geojsonData.features.map((feature: any) => {
-        const projectedPolygon =
-          feature.geometry.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return { vertices: invertedPolygon };
-      });
-      setHexagons(deckHexProj);
-    });
+    //   const deckHexProj = geojsonData.features.map((feature: any) => {
+    //     const projectedPolygon =
+    //       feature.geometry.coordinates[0].map(projection);
+    //     const invertedPolygon = projectedPolygon.map(projection.invert);
+    //     return { vertices: invertedPolygon };
+    //   });
+    //   setHexagons(deckHexProj);
+    // });
 
     loadCountryData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
@@ -139,6 +151,7 @@ const MapComponent = () => {
   };
 
   const handleClick = ({ object }) => {
+    console.log("kwejfbwkjenfiwnefkn");
     if (object && object.geometry) {
       const [longitude, latitude] = d3Geo.geoCentroid(object);
       setViewState({
@@ -249,12 +262,6 @@ const MapComponent = () => {
   }, [showHexagons, showProvinces, showCounties, map]);
 
   return (
-    // <Map
-    //   initialViewState={INITIAL_VIEW_STATE}
-    //   mapStyle={MAP_STYLE}
-    //   style={{ width: "100vw", height: "100vh" }}
-    //   onLoad={handleMapLoad}
-    // />
     <>
       <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
         <Button
