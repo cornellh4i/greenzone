@@ -44,11 +44,6 @@ const MapComponent = () => {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
   const [map, setMap] = useState<MapRef | null>(null);
 
-  const loadGeoData = async () => {
-    const geoData = await import("@/components/charts/data/convertedData.json"); // this is the converted geojson data from EPSG:32646 to WGS84 coordinates
-    return geoData;
-  };
-
   const loadCountryData = async () => {
     const stateData = await import("@/components/charts/data/country.json");
     return stateData;
@@ -66,19 +61,26 @@ const MapComponent = () => {
     return countyData;
   };
 
-  const getData = async () => {
+  // EXMAMPLE FUNCTION TO FETCH HEX DATA
+  const loadGeoData = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/hexagons");
       const json_object = await response.json();
       const geojsonData = json_object;
-      console.log(json_object);
+
       const projection = d3Geo.geoMercator();
+
+      // THIS BLOCK IS REQUIRED TO CONVERT HEX COORDINATES - no need to understand it
       const deckHexProj = geojsonData.map((feature: any) => {
-        const projectedPolygon =
-          feature.geometry.coordinates[0].map(projection);
+        const utmCoordinates = feature.geometry.coordinates[0];
+        const wgs84Coordinates = utmCoordinates.map((coord: [number, number]) =>
+          proj4("EPSG:32646", "WGS84", coord)
+        );
+        const projectedPolygon = wgs84Coordinates.map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return { vertices: invertedPolygon };
       });
+
       setHexagons(deckHexProj);
     } catch (error) {
       console.error("Error fetching data from Express:", error);
@@ -86,19 +88,7 @@ const MapComponent = () => {
   };
 
   useEffect(() => {
-    getData();
-    // loadGeoData().then((geojsonData) => {
-    //   const projection = d3Geo.geoMercator();
-
-    //   const deckHexProj = geojsonData.features.map((feature: any) => {
-    //     const projectedPolygon =
-    //       feature.geometry.coordinates[0].map(projection);
-    //     const invertedPolygon = projectedPolygon.map(projection.invert);
-    //     return { vertices: invertedPolygon };
-    //   });
-    //   setHexagons(deckHexProj);
-    // });
-
+    loadGeoData();
     loadCountryData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
