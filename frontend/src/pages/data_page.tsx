@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 let MapContainer: React.ComponentType<any>;
 let TileLayer: React.ComponentType<any>;
@@ -40,9 +40,9 @@ function MapComponent() {
     try {
       const [provincesResponse, countiesResponse, hexagonsResponse] =
         await Promise.all([
-          axios.get("/province"),
-          axios.get("/county"),
-          axios.get("/hexagons"),
+          axios.get("http://localhost:8080/api/province"),
+          axios.get("http://localhost:8080/api/county"),
+          axios.get("http://localhost:8080/api/hexagons"),
         ]);
 
       // Extract data from responses
@@ -51,8 +51,18 @@ function MapComponent() {
       const hexagons = hexagonsResponse.data;
 
       return { provinces, counties, hexagons };
-    } catch (error) {
-      console.error("Error fetching map data:", error);
+    } catch (error: AxiosError | any) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Response error:", error.response.status, error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received:", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Request setup error:", error.message);
+      }
     }
   }
 
