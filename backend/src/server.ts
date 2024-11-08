@@ -14,12 +14,11 @@ const app = express();
 function createServer() {
   // const routes = require("./routes");
 
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: "100mb" }));
+  app.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }));
   // app.use(morgan("combined"));
   app.use(cors());
   app.use(express.static(path.resolve("..", "client", "build")));
-  app.use(express.json({ limit: "50mb" }));
 
   // /**** Add routes ****/
   // app.use("/api", routes);

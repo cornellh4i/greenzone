@@ -7,11 +7,31 @@ export const createHexagon = async (
   res: Response
 ): Promise<void> => {
   try {
-    const hexagon = new Hexagon(req.body);
+    const feature = req.body;
+
+    // Define the hexagon object based on the new structure
+    const hexagonData = {
+      grid_id: feature.properties.grid_id,
+      grid_area: feature.properties.grid_area,
+      aid: feature.properties.aid,
+      sid: feature.properties.sid,
+      asid: feature.properties.asid,
+      soum_utm_crs: feature.properties.soum_utm_crs,
+      attribute_1: feature.properties.attribute_1,
+      area_km2: feature.properties.area_km2,
+      province_number_of_livestock: feature.properties.livestock,
+      province_herders: feature.properties.herders,
+      geometry: feature.geometry,
+    };
+
+    // Create a new Hexagon instance and save it to the database
+    const hexagon = new Hexagon(hexagonData);
+    console.log(hexagon);
     await hexagon.save();
+
+    // Send the created hexagon as the response
     res.status(201).json(hexagon);
   } catch (error: any) {
-    // Use 'any' type
     res.status(400).json({ message: error.message });
   }
 };
@@ -39,14 +59,10 @@ export const updateHexagon = async (
     const { hexagon_id } = req.params;
     const updatedData = req.body;
 
-    const hexagon = await Hexagon.findByIdAndUpdate(
-      hexagon_id,
-      updatedData,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const hexagon = await Hexagon.findByIdAndUpdate(hexagon_id, updatedData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!hexagon) {
       res.status(404).json({ message: "Hexagon not found" });

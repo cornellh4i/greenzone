@@ -23,27 +23,33 @@ const provinceSchema = new Schema({
     required: true,
   },
   province_number_of_livestock: {
-    type: { String: String },
+    type: Map,
+    of: Number,
     required: true,
   },
   province_number_of_cattle: {
-    type: { Number: Number },
+    type: Map,
+    of: Number,
     required: true,
   },
   province_number_of_goat: {
-    type: { Number: Number },
+    type: Map,
+    of: Number,
     required: true,
   },
   province_number_of_sheep: {
-    type: { Number: Number },
+    type: Map,
+    of: Number,
     required: true,
   },
   province_number_of_camel: {
-    type: { Number: Number },
+    type: Map,
+    of: Number,
     required: true,
   },
   province_number_of_horse: {
-    type: { Number: Number },
+    type: Map,
+    of: Number,
     required: true,
   },
   geometry: {

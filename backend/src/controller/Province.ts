@@ -20,9 +20,11 @@ export const createAllProvinces = async (
   res: Response
 ): Promise<void> => {
   try {
-    const provinces = req.body.features.map((feature: any) => ({
+    const feature = req.body;
+    console.log(feature);
+    const province = {
       aid: feature.properties.aid,
-      province_name: feature.properties.province,
+      province_name: feature.properties.name,
       province_counties: feature.properties.province_counties,
       province_land_area: feature.properties.province_land_area,
       province_herders: feature.properties.herders,
@@ -33,10 +35,10 @@ export const createAllProvinces = async (
       province_number_of_camel: feature.properties.number_of_camel,
       province_number_of_horse: feature.properties.number_of_horse,
       geometry: feature.geometry,
-    }));
-    console.log(provinces);
+    };
+    console.log(province);
     // Insert all provinces at once using insertMany for efficiency
-    const insertedProvinces = await Province.insertMany(provinces);
+    const insertedProvinces = await new Province(province).save();
 
     res.status(201).json(insertedProvinces);
   } catch (error: any) {
