@@ -33,7 +33,7 @@ proj4.defs("EPSG:32646", "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs");
 const MapComponent = () => {
   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
   const [country, setCountry] = useState<Geometry[]>([]);
-  const [provinces, setProvinces] = useState<Hexagon[]>([]);
+  const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [counties, setCounties] = useState<Geometry[]>([]);
 
   const [showHexagons, setShowHexagons] = useState(false);
@@ -54,18 +54,12 @@ const MapComponent = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json_object = await response.json();
       const geojsonData = json_object;
-  
-      const projection = d3Geo.geoMercator();
-  
+    
       const deckProvinceProj = geojsonData.map((feature: any) => {
         const utmCoordinates = feature.geometry.coordinates[0];
-        const wgs84Coordinates = utmCoordinates.map((coord: [number, number]) =>
-          proj4("EPSG:32646", "WGS84", coord)
-        );
-        const projectedPolygon = wgs84Coordinates.map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
+
   
-        return { vertices: invertedPolygon };
+        return { type: "Polygon", coordinates: [utmCoordinates] };
       });
   
       setProvinces(deckProvinceProj);
@@ -105,9 +99,11 @@ const MapComponent = () => {
     }
   };
 
+
+
   useEffect(() => {
     loadGeoData();
-    loadCountryData()
+    loadCountryData();
     // .then((geojsonData) => {
     //   const projection = d3Geo.geoMercator();
 
@@ -122,7 +118,7 @@ const MapComponent = () => {
     //   setCountry(deckHexProj);
     // });
 
-    loadProvinceData()
+    loadProvinceData();
 
     loadCountyData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
@@ -148,7 +144,7 @@ const MapComponent = () => {
   };
 
   const handleClick = ({ object }) => {
-    console.log("kwejfbwkjenfiwnefkn");
+    console.log("heuhwohw");
     if (object && object.geometry) {
       const [longitude, latitude] = d3Geo.geoCentroid(object);
       setViewState({
@@ -199,13 +195,17 @@ const MapComponent = () => {
   const provinceLayer: PolygonLayer = new PolygonLayer({
     id: "province-layer",
     data: provinces,
-    getPolygon: (d) => d.vertices,
+    getPolygon: (d) => d.coordinates[0],
     stroked: true,
     filled: false,
     getLineColor: [0, 0, 0],
     lineWidthMinPixels: 1,
+    pickable: true,
     updateTriggers: {
-      getPolygon: [viewState.zoom],
+      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
+    },
+    parameters: {
+      blend: true,
     },
   });
   console.log("Provinces data:", provinces);
@@ -230,9 +230,7 @@ const MapComponent = () => {
       blend: true,
     },
   });
-
-  console.log("Country data:", counties);
-
+  console.log("Counties data:", counties);
 
   const handleMapLoad = (event: mapboxgl.MapboxEvent) => {
     setMap(event.target as MapRef); // Store the map instance with correct type
