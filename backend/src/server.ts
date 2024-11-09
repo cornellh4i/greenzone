@@ -13,8 +13,13 @@ const cors = require("cors");
 const app = express();
 
 function createServer() {
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+
+  // const routes = require("./routes");
+
+  app.use(bodyParser.json({ limit: "100mb" }));
+  app.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }));
+  // app.use(morgan("combined"));
+
   app.use(cors());
 
   // /**** Add routes ****/

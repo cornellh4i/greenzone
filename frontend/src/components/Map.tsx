@@ -50,9 +50,7 @@ const MapComponent = () => {
   };
 
   const loadProvinceData = async () => {
-    const provinceData = await import(
-      "@/components/charts/data/provinces.json"
-    );
+    const provinceData = await import("@/components/charts/data/mn.json");
     return provinceData;
   };
 
@@ -106,8 +104,9 @@ const MapComponent = () => {
     loadProvinceData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
 
-      const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates[0].map(projection);
+      const deckHexProj = geojsonData.features.map((feature: any) => {
+        const projectedPolygon =
+          feature.geometry.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
           type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
