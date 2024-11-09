@@ -33,7 +33,7 @@ proj4.defs("EPSG:32646", "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs");
 const MapComponent = () => {
   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
   const [country, setCountry] = useState<Geometry[]>([]);
-  const [provinces, setProvinces] = useState<Geometry[]>([]);
+  const [provinces, setProvinces] = useState<Hexagon[]>([]);
   const [counties, setCounties] = useState<Geometry[]>([]);
 
   const [showHexagons, setShowHexagons] = useState(false);
@@ -50,11 +50,30 @@ const MapComponent = () => {
   };
 
   const loadProvinceData = async () => {
-    const provinceData = await import(
-      "@/components/charts/data/provinces.json"
-    );
-    return provinceData;
+    try {
+      const response = await fetch("http://localhost:8080/api/province");
+      const json_object = await response.json();
+      const geojsonData = json_object;
+  
+      const projection = d3Geo.geoMercator();
+  
+      const deckProvinceProj = geojsonData.map((feature: any) => {
+        const utmCoordinates = feature.geometry.coordinates[0];
+        const wgs84Coordinates = utmCoordinates.map((coord: [number, number]) =>
+          proj4("EPSG:32646", "WGS84", coord)
+        );
+        const projectedPolygon = wgs84Coordinates.map(projection);
+        const invertedPolygon = projectedPolygon.map(projection.invert);
+  
+        return { vertices: invertedPolygon };
+      });
+  
+      setProvinces(deckProvinceProj);
+    } catch (error) {
+      console.error("Error fetching province data:", error);
+    }
   };
+  
 
   const loadCountyData = async () => {
     const countyData = await import("@/components/charts/data/counties.json");
@@ -80,7 +99,6 @@ const MapComponent = () => {
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return { vertices: invertedPolygon };
       });
-
       setHexagons(deckHexProj);
     } catch (error) {
       console.error("Error fetching data from Express:", error);
@@ -89,33 +107,22 @@ const MapComponent = () => {
 
   useEffect(() => {
     loadGeoData();
-    loadCountryData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
+    loadCountryData()
+    // .then((geojsonData) => {
+    //   const projection = d3Geo.geoMercator();
 
-      const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-        };
-      });
-      setCountry(deckHexProj);
-    });
+    //   const deckHexProj = geojsonData.geometries.map((feature: any) => {
+    //     const projectedPolygon = feature.coordinates[0].map(projection);
+    //     const invertedPolygon = projectedPolygon.map(projection.invert);
+    //     return {
+    //       type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
+    //       coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
+    //     };
+    //   });
+    //   setCountry(deckHexProj);
+    // });
 
-    loadProvinceData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
-
-      const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-        };
-      });
-      setProvinces(deckHexProj);
-    });
+    loadProvinceData()
 
     loadCountyData().then((geojsonData) => {
       const projection = d3Geo.geoMercator();
@@ -166,6 +173,8 @@ const MapComponent = () => {
       getPolygon: [viewState.zoom], // Ensure smooth adaptation
     },
   });
+  console.log("Hexagon data:", hexagons);
+
 
   const countryLayer = new PolygonLayer({
     id: "country-layer",
@@ -187,25 +196,20 @@ const MapComponent = () => {
     },
   });
 
-  const provienceLayer = new PolygonLayer({
+  const provinceLayer: PolygonLayer = new PolygonLayer({
     id: "province-layer",
     data: provinces,
-    getPolygon: (d) => d.coordinates[0],
+    getPolygon: (d) => d.vertices,
     stroked: true,
     filled: false,
-    getLineColor: [0, 0, 255],
+    getLineColor: [0, 0, 0],
     lineWidthMinPixels: 1,
-    pickable: true,
-    onHover: handleHover,
-    onClick: handleClick,
-    getLineWidth: 2,
     updateTriggers: {
-      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
-    },
-    parameters: {
-      blend: true,
+      getPolygon: [viewState.zoom],
     },
   });
+  console.log("Provinces data:", provinces);
+
 
   const countyLayer = new PolygonLayer({
     id: "county-layer",
@@ -227,6 +231,9 @@ const MapComponent = () => {
     },
   });
 
+  console.log("Country data:", counties);
+
+
   const handleMapLoad = (event: mapboxgl.MapboxEvent) => {
     setMap(event.target as MapRef); // Store the map instance with correct type
   };
@@ -237,7 +244,7 @@ const MapComponent = () => {
     const layers = [];
     layers.push(countryLayer);
     if (showHexagons) layers.push(hexagonLayer);
-    if (showProvinces) layers.push(provienceLayer);
+    if (showProvinces) layers.push(provinceLayer);
     if (showCounties) layers.push(countyLayer);
 
     const overlay = new MapboxOverlay({ layers });
