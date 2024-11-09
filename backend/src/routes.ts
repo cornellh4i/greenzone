@@ -11,6 +11,8 @@ import {
   deleteProvince,
   getProvinces,
   updateProvince,
+  getProvinceById,
+  getProvinceByName,
 } from "./controller/Province";
 import {
   createCounty,
@@ -41,6 +43,11 @@ router.post("/province/all", createAllProvinces);
 
 // Route to get all provinces
 router.get("/province", getProvinces);
+
+router.get("/province/:province_name", getProvinceByName);
+
+// Route to get a specific province by ID
+router.get("/province/:province_id", getProvinceById);
 
 // Route to update a province
 router.put("/province/:province_id", updateProvince);
