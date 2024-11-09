@@ -58,6 +58,44 @@ export const getProvinces = async (
   }
 };
 
+export const getProvinceById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  console.log("wwggeg");
+  const { id } = req.params; // Extract ID from the URL
+
+  try {
+    const province = await Province.findById(id);
+    if (!province) {
+      res.status(404).json({ message: "Provinceqwcqwdqwd not found" });
+      return;
+    }
+    res.status(200).json(province);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get a province by name
+export const getProvinceByName = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { province_name } = req.params;
+
+  try {
+    const province = await Province.findOne({ province_name: province_name });
+    if (!province) {
+      res.status(404).json({ message: "Provinceqwcqwdqwd not foundwvefewfwe" });
+      return;
+    }
+    res.status(200).json(province);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const updateProvince = async (
   req: Request,
   res: Response
@@ -76,7 +114,9 @@ export const updateProvince = async (
     );
 
     if (!province) {
-      res.status(404).json({ message: "Province not found" });
+      res
+        .status(404)
+        .json({ message: "Provincvwervwefweeqwcqwdqwd not found" });
     } else {
       res.status(200).json(province);
     }
