@@ -140,7 +140,6 @@ const MapComponent = () => {
   };
 
   const handleClick = ({ object }) => {
-    console.log("kwejfbwkjenfiwnefkn");
     if (object && object.geometry) {
       const [longitude, latitude] = d3Geo.geoCentroid(object);
       setViewState({
