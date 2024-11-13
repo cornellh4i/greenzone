@@ -1,5 +1,13 @@
+// import React, { useState, useEffect } from "react";
+// import { Map, MapRef } from "react-map-gl/maplibre";
+// import { PolygonLayer } from "deck.gl";
+// import { MapboxOverlay } from "@deck.gl/mapbox";
+// import * as d3Geo from "d3-geo";
+// import proj4 from "proj4";
+// import "maplibre-gl/dist/maplibre-gl.css";
+// import Button from "./atoms/Button";
 import React, { useState, useEffect } from "react";
-import { Map, MapRef } from "react-map-gl/maplibre";
+import { Map, MapRef } from "react-map-gl/maplibre"; // Import FlyToInterpolator
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3Geo from "d3-geo";
@@ -30,6 +38,19 @@ const MAP_STYLE =
 // Define the projection transformation from EPSG:32646 (UTM Zone 46N) to WGS84
 proj4.defs("EPSG:32646", "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs");
 
+// const MapComponent = () => {
+//   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
+//   const [country, setCountry] = useState<Geometry[]>([]);
+//   const [provinces, setProvinces] = useState<Geometry[]>([]);
+//   const [counties, setCounties] = useState<Geometry[]>([]);
+
+//   const [showHexagons, setShowHexagons] = useState(false);
+//   const [showProvinces, setShowProvinces] = useState(false);
+//   const [showCounties, setShowCounties] = useState(false);
+//   const [hoverInfo, setHoverInfo] = useState(null);
+
+//   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
+//   const [map, setMap] = useState<MapRef | null>(null);
 const MapComponent = () => {
   const [hexagons, setHexagons] = useState<Hexagon[]>([]);
   const [country, setCountry] = useState<Geometry[]>([]);
@@ -54,20 +75,24 @@ const MapComponent = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json_object = await response.json();
       const geojsonData = json_object;
-    
-      const deckProvinceProj = geojsonData.map((feature: any) => {
-        const utmCoordinates = feature.geometry.coordinates[0];
 
-  
-        return { type: "Polygon", coordinates: [utmCoordinates] };
+      const deckProvinceProj = geojsonData.map((feature: any) => {
+        const coordinates = feature.geometry.coordinates;
+
+        return {
+          type: "Polygon",
+          coordinates: coordinates, // Use coordinates directly without transformation
+          properties: {
+            province_name: feature.province_name, // Retain province name
+          },
+        };
       });
-  
+
       setProvinces(deckProvinceProj);
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
   };
-  
 
   const loadCountyData = async () => {
     const countyData = await import("@/components/charts/data/counties.json");
@@ -99,8 +124,6 @@ const MapComponent = () => {
     }
   };
 
-
-
   useEffect(() => {
     loadGeoData();
     loadCountryData();
@@ -127,8 +150,8 @@ const MapComponent = () => {
         const projectedPolygon = feature.coordinates[0].map(projection);
         const invertedPolygon = projectedPolygon.map(projection.invert);
         return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
+          type: "Polygon",
+          coordinates: [invertedPolygon],
         };
       });
       setCounties(deckHexProj);
@@ -144,7 +167,6 @@ const MapComponent = () => {
   };
 
   const handleClick = ({ object }) => {
-    console.log("heuhwohw");
     if (object && object.geometry) {
       const [longitude, latitude] = d3Geo.geoCentroid(object);
       setViewState({
@@ -154,6 +176,49 @@ const MapComponent = () => {
         zoom: 8, // Adjust zoom level as needed
         transitionInterpolator: new maplibregl.FlyToInterpolator(),
       });
+    }
+  };
+  // const handleProvinceClick = ({ object, coordinate }) => {
+  //   console.log("ewfjelkwd");
+  //   if (object && object.properties && object.properties.province_name) {
+  //     const provinceName = object.properties.province_name;
+  //     const [longitude, latitude] = coordinate;
+  //     console.log(
+  //       `Clicked on province: ${provinceName} at coordinates: Latitude ${latitude}, Longitude ${longitude}`
+  //     );
+  //   }
+  // };
+  const handleProvinceClick = ({ object }) => {
+    console.log("hello");
+    if (object && object.properties && object.properties.province_name) {
+      console.log("hellowoohoo");
+      const provinceName = object.properties.province_name;
+
+      // Calculate the centroid using d3-geo
+      const centroid = d3Geo.geoCentroid(object);
+      const [longitude, latitude] = centroid;
+
+      console.log(
+        `Clicked on province: ${provinceName} at coordinates: Latitude ${latitude}, Longitude ${longitude}`
+      );
+
+      // Update the view state to center on the centroid and zoom in
+      setViewState({
+        ...viewState,
+        latitude,
+        longitude,
+        zoom: 8, // Adjust zoom level as needed
+        transitionInterpolator: new FlyToInterpolator(), // Animate the transition
+        transitionDuration: 1000, // Duration in milliseconds
+      });
+    }
+  };
+
+  const handleProvinceHover = ({ object, x, y }) => {
+    if (object) {
+      setHoverInfo({ x, y, feature: object });
+    } else {
+      setHoverInfo(null);
     }
   };
 
@@ -170,7 +235,6 @@ const MapComponent = () => {
     },
   });
   console.log("Hexagon data:", hexagons);
-
 
   const countryLayer = new PolygonLayer({
     id: "country-layer",
@@ -200,6 +264,14 @@ const MapComponent = () => {
     filled: false,
     getLineColor: [0, 0, 0],
     lineWidthMinPixels: 1,
+    // onClick: handleProvinceClick,
+    onHover: (event) => {
+      if (event.object) {
+        console.log("yay");
+      }
+    },
+    onClick: (event) => console.log("hovered"),
+    // onHover: handleProvinceHover,
     pickable: true,
     updateTriggers: {
       getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
@@ -209,7 +281,6 @@ const MapComponent = () => {
     },
   });
   console.log("Provinces data:", provinces);
-
 
   const countyLayer = new PolygonLayer({
     id: "county-layer",
@@ -274,6 +345,8 @@ const MapComponent = () => {
       </div>
       <Map
         initialViewState={INITIAL_VIEW_STATE}
+        viewState={viewState}
+        // onMove={(evt) => setViewState(evt.viewState)}
         mapStyle={MAP_STYLE}
         style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
