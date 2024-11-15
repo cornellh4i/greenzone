@@ -7,7 +7,7 @@ import SidePain from "@/components/organisms/SidePain";
 const SidePanelPage = () => {
   return (
     <div>
-      {/* <SidePanel></SidePanel> */}
+      {/*<SidePanel></SidePanel>*/}
       <SidePain></SidePain>
     </div>
   );
