@@ -29,6 +29,10 @@ const SidePain = () => {
       const data = await response.json();
 
       // Transform data into the format required by BarChart
+
+      const province_land_area = data["province_land_area"];
+      const province_herders = data["province_herders"];
+
       const transformedData = livestockTypes.map((type) => ({
         x: type,
         y: data[`province_number_of_${type.toLowerCase()}`]?.[year] || 0, // Default to 0 if no data for the year
