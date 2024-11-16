@@ -241,8 +241,8 @@ const MapComponent = () => {
 
     const layers = [];
     layers.push(countryLayer);
+    layers.push(provinceLayer);
     if (showHexagons) layers.push(hexagonLayer);
-    if (showProvinces) layers.push(provinceLayer);
     if (showCounties) layers.push(countyLayer);
 
     const overlay = new MapboxOverlay({ layers });
@@ -262,10 +262,6 @@ const MapComponent = () => {
         <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
-        />
-        <Button
-          label="Toggle Provinces"
-          onClick={() => setShowProvinces((prev) => !prev)}
         />
         <Button
           label="Toggle Counties"
