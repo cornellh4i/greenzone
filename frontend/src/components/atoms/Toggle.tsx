@@ -1,19 +1,29 @@
-import React from "react";
-import { Button as MuiButton, SxProps } from "@mui/material";
+import React, { useState } from 'react';
+import { Switch } from '@mui/material';
 
-interface ButtonProps {
-  onClick: () => void;
-  label: string;
-  sx?: SxProps;
-  disabled?: boolean;
+interface ToggleSwitchProps {
+  initialChecked?: boolean;
+  onChange?: (checked: boolean) => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ onClick, label, sx, disabled }) => {
+const Toggle: React.FC<ToggleSwitchProps> = ({ initialChecked = false, onChange }) => {
+  const [checked, setChecked] = useState(initialChecked);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newChecked = event.target.checked;
+    setChecked(newChecked);
+    if (onChange) {
+      onChange(newChecked); // Call the passed `onChange` function with the new checked value
+    }
+  };
+
   return (
-    <MuiButton variant="contained" onClick={onClick} sx={sx} disabled={disabled}>
-      {label}
-    </MuiButton>
+    <Switch
+      checked={checked}
+      onChange={handleChange}
+      color="primary" // Customize color if needed
+    />
   );
 };
 
-export default Button;
+export default Toggle;

@@ -11,8 +11,10 @@ import {
 } from "@/utils/helpers";
 import { Mongolia } from "@/utils/interfaces";
 import DropDown from "@/components/atoms/DropDown";
+import CheckboxGroup from "@/components/atoms/RadioButton";
 import SearchBar from "@/components/molecules/SearchBar";
 import BarChart from "@/components/charts/barchart";
+import Slide from "@/components/molecules/Slide";
 
 const SidePanel = () => {
   const organizedData: Mongolia = data;
@@ -85,6 +87,15 @@ const SidePanel = () => {
     }
   };
 
+  const checkboxes = [
+    { name: 'filter1', label: 'Filter 1' },
+    { name: 'filter2', label: 'Filter 2' },
+  ];
+
+  const handleFilterChange = (name: string, checked: boolean) => {
+    console.log(`${name} is now ${checked ? 'checked' : 'unchecked'}`);
+  };
+
   return (
     <div>
       <Button onClick={handlePanelToggle} label="Toggle SidePanel" />
@@ -144,7 +155,30 @@ const SidePanel = () => {
                     />
                   </div>
                 )}
+                <div>
+                  <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}>Carrying Capacity Early Warning Systems</h1>
+                  <p style={{ color: "grey" }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                    Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </p>
+
+                  <Slide selectedYear={selectedYear} onChange={handleYearChange} />
+                  
+                  <h2 style={{ fontSize: "1.5rem", marginTop: "20px" }}>Grazing Range</h2>
+                  <p style={{ color: "grey", fontSize: "0.9rem" }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </p>
+
+                  <h2 style={{ fontSize: "1.5rem", marginTop: "20px" }}>Data Layers</h2>
+                  <p style={{ color: "grey", fontSize: "0.9rem" }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </p>
+                  <CheckboxGroup checkboxes={checkboxes} rowCount={3} onChange={handleFilterChange}> 
+                  </CheckboxGroup>
+                </div>
               </div>
+              {/* Conditionally render ContentForSearchResult based on search */}
+              
             </Box>
           </Drawer>
         </div>
