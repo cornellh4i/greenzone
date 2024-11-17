@@ -5,27 +5,55 @@ import SearchBar from "@/components/molecules/SearchBar";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer } from "@mui/material";
 
-const SidePain = () => {
+import RadioButton from "@/components/atoms/RadioButton";
+import Slide from "@/components/molecules/Slide";
+import Toggle from "@/components/atoms/Toggle";
+
+const SidePanel = () => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const yearRange = [2002, 2003, 2024]; // example year range
+  const yearRange = [2007, 2014]; // example year range
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
+  const [provinceData, setProvinceData] = useState<any | null>(null); // State to store province data
 
   const loadProvince = async () => {
     try {
-      const provinces = await fetch("http://localhost:8080/api/province");
-      const json_object = await provinces.json();
-      console.log(json_object); // should see the province data logged in console
-      // get the province of interest- must be provided
+      const response = await fetch(`http://localhost:8080/api/province/${selectedAimag}`);
+      const json_object = await response.json();
+  
+      // Extract general information (non-year dependent)
+      const { 
+        province_name, 
+        province_land_area, 
+        province_herders 
+      } = json_object;
+  
+      // Extract year-dependent livestock data based on the selected year
+      const selectedYearData = {
+        number_of_livestock: json_object.province_number_of_livestock[selectedYear || 2014],
+        number_of_cattle: json_object.province_number_of_cattle[selectedYear || 2014],
+        number_of_goat: json_object.province_number_of_goat[selectedYear || 2014],
+        number_of_sheep: json_object.province_number_of_sheep[selectedYear || 2014],
+        number_of_camel: json_object.province_number_of_camel[selectedYear || 2014],
+        number_of_horse: json_object.province_number_of_horse[selectedYear || 2014],
+      };
+  
+      // Format data for the bar chart
+      const formattedData = livestockTypes.map((livestockType) => ({
+        x: livestockType,
+        y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
+      }));
 
-      // get the year of interest- doesn't have to be provided(defaults to latest year)
-
-      // gather data for each animal for the province for that Year
-
-      // Set the filteredData state variable
-      // should look something like [{aimag:<name_of_aimag> , data:[{x:'Cattle', y: 86}, {x:'Horse', y: 45} ... {x:'Sheep', y:90}]}] so that the bargraph.tsx component can recognize the input.
+      // Combine general information with year-specific data
+      setProvinceData({
+        province_name,
+        province_land_area,
+        province_herders,
+        selectedYearData,
+        formattedData,
+      });
     } catch (error) {
       console.error("Error fetching data from Express:", error);
     }
@@ -34,24 +62,58 @@ const SidePain = () => {
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setSelectedAimag(null);
-  }; // handles opening the sidepanel and closing it
+    setProvinceData(null); // Clear province data when closing panel
+  };
 
   const handleProvinceSearch = (aimag: string | null) => {
-    //set the province state variable depending on what the user searches
+    setSelectedAimag(aimag);
   };
 
-  const handleYearSlider = (year: number | null) => {
-    //set the year state variable depending on what the user inputs
+  const handleYearSlider = (year: number) => {
+    setSelectedYear(year);
   };
 
-  //useEffect to fetch the data and then display
+  const handleBack = () => {
+    setSelectedAimag(null);
+    setProvinceData(null); 
+    
+  };
+
   useEffect(() => {
-    handleProvinceSearch(selectedAimag);
+    if (selectedAimag) {
+      loadProvince();
+    }
+  }, [selectedAimag]); 
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-    handleYearSlider(selectedYear);
+  const handleOptionChange = (value: string) => {
+    setSelectedOption(value);
+  };
 
-    loadProvince();
-  }, []);
+  const options = [
+    {
+      name: "carryingCapacity",
+      label: "Carrying Capacity",
+      content: (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button onClick={() => {}} label="Below" />
+          <Button onClick={() => {}} label="At Capacity" />
+          <Button onClick={() => {}} label="Above" />
+        </div>
+      ),
+    },
+    {
+      name: "zScore",
+      label: "Z-Score",
+      content: (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button onClick={() => {}} label="Positive" />
+          <Button onClick={() => {}} label="Zero" />
+          <Button onClick={() => {}} label="Negative" />
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -74,49 +136,155 @@ const SidePain = () => {
             }}
           >
             <Box sx={{ position: "relative", width: "100%" }}>
-              <div>
-                <Button
-                  onClick={handlePanelToggle}
-                  label="Close"
-                  sx={{ position: "absolute", top: 8, right: 8 }}
-                ></Button>
+              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+                <Button onClick={handlePanelToggle} label="Close" />
               </div>
 
               <div style={{ marginTop: "60px" }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 11, marginRight: "1rem" }}>
-                    <SearchBar onSearch={handleProvinceSearch} />
-                  </div>
-                </div>
+                <SearchBar onSearch={handleProvinceSearch} />
+              </div>
 
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  height: "100%",
+                }}
+              >
                 <div
                   style={{
+                    width: "480px",
+                    height: "860.01px",
+                    padding: "16px",
+                    boxSizing: "border-box",
+                    overflow: "hidden",
                     display: "flex",
-                    alignItems: "center",
-                    marginTop: "20px",
+                    flexDirection: "column",
+                    gap: "20px",
                   }}
                 >
-                  <div style={{ flex: 11, marginRight: "1rem" }}>
-                    <label>Select a Year: {selectedYear}</label>
-                    <input // make a slider for the year, adjust the props
-                      type="range"
-                      min={Math.min(...yearRange)}
-                      max={Math.max(...yearRange)}
-                      value={selectedYear}
-                      onChange={handleYearSlider}
-                      aria-label="Select a year"
-                    />
-                  </div>
-                </div>
-                {selectedAimag &&
-                  filteredData.length > 0 && ( // if there's actual data show bar chart
-                    <div>
-                      <BarChart
-                        datasets={filteredData}
-                        livestock={livestockTypes}
+                  {!selectedAimag ? (
+                    <>
+                      <div style={{ textAlign: "center", marginTop: "20px" }}>
+                        <h1
+                          style={{
+                            fontFamily: "Poppins",
+                            fontSize: "32px",
+                            fontWeight: "600",
+                            lineHeight: "45.76px",
+                            letterSpacing: "0.17px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Carrying Capacity Early Warning System
+                        </h1>
+                        <p
+                          style={{
+                            fontFamily: "Inter",
+                            fontSize: "20px",
+                            fontWeight: "400",
+                            lineHeight: "28.6px",
+                            letterSpacing: "0.17px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula nisi a facilisis tempor.
+                        </p>
+                      </div>
+                      <hr style={{ border: "1px solid gray", margin: "10px 0" }} />
+
+                      <Slide
+                        name="Year"
+                        selectedValue={2014}
+                        onChange={handleYearSlider}
+                        min={2007}
+                        max={2014}
                       />
+                      <hr style={{ border: "1px solid gray", margin: "10px 0" }} />
+
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <h2
+                          style={{
+                            fontFamily: "Poppins",
+                            fontSize: "20px",
+                            fontWeight: "600",
+                            lineHeight: "28.6px",
+                            letterSpacing: "0.17px",
+                            textAlign: "left",
+                            textDecoration: "none",
+                            marginRight: "10px",
+                          }}
+                        >
+                          Grazing Range
+                        </h2>
+                        <Toggle initialChecked={false} onChange={() => {}} />
+                      </div>
+                      <p
+                        style={{
+                          fontFamily: "Inter",
+                          fontSize: "16px",
+                          fontWeight: "400",
+                          lineHeight: "28.6px",
+                          letterSpacing: "0.17px",
+                          textAlign: "left",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula nisi a facilisis tempor.
+                      </p>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <h2
+                          style={{
+                            fontFamily: "Poppins",
+                            fontSize: "20px",
+                            fontWeight: "600",
+                            lineHeight: "28.6px",
+                            letterSpacing: "0.17px",
+                            textAlign: "left",
+                            textDecoration: "none",
+                            marginRight: "10px",
+                          }}
+                        >
+                          Data Layers
+                        </h2>
+                        <span
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            borderRadius: "50%",
+                            background: "gray",
+                            display: "inline-block",
+                          }}
+                        ></span>
+                      </div>
+                      <RadioButton
+                        options={options}
+                        selectedOption={selectedOption}
+                        onChange={handleOptionChange}
+                      />
+                    </>
+                  ) : (
+                    <div>
+                      {provinceData ? (
+                        <>
+                          <Button onClick={handleBack} label="Back" />
+                          <h1>{provinceData.province_name}</h1>
+                          <p><strong>Land Area:</strong> {provinceData.province_land_area}</p>
+                          <p><strong>Number of Herders:</strong> {provinceData.province_herders}</p>
+                          
+                          <h2>Livestock Data for {selectedYear}</h2>
+              
+                          {provinceData && provinceData.formattedData.length > 0 && (
+                            <BarChart datasets={[{ aimag: selectedAimag, data: provinceData.formattedData }]} livestock={livestockTypes} />
+                          )}
+                        </>
+                      ) : (
+                        <p>Loading...</p>
+                      )}
                     </div>
                   )}
+                </div>
               </div>
             </Box>
           </Drawer>
@@ -125,4 +293,5 @@ const SidePain = () => {
     </div>
   );
 };
-export default SidePain;
+
+export default SidePanel;
