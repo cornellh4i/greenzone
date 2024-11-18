@@ -9,75 +9,114 @@ import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/atoms/Slide";
 import Toggle from "@/components/atoms/Toggle";
 import { Geometry } from "../Map";
+import { select } from "d3";
 
 interface SidePanelProps {
-  data?: Geometry[];
+  data: Geometry[];
   provinceName?: string | null;
 }
 
 const SidePanel: React.FC<SidePanelProps> = ({ data, provinceName }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const yearRange = [2007, 2014]; // example year range
+  // const yearRange = [2007, 2014]; // example year range
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number>(2014);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
   const [provinceData, setProvinceData] = useState<any | null>(null); // State to store province data
 
-  console.log(data);
+
+  const loadProvince = (province: string) => {
+    const year = selectedYear || 2014;
+    const provinceData = data.find((d) => d.provinceName === province);
+    const province_name = provinceData.provinceName;
+    const province_land_area = provinceData.provinceLandArea;
+    const province_herders = provinceData.provinceHerders;
+
+    const selectedYearData = {
+      number_of_livestock:
+        provinceData.livestock[year],
+      number_of_cattle:
+        provinceData.cattle[year],
+        // json_object.province_number_of_cattle[selectedYear || 2014],
+      number_of_goat:
+        provinceData.goat[year],
+        // json_object.province_number_of_goat[selectedYear || 2014],
+      number_of_sheep:
+        provinceData.sheep[year],
+        // json_object.province_number_of_sheep[selectedYear || 2014],
+      number_of_camel:
+        provinceData.camel[year],
+        // json_object.province_number_of_camel[selectedYear || 2014],
+      number_of_horse:
+        provinceData.horse[year],
+        // json_object.province_number_of_horse[selectedYear || 2014],
+    };
+
+    const formattedData = livestockTypes.map((livestockType) => ({
+      x: livestockType,
+      y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
+    }));
 
 
-  const loadProvince = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/province/${selectedAimag}`
-      );
-      const json_object = await response.json();
+    setProvinceData({
+      province_name,
+      province_land_area,
+      province_herders,
+      selectedYearData,
+      formattedData,
+    })};
 
-      // Extract general information (non-year dependent)
-      const { province_name, province_land_area, province_herders } =
-        json_object;
-        console.log(json_object);
+  //   try {
+  //     const response = await fetch(
+  //       `http://localhost:8080/api/province/${selectedAimag}`
+  //     );
+  //     const json_object = await response.json();
 
-      // Extract year-dependent livestock data based on the selected year
-      const selectedYearData = {
-        number_of_livestock:
-          json_object.province_number_of_livestock[selectedYear || 2014],
-        number_of_cattle:
-          json_object.province_number_of_cattle[selectedYear || 2014],
-        number_of_goat:
-          json_object.province_number_of_goat[selectedYear || 2014],
-        number_of_sheep:
-          json_object.province_number_of_sheep[selectedYear || 2014],
-        number_of_camel:
-          json_object.province_number_of_camel[selectedYear || 2014],
-        number_of_horse:
-          json_object.province_number_of_horse[selectedYear || 2014],
-      };
+  //     // Extract general information (non-year dependent)
+  //     const { province_name, province_land_area, province_herders } =
+  //       json_object;
 
-      // Format data for the bar chart
-      const formattedData = livestockTypes.map((livestockType) => ({
-        x: livestockType,
-        y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-      }));
+  //     // Extract year-dependent livestock data based on the selected year
+  //     const selectedYearData = {
+  //       number_of_livestock:
+  //         json_object.province_number_of_livestock[selectedYear || 2014],
+  //       number_of_cattle:
+  //         json_object.province_number_of_cattle[selectedYear || 2014],
+  //       number_of_goat:
+  //         json_object.province_number_of_goat[selectedYear || 2014],
+  //       number_of_sheep:
+  //         json_object.province_number_of_sheep[selectedYear || 2014],
+  //       number_of_camel:
+  //         json_object.province_number_of_camel[selectedYear || 2014],
+  //       number_of_horse:
+  //         json_object.province_number_of_horse[selectedYear || 2014],
+  //     };
 
-      // Combine general information with year-specific data
-      setProvinceData({
-        province_name,
-        province_land_area,
-        province_herders,
-        selectedYearData,
-        formattedData,
-      });
-    } catch (error) {
-      console.error("Error fetching data from Express:", error);
-    }
-  };
+  //     // Format data for the bar chart
+  //     const formattedData = livestockTypes.map((livestockType) => ({
+  //       x: livestockType,
+  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
+  //     }));
+
+  //     // Combine general information with year-specific data
+  //     setProvinceData({
+  //       province_name,
+  //       province_land_area,
+  //       province_herders,
+  //       selectedYearData,
+  //       formattedData,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching data from Express:", error);
+  //   }
+  // };
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setSelectedAimag(null);
     setProvinceData(null); // Clear province data when closing panel
+    setSelectedYear(2014);
   };
 
   const handleProvinceSearch = (aimag: string | null) => {
@@ -225,9 +264,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ data, provinceName }) => {
 
                       <Slide
                         name="Year"
-                        selectedValue={2014}
+                        selectedValue={selectedYear}
                         onChange={handleYearSlider}
-                        min={2007}
+                        min={2002}
                         max={2014}
                       />
                       <hr

@@ -6,7 +6,7 @@ import SidePanel from "@/components/organisms/SidePanel";
 const SidePanelPage = () => {
   return (
     <div>
-      <SidePanel/>
+      <SidePanel data={[]}/>
     </div>
   );
 };
