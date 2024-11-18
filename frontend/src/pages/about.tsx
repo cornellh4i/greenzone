@@ -13,7 +13,6 @@ export default About;*/
 
 /** An About page */
 const About = () => {
-  console.log("about!");
   return <>{<SimpleMap />}</>;
 };
 

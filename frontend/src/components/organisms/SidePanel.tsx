@@ -9,7 +9,11 @@ import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/atoms/Slide";
 import Toggle from "@/components/atoms/Toggle";
 
-const SidePanel = () => {
+interface SidePanelProps {
+  provinceName?: string | null;
+}
+
+const SidePanel: React.FC<SidePanelProps> = ({ provinceName }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
   const yearRange = [2007, 2014]; // example year range
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -17,6 +21,7 @@ const SidePanel = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
   const [provinceData, setProvinceData] = useState<any | null>(null); // State to store province data
+
 
   const loadProvince = async () => {
     try {
@@ -74,6 +79,8 @@ const SidePanel = () => {
     setSelectedAimag(aimag);
   };
 
+
+
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
@@ -83,11 +90,20 @@ const SidePanel = () => {
     setProvinceData(null);
   };
 
+
+  useEffect(() => {
+    if (provinceName) {
+      setSelectedAimag(provinceName);
+      setIsPanelOpen(true);
+    }
+  }, [provinceName]);
+
   useEffect(() => {
     if (selectedAimag) {
       loadProvince();
     }
   }, [selectedAimag]);
+
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const handleOptionChange = (value: string) => {
@@ -118,6 +134,7 @@ const SidePanel = () => {
       ),
     },
   ];
+
 
   return (
     <div>
