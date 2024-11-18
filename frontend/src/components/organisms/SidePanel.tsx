@@ -8,12 +8,14 @@ import { Box, Drawer } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/atoms/Slide";
 import Toggle from "@/components/atoms/Toggle";
+import { Geometry } from "../Map";
 
 interface SidePanelProps {
+  data?: Geometry[];
   provinceName?: string | null;
 }
 
-const SidePanel: React.FC<SidePanelProps> = ({ provinceName }) => {
+const SidePanel: React.FC<SidePanelProps> = ({ data, provinceName }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
   const yearRange = [2007, 2014]; // example year range
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -21,6 +23,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ provinceName }) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
   const [provinceData, setProvinceData] = useState<any | null>(null); // State to store province data
+
+  console.log(data);
 
 
   const loadProvince = async () => {
@@ -33,6 +37,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ provinceName }) => {
       // Extract general information (non-year dependent)
       const { province_name, province_land_area, province_herders } =
         json_object;
+        console.log(json_object);
 
       // Extract year-dependent livestock data based on the selected year
       const selectedYearData = {
@@ -100,7 +105,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ provinceName }) => {
 
   useEffect(() => {
     if (selectedAimag) {
-      loadProvince();
+      loadProvince(selectedAimag);
     }
   }, [selectedAimag]);
 

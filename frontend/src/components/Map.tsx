@@ -7,7 +7,6 @@ import proj4 from "proj4";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Button from "./atoms/Button";
 import SidePanel from "@/components/organisms/SidePanel";
-import { get } from "http";
 
 
 const INITIAL_VIEW_STATE = {
@@ -22,10 +21,30 @@ interface Hexagon {
   vertices: [number, number][];
 }
 
-interface Geometry {
+export interface Geometry {
   type: string;
   coordinates: number[][][] | number[][];
-  province_name: string | null;
+  provinceName: string | null;
+  provinceLandArea: number | 0;
+  provinceHerders: number | 0;
+  livestock: {
+    [key: string] : number | 0
+  };
+  cattle: {
+    [key: string] : number | 0
+  };
+  goat: {
+    [key: string] : number | 0
+  };
+  sheep: {
+    [key: string] : number | 0
+  };
+  camel: {
+    [key: string] : number | 0
+  };
+  horse: {
+    [key: string] : number | 0
+  };
 }
 
 
@@ -44,7 +63,7 @@ const MapComponent = () => {
   const [showHexagons, setShowHexagons] = useState(false);
   const [showProvinces, setShowProvinces] = useState(false);
   const [showCounties, setShowCounties] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [clickInfo, setClickInfo] = useState<string | null>(null);
 
 
@@ -66,8 +85,16 @@ const MapComponent = () => {
       const deckProvinceProj = geojsonData.map((feature: any) => {
         const utmCoordinates = feature.geometry.coordinates[0];
         const provinceName = feature.province_name;
+        const provinceLandArea = feature.province_land_area;
+        const provinceHerders = feature.province_herders;
+        const livestock = feature.province_number_of_livestock;
+        const cattle = feature.province_number_of_cattle;
+        const goat = feature.province_number_of_goat;
+        const sheep = feature.province_number_of_sheep;
+        const camel = feature.province_number_of_camel;
+        const horse = feature.province_number_of_horse;
   
-        return { type: "Polygon", coordinates: [utmCoordinates], provinceName: provinceName };
+        return { type: "Polygon", coordinates: [utmCoordinates], provinceName: provinceName, provinceLandArea: provinceLandArea, provinceHerders: provinceHerders, livestock: livestock, cattle: cattle, goat: goat, sheep: sheep, camel: camel, horse: horse };
       });
   
       setProvinces(deckProvinceProj);
@@ -213,6 +240,13 @@ const MapComponent = () => {
     autoHighlight: true, 
     highlightColor: [20, 20, 20, 20], 
     onClick: handleProvinceClick,
+    onHover: ({ object }) => {
+      if (object) {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+    }
   });
   // console.log("Provinces data:", provinces);
   // console.log(clickInfo);
@@ -266,7 +300,7 @@ const MapComponent = () => {
   return (
     <>
       <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
-        <SidePanel provinceName={clickInfo}/>
+        <SidePanel data={provinces} provinceName={clickInfo}/>
         <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
@@ -279,7 +313,8 @@ const MapComponent = () => {
       <Map
         initialViewState={INITIAL_VIEW_STATE}
         mapStyle={MAP_STYLE}
-        style={{ width: "100vw", height: "100vh" }}
+        cursor={isHovered ? "pointer" : "grab"}
+        style={{ width: "100vw", height: "100vh", }}
         onLoad={handleMapLoad}
       />
       {/* {hoverInfo && (
