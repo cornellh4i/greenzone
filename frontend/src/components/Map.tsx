@@ -343,10 +343,10 @@ const MapComponent = () => {
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
         />
-        <Button
+        {/* <Button
           label="Toggle Counties"
           onClick={() => setShowCounties((prev) => !prev)}
-        />
+        /> */}
       </div>
       <Map
         initialViewState={INITIAL_VIEW_STATE}
