@@ -12,15 +12,14 @@ export const createHexagon = async (
     // Define the hexagon object based on the new structure
     const hexagonData = {
       grid_id: feature.properties.grid_id,
-      grid_area: feature.properties.grid_area,
       aid: feature.properties.aid,
       sid: feature.properties.sid,
       asid: feature.properties.asid,
-      soum_utm_crs: feature.properties.soum_utm_crs,
-      attribute_1: feature.properties.attribute_1,
+      utm_crs: feature.properties.utm_crs,
+      bm_pred: feature.properties.bm_pred,
       area_km2: feature.properties.area_km2,
-      province_number_of_livestock: feature.properties.livestock,
-      province_herders: feature.properties.herders,
+      livestock: feature.properties.livestock,
+      herders: feature.properties.herders,
       geometry: feature.geometry,
     };
 

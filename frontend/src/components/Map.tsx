@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Map, MapRef } from "react-map-gl/maplibre";
-import {FlyToInterpolator} from '@deck.gl/core';
+import { FlyToInterpolator } from "@deck.gl/core";
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3Geo from "d3-geo";
@@ -8,7 +8,6 @@ import proj4 from "proj4";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Button from "./atoms/Button";
 import SidePanel from "@/components/organisms/SidePanel";
-
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -30,25 +29,24 @@ export interface Geometry {
   provinceHerders: number | 0;
   view: [[number, number], [number, number]];
   livestock: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
   cattle: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
   goat: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
   sheep: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
   camel: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
   horse: {
-    [key: string] : number | 0
+    [key: string]: number | 0;
   };
 }
-
 
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -68,8 +66,6 @@ const MapComponent = () => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [clickInfo, setClickInfo] = useState<string | null>(null);
 
-
-
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
   const [map, setMap] = useState<MapRef | null>(null);
 
@@ -83,20 +79,29 @@ const MapComponent = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json_object = await response.json();
       const geojsonData = json_object;
-    
+
       const deckProvinceProj = geojsonData.map((feature: any) => {
         const utmCoordinates = feature.geometry.coordinates[0];
         const zoomCoordinates = (() => {
-          let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
-        
+          let minLng = Infinity,
+            minLat = Infinity,
+            maxLng = -Infinity,
+            maxLat = -Infinity;
+
           utmCoordinates.forEach(([lng, lat]) => {
             if (lng < minLng) minLng = lng;
             if (lat < minLat) minLat = lat;
             if (lng > maxLng) maxLng = lng;
             if (lat > maxLat) maxLat = lat;
           });
-          console.log([[minLng, minLat], [maxLng, maxLat]]);
-          return [[minLng, minLat], [maxLng, maxLat]];
+          console.log([
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ]);
+          return [
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ];
         })();
         const provinceName = feature.province_name;
         const provinceLandArea = feature.province_land_area;
@@ -107,25 +112,37 @@ const MapComponent = () => {
         const sheep = feature.province_number_of_sheep;
         const camel = feature.province_number_of_camel;
         const horse = feature.province_number_of_horse;
-  
-        return { type: "Polygon", coordinates: [utmCoordinates], provinceName: provinceName, 
-        provinceLandArea: provinceLandArea, provinceHerders: provinceHerders, 
-        view: zoomCoordinates, livestock: livestock, cattle: cattle, goat: goat,
-        sheep: sheep, camel: camel, horse: horse };
+
+        return {
+          type: "Polygon",
+          coordinates: [utmCoordinates],
+          provinceName: provinceName,
+          provinceLandArea: provinceLandArea,
+          provinceHerders: provinceHerders,
+          view: zoomCoordinates,
+          livestock: livestock,
+          cattle: cattle,
+          goat: goat,
+          sheep: sheep,
+          camel: camel,
+          horse: horse,
+        };
       });
-  
+
       setProvinces(deckProvinceProj);
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
   };
 
-  const handleZoomToProvince = (zoomCoords: [[number, number], [number, number]]) => {
+  const handleZoomToProvince = (
+    zoomCoords: [[number, number], [number, number]]
+  ) => {
     console.log("zoom:", zoomCoords);
     const sw = zoomCoords[0];
-    console.log("sw:", sw)
+    console.log("sw:", sw);
     const ne = zoomCoords[1];
-    console.log("ne:", ne)
+    console.log("ne:", ne);
 
     const centerLng = (sw[0] + ne[0]) / 2; // Average longitude
     const centerLat = (sw[1] + ne[1]) / 2;
@@ -133,13 +150,12 @@ const MapComponent = () => {
     setViewState((prev) => ({
       ...prev,
       longitude: centerLng - 1.5, // Center longitude & adjust to right to avoid sidepanel coverage
-      latitude: centerLat,  // Center latitude
+      latitude: centerLat, // Center latitude
       zoom: 6.5, // Adjust zoom level as needed
       transitionDuration: 1000, // Smooth animation
       transitionInterpolator: new FlyToInterpolator({ curve: 1.5, speed: 1.2 }),
     }));
   };
-  
 
   const loadCountyData = async () => {
     const countyData = await import("@/components/charts/data/counties.json");
@@ -153,17 +169,11 @@ const MapComponent = () => {
       const json_object = await response.json();
       const geojsonData = json_object;
 
-      const projection = d3Geo.geoMercator();
-
       // THIS BLOCK IS REQUIRED TO CONVERT HEX COORDINATES - no need to understand it
       const deckHexProj = geojsonData.map((feature: any) => {
-        const utmCoordinates = feature.geometry.coordinates[0];
-        const wgs84Coordinates = utmCoordinates.map((coord: [number, number]) =>
-          proj4("EPSG:32646", "WGS84", coord)
-        );
-        const projectedPolygon = wgs84Coordinates.map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return { vertices: invertedPolygon };
+        return {
+          vertices: feature.geometry.coordinates[0], // Polygon vertices
+        };
       });
       setHexagons(deckHexProj);
     } catch (error) {
@@ -171,25 +181,9 @@ const MapComponent = () => {
     }
   };
 
-
-
   useEffect(() => {
     loadGeoData();
     loadCountryData();
-    // .then((geojsonData) => {
-    //   const projection = d3Geo.geoMercator();
-
-    //   const deckHexProj = geojsonData.geometries.map((feature: any) => {
-    //     const projectedPolygon = feature.coordinates[0].map(projection);
-    //     const invertedPolygon = projectedPolygon.map(projection.invert);
-    //     return {
-    //       type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-    //       coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-    //     };
-    //   });
-    //   setCountry(deckHexProj);
-    // });
-
     loadProvinceData();
 
     loadCountyData().then((geojsonData) => {
@@ -207,7 +201,14 @@ const MapComponent = () => {
     });
   }, []);
 
-  const handleProvinceClick = ({ object }: { object: { provinceName: string, view: [[number, number], [number, number]] } | null }) => {
+  const handleProvinceClick = ({
+    object,
+  }: {
+    object: {
+      provinceName: string;
+      view: [[number, number], [number, number]];
+    } | null;
+  }) => {
     if (object) {
       setClickInfo(object.provinceName);
       handleZoomToProvince(object.view);
@@ -230,7 +231,6 @@ const MapComponent = () => {
     }
   };
 
-
   const hexagonLayer = new PolygonLayer({
     id: "hexagon-layer",
     data: hexagons,
@@ -243,7 +243,6 @@ const MapComponent = () => {
       getPolygon: [viewState.zoom], // Ensure smooth adaptation
     },
   });
-
 
   const countryLayer = new PolygonLayer({
     id: "country-layer",
@@ -271,12 +270,12 @@ const MapComponent = () => {
     getPolygon: (d) => d.coordinates[0],
     stroked: true,
     filled: true,
-    getLineColor: [0,0,0],
-    getFillColor: [0, 0, 0, 0], 
-    lineWidthMinPixels: 2, 
-    pickable: true, 
-    autoHighlight: true, 
-    highlightColor: [20, 20, 20, 20], 
+    getLineColor: [0, 0, 0],
+    getFillColor: [0, 0, 0, 0],
+    lineWidthMinPixels: 2,
+    pickable: true,
+    autoHighlight: true,
+    highlightColor: [20, 20, 20, 20],
     onClick: handleProvinceClick,
     onHover: ({ object }) => {
       if (object) {
@@ -284,11 +283,10 @@ const MapComponent = () => {
       } else {
         setIsHovered(false);
       }
-    }
+    },
   });
   // console.log("Provinces data:", provinces);
   // console.log(clickInfo);
-
 
   const countyLayer = new PolygonLayer({
     id: "county-layer",
@@ -338,7 +336,7 @@ const MapComponent = () => {
   return (
     <>
       <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
-        <SidePanel data={provinces} provinceName={clickInfo}/>
+        <SidePanel data={provinces} provinceName={clickInfo} />
         <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
@@ -353,7 +351,7 @@ const MapComponent = () => {
         {...viewState}
         mapStyle={MAP_STYLE}
         cursor={isHovered ? "pointer" : "grab"}
-        style={{ width: "100vw", height: "100vh", }}
+        style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
         onMove={(evt) => setViewState(evt.viewState)}
         interactiveLayerIds={[]} // Disable default interactivity

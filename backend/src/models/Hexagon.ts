@@ -17,10 +17,6 @@ const hexagonSchema = new Schema({
       required: true,
     },
   },
-  grid_area: {
-    type: Number,
-    required: true,
-  },
   aid: {
     type: Number,
     required: true,
@@ -33,11 +29,11 @@ const hexagonSchema = new Schema({
     type: Number,
     required: true,
   },
-  soum_utm_crs: {
+  utm_crs: {
     type: Number,
     required: true,
   },
-  attribute_1: {
+  bm_pred: {
     type: Number,
     required: false, // Optional, specify required: true if it's mandatory
   },
