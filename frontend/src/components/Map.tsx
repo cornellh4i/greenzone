@@ -178,6 +178,7 @@ const MapComponent = () => {
       const deckHexProj = geojsonData.map((feature: any) => {
         return {
           vertices: feature.geometry.coordinates[0], // Polygon vertices
+          bm_pred: feature.bm_pred,
         };
       });
       setHexagons(deckHexProj);
@@ -244,11 +245,19 @@ const MapComponent = () => {
     data: hexagons,
     getPolygon: (d) => d.vertices,
     stroked: true,
-    filled: false,
+    filled: true,
     getLineColor: [0, 0, 0],
+    getFillColor: (d) => {
+      if (d.bm_pred <= 0.4) {
+        return [0, 170, 60, 200];
+      } else if (d.bm_pred < 0.6) {
+        return [255, 255, 20, 150];
+      }
+      return [214, 15, 2, 150];
+    },
     lineWidthMinPixels: 1,
     updateTriggers: {
-      getPolygon: [viewState.zoom], // Ensure smooth adaptation
+      getFillColor: hexagons.map((d) => d.bm_pred),
     },
   });
 
