@@ -344,7 +344,12 @@ const MapComponent = () => {
   return (
     <>
       <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
-        <SidePanel data={provinces} provinceName={clickInfo} />
+        <SidePanel
+          data={provinces}
+          provinceName={clickInfo}
+          setShowHexagons={setShowHexagons}
+        />
+
         <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
