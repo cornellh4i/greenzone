@@ -188,6 +188,9 @@ const SidePanel: React.FC<SidePanelProps> = ({
             anchor="left"
             open={isPanelOpen}
             onClose={handlePanelToggle}
+            ModalProps={{
+              BackdropProps: { invisible: true },
+            }}
             PaperProps={{
               sx: {
                 width: "80%",
