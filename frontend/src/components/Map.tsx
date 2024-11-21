@@ -147,11 +147,16 @@ const MapComponent = () => {
     const centerLng = (sw[0] + ne[0]) / 2; // Average longitude
     const centerLat = (sw[1] + ne[1]) / 2;
 
+    const lngDiff = ne[0] - sw[0];
+    const latDiff = ne[1] - sw[1];
+
+    const zoom = Math.floor(8 - Math.log2(Math.max(latDiff, lngDiff)));
+
     setViewState((prev) => ({
       ...prev,
-      longitude: centerLng - 1.5, // Center longitude & adjust to right to avoid sidepanel coverage
+      longitude: centerLng, // Center longitude & adjust to right to avoid sidepanel coverage
       latitude: centerLat, // Center latitude
-      zoom: 6.5, // Adjust zoom level as needed
+      zoom: zoom, // Adjust zoom level as needed
       transitionDuration: 1000, // Smooth animation
       transitionInterpolator: new FlyToInterpolator({ curve: 1.5, speed: 1.2 }),
     }));
@@ -212,6 +217,9 @@ const MapComponent = () => {
     if (object) {
       setClickInfo(object.provinceName);
       handleZoomToProvince(object.view);
+      setTimeout(() => {
+        setClickInfo(null);
+      }, 100);
     } else {
       setClickInfo(null);
     }
@@ -320,7 +328,7 @@ const MapComponent = () => {
     layers.push(countryLayer);
     layers.push(provinceLayer);
     if (showHexagons) layers.push(hexagonLayer);
-    if (showCounties) layers.push(countyLayer);
+    // if (showCounties) layers.push(countyLayer);
 
     const overlay = new MapboxOverlay({ layers });
 
