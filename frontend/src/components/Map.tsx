@@ -350,10 +350,10 @@ const MapComponent = () => {
           setShowHexagons={setShowHexagons}
         />
 
-        <Button
+        {/* <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
-        />
+        /> */}
         {/* <Button
           label="Toggle Counties"
           onClick={() => setShowCounties((prev) => !prev)}
