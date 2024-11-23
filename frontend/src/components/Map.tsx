@@ -315,12 +315,6 @@ const MapComponent = () => {
     filled: true,
     getLineColor: [0, 0, 0],
     getFillColor: [0, 170, 60, 200],
-    // getFillColor: (d) => {
-    //   if (d.bm_pred <= 0.4) {
-    //     return [0, 170, 60, 200];
-    //   }
-    //   return [214, 15, 2, 150];
-    // },
     lineWidthMinPixels: 1,
     updateTriggers: {
       getFillColor: belowHexagons.map((d) => d.bm_pred),

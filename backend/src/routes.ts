@@ -38,7 +38,7 @@ router.get("/hexagons/bm_pred_below", getBelowHexagons);
 //Route to get all hexagons with a bm_pred between 0.4 and 0.6
 router.get("/hexagons/bm_pred_at_cap", getAtCapHexagons);
 
-//Route to get all hexagons with a bm_pred between 0.4 and 0.6
+//Route to get all hexagons with a bm_pred >= 0.6
 router.get("/hexagons/bm_pred_above", getAboveHexagons);
 
 // Route to update a hexagon
