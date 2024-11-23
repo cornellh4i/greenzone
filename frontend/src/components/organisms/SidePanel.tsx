@@ -15,12 +15,22 @@ interface SidePanelProps {
   data: Geometry[];
   provinceName?: string | null;
   setShowHexagons: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowBelowHexagons: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowAtCapHexagons: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowAboveHexagons: React.Dispatch<React.SetStateAction<boolean>>;
+  zoomToProvince: (province: Geometry) => void; // Add this
+  highlightProvince?: (province: Geometry | null) => void; // Optional
 }
 
 const SidePanel: React.FC<SidePanelProps> = ({
   data,
   provinceName,
   setShowHexagons,
+  setShowBelowHexagons,
+  setShowAtCapHexagons,
+  setShowAboveHexagons,
+  zoomToProvince,
+  highlightProvince,
 }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
   // const yearRange = [2007, 2014]; // example year range
@@ -65,60 +75,24 @@ const SidePanel: React.FC<SidePanelProps> = ({
     });
   };
 
-  //   try {
-  //     const response = await fetch(
-  //       `http://localhost:8080/api/province/${selectedAimag}`
-  //     );
-  //     const json_object = await response.json();
-
-  //     // Extract general information (non-year dependent)
-  //     const { province_name, province_land_area, province_herders } =
-  //       json_object;
-
-  //     // Extract year-dependent livestock data based on the selected year
-  //     const selectedYearData = {
-  //       number_of_livestock:
-  //         json_object.province_number_of_livestock[selectedYear || 2014],
-  //       number_of_cattle:
-  //         json_object.province_number_of_cattle[selectedYear || 2014],
-  //       number_of_goat:
-  //         json_object.province_number_of_goat[selectedYear || 2014],
-  //       number_of_sheep:
-  //         json_object.province_number_of_sheep[selectedYear || 2014],
-  //       number_of_camel:
-  //         json_object.province_number_of_camel[selectedYear || 2014],
-  //       number_of_horse:
-  //         json_object.province_number_of_horse[selectedYear || 2014],
-  //     };
-
-  //     // Format data for the bar chart
-  //     const formattedData = livestockTypes.map((livestockType) => ({
-  //       x: livestockType,
-  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-  //     }));
-
-  //     // Combine general information with year-specific data
-  //     setProvinceData({
-  //       province_name,
-  //       province_land_area,
-  //       province_herders,
-  //       selectedYearData,
-  //       formattedData,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching data from Express:", error);
-  //   }
-  // };
-
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setSelectedAimag(null);
-    setProvinceData(null); // Clear province data when closing panel
+    setProvinceData(null);
     setSelectedYear(2014);
   };
 
   const handleProvinceSearch = (aimag: string | null) => {
     setSelectedAimag(aimag);
+
+    const province = data.find((d) => d.provinceName === aimag);
+
+    if (province) {
+      zoomToProvince(province); // Call the function passed from the parent
+      if (highlightProvince) highlightProvince(province); // Optional highlight
+    } else {
+      if (highlightProvince) highlightProvince(null); // Reset highlight
+    }
   };
 
   const handleYearSlider = (year: number) => {
@@ -160,9 +134,33 @@ const SidePanel: React.FC<SidePanelProps> = ({
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Button onClick={() => {}} label="Below" />
-          <Button onClick={() => {}} label="At Capacity" />
-          <Button onClick={() => {}} label="Above" />
+          <Button
+            onClick={() => {
+              setShowBelowHexagons(true);
+              setShowAtCapHexagons(false);
+              setShowHexagons(false);
+              setShowAboveHexagons(false);
+            }}
+            label="Below"
+          />
+          <Button
+            onClick={() => {
+              setShowAtCapHexagons(true);
+              setShowHexagons(false);
+              setShowBelowHexagons(false);
+              setShowAboveHexagons(false);
+            }}
+            label="At Capacity"
+          />
+          <Button
+            onClick={() => {
+              setShowAtCapHexagons(false);
+              setShowHexagons(false);
+              setShowBelowHexagons(false);
+              setShowAboveHexagons(true);
+            }}
+            label="Above"
+          />
         </div>
       ),
     },
