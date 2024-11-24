@@ -447,6 +447,7 @@ const MapComponent = () => {
     showCounties,
     map,
   ]);
+  // meow meow meow
 
   const zoomToProvince = (province: Geometry) => {
     const [sw, ne] = province.view; // Assuming `view` has the SW and NE bounds
@@ -507,10 +508,10 @@ const MapComponent = () => {
           highlightProvince={highlightProvince}
         />
 
-        {/* <Button
+        <Button
           label="Toggle Hexagons"
           onClick={() => setShowHexagons((prev) => !prev)}
-        /> */}
+        />
         {/* <Button
           label="Toggle Counties"
           onClick={() => setShowCounties((prev) => !prev)}
