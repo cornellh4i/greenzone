@@ -139,28 +139,22 @@ const SidePanel: React.FC<SidePanelProps> = ({
         <div style={{ display: "flex", gap: "10px" }}>
           <Button
             onClick={() => {
-              setShowBelowHexagons(true);
-              setShowAtCapHexagons(false);
+              setShowBelowHexagons((prev) => !prev);
               setShowHexagons(false);
-              setShowAboveHexagons(false);
             }}
             label="Below"
           />
           <Button
             onClick={() => {
-              setShowAtCapHexagons(true);
+              setShowAtCapHexagons((prev) => !prev);
               setShowHexagons(false);
-              setShowBelowHexagons(false);
-              setShowAboveHexagons(false);
             }}
             label="At Capacity"
           />
           <Button
             onClick={() => {
-              setShowAtCapHexagons(false);
               setShowHexagons(false);
-              setShowBelowHexagons(false);
-              setShowAboveHexagons(true);
+              setShowAboveHexagons((prev) => !prev);
             }}
             label="Above"
           />
