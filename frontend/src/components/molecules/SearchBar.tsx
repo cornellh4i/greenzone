@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { Box } from "@mui/material";
-
-import Dropdown from "../atoms/DropDown";
-import Button from "../atoms/Button";
+import Fuse from "fuse.js";
 import data from "@/components/charts/data/mongolia-province-data.json";
 
 const SearchBar: React.FC<{
-  onSearch: (selectedAimag: string | null, selectedYear: string | null) => void;
+  onSearch: (selectedAimag: string | null) => void;
 }> = ({ onSearch }) => {
   const uniqueAimag = Array.from(
     new Set(
@@ -16,44 +13,65 @@ const SearchBar: React.FC<{
     )
   );
 
-  const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const fuse = new Fuse(uniqueAimag, { threshold: 0.3 });
 
-  const handleSearch = () => {
-    onSearch(selectedAimag, selectedYear);
+  const [inputValue, setInputValue] = useState("");
+
+  const filteredOptions = inputValue
+    ? fuse.search(inputValue).map((result) => result.item)
+    : uniqueAimag;
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleOptionClick = (option: string) => {
+    setInputValue(option); // Set the selected option
+    onSearch(option); // Trigger the search callback
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-      }}
-    >
-      {" "}
-      <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
-        <Dropdown
-          options={uniqueAimag}
-          value={selectedAimag}
-          onChange={setSelectedAimag}
-          label="Select Aimag"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-      <Button
-        onClick={handleSearch}
-        label="Search"
-        sx={{
-          height: "50px",
-          width: "150px",
-          marginLeft: "auto",
-          flexShrink: 0,
+    <div style={{ position: "relative", width: "100%" }}>
+      <input
+        type="text"
+        placeholder="Search Aimag"
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={() => setInputValue("")} // Show all options on focus
+        style={{
+          width: "100%",
+          padding: "8px",
+          boxSizing: "border-box",
         }}
-        disabled={!selectedAimag}
       />
-    </Box>
+      {filteredOptions.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            width: "100%",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            maxHeight: "150px",
+            overflowY: "auto",
+            zIndex: 1000,
+          }}
+        >
+          {filteredOptions.map((option) => (
+            <div
+              key={option}
+              onClick={() => handleOptionClick(option)}
+              style={{
+                padding: "8px",
+                cursor: "pointer",
+                borderBottom: "1px solid #eee",
+              }}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
