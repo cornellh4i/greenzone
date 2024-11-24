@@ -125,6 +125,9 @@ const SidePanel: React.FC<SidePanelProps> = ({
       setShowHexagons(true);
     } else {
       setShowHexagons(false);
+      setShowAboveHexagons(false);
+      setShowBelowHexagons(false);
+      setShowAtCapHexagons(false);
     }
   };
 
