@@ -36,6 +36,52 @@ export const createHexagon = async (
   }
 };
 
+export const getBelowHexagons = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const hexagonsBelow = await Hexagon.find({ bm_pred: { $lte: 0.4 } });
+
+    res.status(200).json(hexagonsBelow);
+  } catch (error: any) {
+    // Use 'any' type
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAtCapHexagons = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const hexagonsAtCap = await Hexagon.find({
+      bm_pred: { $gt: 0.4, $lt: 0.6 },
+    });
+
+    res.status(200).json(hexagonsAtCap);
+  } catch (error: any) {
+    // Use 'any' type
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAboveHexagons = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const hexagonsAbove = await Hexagon.find({
+      bm_pred: { $gte: 0.6 },
+    });
+
+    res.status(200).json(hexagonsAbove);
+  } catch (error: any) {
+    // Use 'any' type
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get all hexagons
 export const getHexagons = async (
   req: Request,

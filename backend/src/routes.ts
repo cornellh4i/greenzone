@@ -2,6 +2,9 @@ import express from "express";
 import {
   createHexagon,
   getHexagons,
+  getBelowHexagons,
+  getAtCapHexagons,
+  getAboveHexagons,
   updateHexagon,
   deleteHexagon,
 } from "./controller/Hexagon";
@@ -28,6 +31,15 @@ router.post("/hexagons", createHexagon);
 
 // Route to get all hexagons
 router.get("/hexagons", getHexagons);
+
+//Route to get all hexagons with a bm_pred of <= 0.4
+router.get("/hexagons/bm_pred_below", getBelowHexagons);
+
+//Route to get all hexagons with a bm_pred between 0.4 and 0.6
+router.get("/hexagons/bm_pred_at_cap", getAtCapHexagons);
+
+//Route to get all hexagons with a bm_pred between 0.4 and 0.6
+router.get("/hexagons/bm_pred_above", getAboveHexagons);
 
 // Route to update a hexagon
 router.put("/hexagons/:hexagon_id", updateHexagon);
