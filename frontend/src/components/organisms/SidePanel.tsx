@@ -34,6 +34,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   // Fetch data for the selected province
   const loadProvinceData = async (provinceName: string) => {
     try {
+      console.log(provinceName.name);
       const response = await fetch(
         `http://localhost:8080/api/province/${provinceName.name}`
       );

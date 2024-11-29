@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Map from "../components/Map";
-
+import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
 const MonitoringPlatform = () => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
@@ -11,9 +11,12 @@ const MonitoringPlatform = () => {
   const handleProvinceSelect = (provinceName: string) => {
     setSelectedProvince(provinceName);
   };
+  console.log(setSelectedProvince);
 
   return (
-    <div style={{ display: "flex" }}>
+    <>
+      {/* Top Panel */}
+      <TopPanel onProvinceSelect={handleProvinceSelect} />
       {/* Map Component */}
       <SidePanel
         provinceName={selectedProvince}
@@ -30,7 +33,7 @@ const MonitoringPlatform = () => {
         showAtCapCells={showAtCapCells}
         showBelowCells={showBelowCells}
       />
-    </div>
+    </>
   );
 };
 

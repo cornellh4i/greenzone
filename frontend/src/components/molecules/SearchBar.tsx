@@ -3,25 +3,24 @@ import { Box } from "@mui/material";
 
 import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
-import data from "@/components/charts/data/mongolia-province-data.json";
 
-const SearchBar: React.FC<{
-  onSearch: (selectedAimag: string | null, selectedYear: string | null) => void;
-}> = ({ onSearch }) => {
-  const uniqueAimag = Array.from(
-    new Set(
-      Object.values(data)
-        .flat()
-        .map((item) => item.Aimag)
-    )
-  );
+interface SearchBarParams {
+  uniqueData: string[];
+  onValueSelect: (searchValue: { value: string }) => void;
+}
 
-  const [selectedAimag, setSelectedAimag] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+const SearchBar: React.FC<SearchBarParams> = ({
+  uniqueData,
+  onValueSelect,
+}) => {
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
   const handleSearch = () => {
-    onSearch(selectedAimag, selectedYear);
+    if (selectedValue) {
+      console.log(selectedValue);
+      // Ensure selectedValue is not null before calling onValueSelect
+      onValueSelect({ name: selectedValue });
+    }
   };
 
   return (
@@ -35,9 +34,9 @@ const SearchBar: React.FC<{
       {" "}
       <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
         <Dropdown
-          options={uniqueAimag}
-          value={selectedAimag}
-          onChange={setSelectedAimag}
+          options={uniqueData}
+          value={selectedValue}
+          onChange={setSelectedValue}
           label="Select Aimag"
           sx={{ width: "100%" }}
         />
@@ -51,7 +50,7 @@ const SearchBar: React.FC<{
           marginLeft: "auto",
           flexShrink: 0,
         }}
-        disabled={!selectedAimag}
+        disabled={!selectedValue}
       />
     </Box>
   );

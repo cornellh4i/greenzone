@@ -29,7 +29,6 @@ interface CellGeometry {
 }
 
 interface MapProps {
-  onProvinceSelect: (provinceData: { name: string }) => void;
   showBelowCells: boolean | null;
   showAtCapCells: boolean | null;
   showAboveCells: boolean | null;
