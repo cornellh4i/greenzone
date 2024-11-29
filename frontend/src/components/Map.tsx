@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Map, MapRef } from "react-map-gl/maplibre";
+import { Map, MapRef, NavigationControl } from "react-map-gl/maplibre";
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3Geo from "d3-geo";
 import proj4 from "proj4";
 import "maplibre-gl/dist/maplibre-gl.css";
-import Button from "./atoms/Button";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -15,13 +14,24 @@ const INITIAL_VIEW_STATE = {
   pitch: 0,
 };
 
-interface Hexagon {
+// For the Geometrical Shapes on the Maps like Province And Counties
+interface Geometry {
+  type: string;
+  name: string;
+  coordinates: number[];
+}
+// For the Geometrical Shapes on the Maps like Province And Counties
+interface CellGeometry {
+  type: string;
+  name: string;
+  coordinates: number[];
   vertices: [number, number][];
 }
 
-interface Geometry {
-  type: string;
-  coordinates: number[][][] | number[][];
+interface MapProps {
+  showBelowCells: boolean | null;
+  showAtCapCells: boolean | null;
+  showAboveCells: boolean | null;
 }
 
 const MAP_STYLE =
@@ -30,262 +40,228 @@ const MAP_STYLE =
 // Define the projection transformation from EPSG:32646 (UTM Zone 46N) to WGS84
 proj4.defs("EPSG:32646", "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs");
 
-const MapComponent = () => {
-  const [hexagons, setHexagons] = useState<Hexagon[]>([]);
-  const [country, setCountry] = useState<Geometry[]>([]);
+const MapComponent: React.FC<MapProps> = ({
+  onProvinceSelect,
+  showAboveCells,
+  showAtCapCells,
+  showBelowCells,
+}) => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
-  const [counties, setCounties] = useState<Geometry[]>([]);
-
-  const [showHexagons, setShowHexagons] = useState(false);
-  const [showProvinces, setShowProvinces] = useState(false);
-  const [showCounties, setShowCounties] = useState(false);
-  const [hoverInfo, setHoverInfo] = useState(null);
-
-  const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
+  const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
+  const [cells, setCells] = useState<CellGeometry[]>([]);
+  const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
+  const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
+  const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
+  // const [showBelowCells, setShowBelowCells] = useState(false);
+  // const [showAtCapCells, setShowAtCapCells] = useState(false);
+  // const [showAboveCells, setShowAboveCells] = useState(false);
 
-  const loadCountryData = async () => {
-    const stateData = await import("@/components/charts/data/country.json");
-    return stateData;
-  };
-
-  const loadProvinceData = async () => {
-    const provinceData = await import("@/components/charts/data/mn.json");
-    return provinceData;
-  };
-
-  const loadCountyData = async () => {
-    const countyData = await import("@/components/charts/data/counties.json");
-    return countyData;
-  };
-
-  // EXMAMPLE FUNCTION TO FETCH HEX DATA
-  const loadGeoData = async () => {
+  const loadCarryingCapacityCells = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/hexagons");
+      const below_response = await fetch(
+        "http://localhost:8080/api//hexagons/bm_pred_below"
+      );
+      const at_cap_response = await fetch(
+        "http://localhost:8080/api//hexagons/bm_pred_at_cap"
+      );
+      const above_response = await fetch(
+        "http://localhost:8080/api//hexagons/bm_pred_above"
+      );
       const json_object = await response.json();
       const geojsonData = json_object;
 
-      const projection = d3Geo.geoMercator();
+      const json_object_below = await below_response.json();
+      const geojsonDataBelow = json_object_below;
+
+      const json_object_at_cap = await at_cap_response.json();
+      const geojsonDataAtCap = json_object_at_cap;
+
+      const json_object_above = await above_response.json();
+      const geojsonDataAbove = json_object_above;
 
       // THIS BLOCK IS REQUIRED TO CONVERT HEX COORDINATES - no need to understand it
       const deckHexProj = geojsonData.map((feature: any) => {
-        const utmCoordinates = feature.geometry.coordinates[0];
-        const wgs84Coordinates = utmCoordinates.map((coord: [number, number]) =>
-          proj4("EPSG:32646", "WGS84", coord)
-        );
-        const projectedPolygon = wgs84Coordinates.map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return { vertices: invertedPolygon };
+        return {
+          vertices: feature.geometry.coordinates[0], // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
       });
-
-      setHexagons(deckHexProj);
+      const deckHexProjBelow = geojsonDataBelow.map((feature: any) => {
+        return {
+          vertices: feature.geometry.coordinates[0], // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      const deckHexProjAtCap = geojsonDataAtCap.map((feature: any) => {
+        return {
+          vertices: feature.geometry.coordinates[0], // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      const deckHexProjAbove = geojsonDataAbove.map((feature: any) => {
+        return {
+          vertices: feature.geometry.coordinates[0], // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      setCells(deckHexProj);
+      setBelowCells(deckHexProjBelow);
+      setAtCapCells(deckHexProjAtCap);
+      setAboveCells(deckHexProjAbove);
     } catch (error) {
       console.error("Error fetching data from Express:", error);
     }
   };
+  const loadProvinceGeometries = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/province");
+      const json_object = await response.json();
+      const geojsonData = json_object;
+      const projection = d3Geo.geoMercator();
+      const deckProvinceProj = geojsonData.map((feature: any) => {
+        feature.geometry.coordinates[0].map(projection);
+
+        const provinceName = feature.province_name;
+        return {
+          type: "Polygon",
+          name: provinceName,
+          coordinates: feature.geometry.coordinates[0],
+        };
+      });
+      setProvinces(deckProvinceProj);
+    } catch (error) {
+      console.error("Error fetching province data:", error);
+    }
+  };
+
+  const handleMapClick = (
+    provinceName: string | null,
+    coordinates: number[] | null
+  ) => {
+    if (!map) return;
+
+    if (provinceName && coordinates) {
+      // Center the map on the clicked province's coordinates
+      map.flyTo({
+        center: coordinates, // Coordinates of the province
+        zoom: 8, // Adjust zoom level as needed
+        speed: 1.5,
+        curve: 1,
+        essential: true,
+      });
+
+      // Trigger the onProvinceSelect callback
+      onProvinceSelect({ name: provinceName });
+    } else {
+      // Recenter to the default view
+      map.flyTo({
+        center: [103.8467, 46.8625], // Default coordinates for the map's center
+        zoom: 5.5, // Default zoom level
+        speed: 1.5,
+        curve: 1,
+        essential: true,
+      });
+
+      // Reset selection (optional)
+      onProvinceSelect({ name: "Default View" });
+    }
+  };
 
   useEffect(() => {
-    loadGeoData();
-    loadCountryData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
-
-      const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-        };
-      });
-      setCountry(deckHexProj);
-    });
-
-    loadProvinceData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
-
-      const deckHexProj = geojsonData.features.map((feature: any) => {
-        const projectedPolygon =
-          feature.geometry.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-        };
-      });
-      setProvinces(deckHexProj);
-    });
-
-    loadCountyData().then((geojsonData) => {
-      const projection = d3Geo.geoMercator();
-
-      const deckHexProj = geojsonData.geometries.map((feature: any) => {
-        const projectedPolygon = feature.coordinates[0].map(projection);
-        const invertedPolygon = projectedPolygon.map(projection.invert);
-        return {
-          type: "Polygon", // Use the appropriate type (e.g., "Polygon", "MultiPolygon", etc.)
-          coordinates: [invertedPolygon], // Wrap in an array if it's a Polygon
-        };
-      });
-      setCounties(deckHexProj);
-    });
+    loadProvinceGeometries();
+    loadCarryingCapacityCells();
   }, []);
 
-  const handleHover = ({ object, x, y }) => {
-    if (object) {
-      setHoverInfo({ x, y, feature: object });
-    } else {
-      setHoverInfo(null);
-    }
-  };
-
-  const handleClick = ({ object }) => {
-    if (object && object.geometry) {
-      const [longitude, latitude] = d3Geo.geoCentroid(object);
-      setViewState({
-        ...viewState,
-        latitude,
-        longitude,
-        zoom: 8, // Adjust zoom level as needed
-        transitionInterpolator: new maplibregl.FlyToInterpolator(),
-      });
-    }
-  };
-
-  const hexagonLayer = new PolygonLayer({
-    id: "hexagon-layer",
-    data: hexagons,
-    getPolygon: (d) => d.vertices,
-    stroked: true,
-    filled: false,
-    getLineColor: [0, 0, 0],
-    lineWidthMinPixels: 1,
-    updateTriggers: {
-      getPolygon: [viewState.zoom], // Ensure smooth adaptation
-    },
-  });
-
-  const countryLayer = new PolygonLayer({
-    id: "country-layer",
-    data: country,
-    getPolygon: (d) => d.coordinates[0],
-    stroked: true,
-    filled: false,
-    getLineColor: [255, 0, 0],
-    lineWidthMinPixels: 1,
-    pickable: true,
-    onHover: handleHover,
-    onClick: handleClick,
-    getLineWidth: 2,
-    updateTriggers: {
-      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
-    },
-    parameters: {
-      blend: true,
-    },
-  });
-
-  const provienceLayer = new PolygonLayer({
+  const provinceLayer = new PolygonLayer({
     id: "province-layer",
     data: provinces,
-    getPolygon: (d) => d.coordinates[0],
-    stroked: true,
-    filled: false,
-    getLineColor: [0, 0, 255],
+    getPolygon: (d) => d.coordinates,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 1,
     pickable: true,
-    onHover: handleHover,
-    onClick: handleClick,
-    getLineWidth: 2,
-    updateTriggers: {
-      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
-    },
-    parameters: {
-      blend: true,
+    autoHighlight: true,
+    highlightColor: [20, 20, 20, 20],
+    onClick: ({ object }) => {
+      if (object) {
+        handleMapClick(object.name, object.coordinates[0]);
+      } else {
+        handleMapClick(null, null); // Click outside the polygons
+      }
     },
   });
 
-  const countyLayer = new PolygonLayer({
-    id: "county-layer",
-    data: counties,
-    getPolygon: (d) => d.coordinates[0],
+  const cellsBelowLayer = new PolygonLayer({
+    id: "hexagonBelow-layer",
+    data: belowCells,
+    getPolygon: (d) => d.vertices,
     stroked: true,
-    filled: false,
-    getLineColor: [0, 0, 255],
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [0, 170, 60, 200],
     lineWidthMinPixels: 1,
-    pickable: true,
-    onHover: handleHover,
-    onClick: handleClick,
-    getLineWidth: 2,
-    updateTriggers: {
-      getLineColor: hoverInfo ? [hoverInfo.feature] : [0, 0, 255],
-    },
-    parameters: {
-      blend: true,
-    },
+  });
+
+  const cellsAtCapLayer = new PolygonLayer({
+    id: "hexagonAtCap-layer",
+    data: atCapCells,
+    getPolygon: (d) => d.vertices,
+    stroked: true,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [255, 255, 20, 150],
+    lineWidthMinPixels: 1,
+  });
+
+  const cellsAboveLayer = new PolygonLayer({
+    id: "hexagon-above-layer",
+    data: aboveCells,
+    getPolygon: (d) => d.vertices,
+    stroked: true,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [214, 15, 2, 150],
+    lineWidthMinPixels: 1,
   });
 
   const handleMapLoad = (event: mapboxgl.MapboxEvent) => {
-    setMap(event.target as MapRef); // Store the map instance with correct type
+    setMap(event.target as unknown as MapRef);
   };
 
   useEffect(() => {
     if (!map) return; // Ensure map is loaded
-
     const layers = [];
-    layers.push(countryLayer);
-    if (showHexagons) layers.push(hexagonLayer);
-    if (showProvinces) layers.push(provienceLayer);
-    if (showCounties) layers.push(countyLayer);
-
+    layers.push(provinceLayer);
+    // if (showCells) layers.push(cellLayer);
+    // if (showCounties) layers.push(countyLayer);
+    if (showBelowCells) layers.push(cellsBelowLayer);
+    if (showAtCapCells) layers.push(cellsAtCapLayer);
+    if (showAboveCells) layers.push(cellsAboveLayer);
     const overlay = new MapboxOverlay({ layers });
-
-    // Clear any existing overlays and add the new one
     map.addControl(overlay);
-
-    // Cleanup previous overlay
     return () => {
       map.removeControl(overlay);
     };
-  }, [showHexagons, showProvinces, showCounties, map]);
+  }, [map, showBelowCells, showAtCapCells, showAboveCells, showCells]);
+
+  if (!provinces || provinces.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
-      <div style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}>
-        <Button
-          label="Toggle Hexagons"
-          onClick={() => setShowHexagons((prev) => !prev)}
-        />
-        <Button
-          label="Toggle Provinces"
-          onClick={() => setShowProvinces((prev) => !prev)}
-        />
-        <Button
-          label="Toggle Counties"
-          onClick={() => setShowCounties((prev) => !prev)}
-        />
-      </div>
       <Map
+        id="map"
         initialViewState={INITIAL_VIEW_STATE}
         mapStyle={MAP_STYLE}
         style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
-      />
-      {/* {hoverInfo && (
-        <div
-          style={{
-            position: "absolute",
-            left: hoverInfo.x,
-            top: hoverInfo.y,
-            backgroundColor: "white",
-            padding: "5px",
-            pointerEvents: "none",
-            border: "1px solid black",
-          }}
-        >
-          Hovering over: {hoverInfo.feature.properties.name || "Unknown"}
-        </div>
-      )} */}
+      >
+        <NavigationControl position="top-left" />
+      </Map>
     </>
   );
 };

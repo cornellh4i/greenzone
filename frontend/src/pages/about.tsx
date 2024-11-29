@@ -1,4 +1,5 @@
 import React from "react";
+import MapComponent from "@/components/Map";
 import SimpleMap from "@/components/MapWrapper";
 /** An About page */
 /*const About = () => {
@@ -14,7 +15,11 @@ export default About;*/
 /** An About page */
 const About = () => {
   console.log("about!");
-  return <>{<SimpleMap />}</>;
+  return (
+    <>
+      <MapComponent />
+    </>
+  );
 };
 
 export default About;
