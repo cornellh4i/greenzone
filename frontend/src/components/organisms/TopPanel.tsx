@@ -1,8 +1,11 @@
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
+import Dropdown from "../atoms/DropDown";
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
+  isPanelOpen: boolean | null;
+  setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   carryingCapacity: boolean | null;
   showBelowCells: boolean | null;
   showAtCapCells: boolean | null;
@@ -25,7 +28,7 @@ interface TopPanelProps {
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity, showBelowCells, 
+const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, isPanelOpen, setPanelOpen, carryingCapacity, showBelowCells, 
   showAtCapCells, showAboveCells, setCarryingCapacity, setShowBelowCells, setShowAtCapCells, 
   setShowAboveCells, ndviSelect, showPositiveCells, showZeroCells, showNegativeCells, setNdviSelect,
   setShowPositiveCells, setShowZeroCells, setShowNegativeCells, selectedYear, setSelectedYear,
@@ -116,7 +119,9 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity,
   
     return {}; // Default case (should never be reached if above logic is correct)
   };
-  
+
+  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) => (2002 + index).toString());
+
   
   const handleValueSelect = (provinceData: { value: string }) => {
     onProvinceSelect(provinceData); // Pass the value up to MPP
@@ -131,9 +136,18 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity,
             onValueSelect={handleValueSelect}
           />
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', width: '100%' }}>
+          {!isPanelOpen && (
+          <Dropdown
+            label="Select Year"
+            options={yearOptions}
+            value={selectedYear}
+            onChange={(val) => setSelectedYear(val)}
+            sx={{ width: "200px" }}/>
+
+          )}
           {
-          carryingCapacity && (
+          !isPanelOpen && carryingCapacity && (
             <><Button
                 onClick={() => toggleCellState("below")}
                 label="Below Cells"
@@ -141,7 +155,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity,
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               /><Button
                   onClick={() => toggleCellState("atCap")}
-                  label="At Cap Cells"
+                  label="At Capacity"
                   sx={getButtonColor("atCap")}
                   disabled={!carryingCapacity} // Disable if carryingCapacity is false
                 /><Button
@@ -153,7 +167,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity,
           )
           }
           {
-          ndviSelect && (
+          !isPanelOpen && ndviSelect && (
             <><Button
                 onClick={() => toggleCellState("positive")}
                 label="Positive"
@@ -173,13 +187,14 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, carryingCapacity,
           )
           }
           {/* Toggle carrying capacity */}
-          <Button
+          {!isPanelOpen && (<Button
             onClick={() => {setCarryingCapacity((prev) => !prev); setNdviSelect((prev) => !prev); setShowAboveCells(false);
               setShowAtCapCells(false); setShowBelowCells(false); setShowNegativeCells(false); setShowPositiveCells(false);
               setShowZeroCells(false);}}
             label={carryingCapacity ? "Switch to NDVI" : "Switch to Carrying Capacity"}
             sx={{ marginBottom: 2 }}
-          />
+          />)
+            }
         </div>
       </div>
     </div>

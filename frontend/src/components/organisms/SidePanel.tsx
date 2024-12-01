@@ -8,6 +8,8 @@ import Toggle from "@/components/atoms/Toggle";
 
 interface SidePanelProps {
   provinceName: string | null;
+  isPanelOpen: boolean | null;
+  setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   carryingCapacity: boolean | null;
   setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
   showBelowCells: boolean | null;
@@ -31,6 +33,8 @@ interface SidePanelProps {
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
+  isPanelOpen,
+  setIsPanelOpen,
   carryingCapacity,
   setCarryingCapacity,
   showBelowCells,
@@ -52,7 +56,6 @@ const SidePanel: React.FC<SidePanelProps> = ({
   grazingRange,
   setGrazingRange,
 }) => {
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
@@ -137,14 +140,17 @@ const SidePanel: React.FC<SidePanelProps> = ({
           <Button
             onClick={() => setShowBelowCells(!showBelowCells)}
             label="Below"
+            sx={{ backgroundColor: showBelowCells ? "green" : "grey" }}
           />
           <Button
             onClick={() => setShowAtCapCells(!showAtCapCells)}
             label="At Capacity"
+            sx={{ backgroundColor: showAtCapCells ? "#C6BF31" : "grey" }}
           />
           <Button
             onClick={() => setShowAboveCells(!showAboveCells)}
             label="Above"
+            sx={{ backgroundColor: showAboveCells ? "red" : "grey" }}
           />
         </div>
       ),
@@ -154,9 +160,21 @@ const SidePanel: React.FC<SidePanelProps> = ({
       label: "Z-Score",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Button onClick={() => {}} label="Positive" />
-          <Button onClick={() => {}} label="Zero" />
-          <Button onClick={() => {}} label="Negative" />
+          <Button
+            onClick={() => setShowPositiveCells(!showPositiveCells)}
+            label="Positive"
+            sx={{ backgroundColor: showPositiveCells ? "teal" : "grey" }}
+          />
+          <Button
+            onClick={() => setShowZeroCells(!showZeroCells)}
+            label="Zero"
+            sx={{ backgroundColor: showZeroCells ? "darkblue" : "grey" }}
+          />
+          <Button
+            onClick={() => setShowNegativeCells(!showNegativeCells)}
+            label="Negative"
+            sx={{ backgroundColor: showNegativeCells ? "purple" : "grey" }}
+          />
         </div>
       ),
     },

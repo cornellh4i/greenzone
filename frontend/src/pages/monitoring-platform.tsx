@@ -5,6 +5,7 @@ import SidePanel from "../components/organisms/SidePanel";
 const MonitoringPlatform = () => {
 
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
 
   // Associated with Carrying Capacity
   const [carryingCapacity, setCarryingCapacity]= useState(true);
@@ -25,7 +26,51 @@ const MonitoringPlatform = () => {
   const handleProvinceSelect = (provinceName: string) => {
     setSelectedProvince(provinceName);
   };
-  console.log(setSelectedProvince);
+
+  const handleIsPanelOpenChange = (value) => {
+    setIsPanelOpen(value);
+  };
+
+  const handleCarryingCapacityChange = (value) => {
+    setCarryingCapacity(value);
+  };
+
+  const handleShowBelowCellsChange = (value) => {
+    setShowBelowCells(value);
+  };
+
+  const handleShowAtCapCellsChange = (value) => {
+    setShowAtCapCells(value);
+  };
+
+  const handleShowAboveCellsChange = (value) => {
+    setShowAboveCells(value);
+  };
+
+  const handleNdviSelectChange = (value) => {
+    setNdviSelect(value);
+  };
+
+  const handleShowPositiveCellsChange = (value) => {
+    setShowPositiveCells(value);
+  };
+
+  const handleShowZeroCellsChange = (value) => {
+    setShowZeroCells(value);
+  };
+
+  const handleShowNegativeCellsChange = (value) => {
+    setShowNegativeCells(value);
+  };
+
+  const handleSelectedYearChange = (value) => {
+    setSelectedYear(value);
+  };
+
+  const handleGrazingRangeChange = (value) => {
+    setGrazingRange(value);
+  };
+
   // interface for SidePanel
   // fetch coord data for all provinces
   return (
@@ -35,51 +80,55 @@ const MonitoringPlatform = () => {
       {/* Top Panel */}
       <TopPanel 
         onProvinceSelect={handleProvinceSelect}
+        isPanelOpen={isPanelOpen}
+        setIsPanelOpen={handleIsPanelOpenChange}
         carryingCapacity={carryingCapacity}
         showBelowCells={showBelowCells}
         showAtCapCells={showAtCapCells}
         showAboveCells={showAboveCells}
-        setCarryingCapacity={setCarryingCapacity}
-        setShowBelowCells={setShowBelowCells}
-        setShowAtCapCells={setShowAtCapCells}
-        setShowAboveCells={setShowAboveCells}
+        setCarryingCapacity={handleCarryingCapacityChange}
+        setShowBelowCells={handleShowBelowCellsChange}
+        setShowAtCapCells={handleShowAtCapCellsChange}
+        setShowAboveCells={handleShowAboveCellsChange}
         ndviSelect={ndviSelect}
         showPositiveCells={showPositiveCells}
         showZeroCells={showZeroCells}
         showNegativeCells={showNegativeCells}
-        setNdviSelect={setNdviSelect}
-        setShowPositiveCells={setShowPositiveCells}
-        setShowZeroCells={setShowZeroCells}
-        setShowNegativeCells={setShowNegativeCells}
+        setNdviSelect={handleNdviSelectChange}
+        setShowPositiveCells={handleShowPositiveCellsChange}
+        setShowZeroCells={handleShowZeroCellsChange}
+        setShowNegativeCells={handleShowNegativeCellsChange}
         selectedYear={selectedYear}
-        setSelectedYear={setSelectedYear}
+        setSelectedYear={handleSelectedYearChange}
         grazingRange={grazingRange}
-        setGrazingRange={setGrazingRange}
+        setGrazingRange={handleGrazingRangeChange}
       />
       </div>
       <div>
         <SidePanel // fetch for specific info
           provinceName={selectedProvince}
+          isPanelOpen={isPanelOpen}
+          setIsPanelOpen={handleIsPanelOpenChange}
           carryingCapacity={carryingCapacity}
-          setCarryingCapacity={setCarryingCapacity}
+          setCarryingCapacity={handleCarryingCapacityChange}
           showBelowCells={showBelowCells}
-          setShowBelowCells={setShowBelowCells}
+          setShowBelowCells={handleShowBelowCellsChange}
           showAtCapCells={showAtCapCells}
-          setShowAtCapCells={setShowAtCapCells}
+          setShowAtCapCells={handleShowAtCapCellsChange}
           showAboveCells={showAboveCells}
-          setShowAboveCells={setShowAboveCells}
+          setShowAboveCells={handleShowAboveCellsChange}
           ndviSelect={ndviSelect}
-          setNdviSelect={setNdviSelect}
+          setNdviSelect={handleNdviSelectChange}
           showPositiveCells={showPositiveCells}
-          setShowPositiveCells={setShowPositiveCells}
+          setShowPositiveCells={handleShowPositiveCellsChange}
           showZeroCells={showZeroCells}
-          setShowZeroCells={setShowZeroCells}
+          setShowZeroCells={handleShowZeroCellsChange}
           showNegativeCells={showNegativeCells}
-          setShowNegativeCells={setShowNegativeCells}
+          setShowNegativeCells={handleShowNegativeCellsChange}
           selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
+          setSelectedYear={handleSelectedYearChange}
           grazingRange={grazingRange}
-          setGrazingRange={setGrazingRange}
+          setGrazingRange={handleGrazingRangeChange}
         />
       </div>
         <Map // fetches all coordinates Province/Counties/Cells
