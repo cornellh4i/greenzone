@@ -8,28 +8,55 @@ import Toggle from "@/components/atoms/Toggle";
 
 interface SidePanelProps {
   provinceName: string | null;
+  carryingCapacity: boolean | null;
+  setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
   showBelowCells: boolean | null;
   setShowBelowCells: React.Dispatch<React.SetStateAction<boolean>>;
   showAtCapCells: boolean | null;
   setShowAtCapCells: React.Dispatch<React.SetStateAction<boolean>>;
   showAboveCells: boolean | null;
   setShowAboveCells: React.Dispatch<React.SetStateAction<boolean>>;
+  ndviSelect: boolean | null;
+  setNdviSelect: React.Dispatch<React.SetStateAction<boolean>>;
+  showPositiveCells: boolean | null;
+  setShowPositiveCells: React.Dispatch<React.SetStateAction<boolean>>;
+  showZeroCells: boolean | null;
+  setShowZeroCells: React.Dispatch<React.SetStateAction<boolean>>;
+  showNegativeCells: boolean | null;
+  setShowNegativeCells: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedYear: number | 2014;
+  setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+  grazingRange: boolean | null;
+  setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
+  carryingCapacity,
+  setCarryingCapacity,
   showBelowCells,
   setShowBelowCells,
   showAtCapCells,
   setShowAtCapCells,
   showAboveCells,
   setShowAboveCells,
+  ndviSelect,
+  setNdviSelect,
+  showPositiveCells,
+  setShowPositiveCells,
+  showZeroCells,
+  setShowZeroCells,
+  showNegativeCells,
+  setShowNegativeCells,
+  selectedYear,
+  setSelectedYear,
+  grazingRange,
+  setGrazingRange,
 }) => {
-  const [selectedYear, setSelectedYear] = useState<number>(2014);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>("carryingCapacity");
 
   // Fetch data for the selected province
   const loadProvinceData = async (provinceName: string) => {
@@ -138,7 +165,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   return (
     <div>
       {/* Toggle SidePanel Button */}
-      <Button onClick={handlePanelToggle} label="Toggle SidePanel" />
+      {/* <Button onClick={handlePanelToggle} label="Toggle SidePanel" /> */}
 
       {/* Persistent Drawer */}
       <Drawer
@@ -152,6 +179,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
             maxWidth: "400px",
             boxSizing: "border-box",
             p: 2,
+            paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
           },
