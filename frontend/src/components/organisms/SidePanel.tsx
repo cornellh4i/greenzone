@@ -28,7 +28,7 @@ interface SidePanelProps {
   setShowNegativeCells: React.Dispatch<React.SetStateAction<boolean>>;
   selectedYear: number | 2014;
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-  grazingRange: boolean | null;
+  grazingRange: boolean | false;
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const SidePanel: React.FC<SidePanelProps> = ({
@@ -224,7 +224,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 max={2014}
               />
               <h2>Grazing Range</h2>
-              <Toggle initialChecked={false} onChange={() => {}} />
+              <Toggle initialChecked={grazingRange} onChange={(checked) => setGrazingRange(checked)} />
               <h2>Data Layers</h2>
               <RadioButton
                 options={options}

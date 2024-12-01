@@ -146,6 +146,12 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, isPanelOpen, setP
             sx={{ width: "200px" }}/>
 
           )}
+          {!isPanelOpen && (
+            <Button
+              onClick={() => setGrazingRange((prev) => !prev)}
+              label="Grazing Range"
+              sx={{
+                backgroundColor: grazingRange ? 'green' : 'grey'}}/>)}
           {
           !isPanelOpen && carryingCapacity && (
             <><Button
