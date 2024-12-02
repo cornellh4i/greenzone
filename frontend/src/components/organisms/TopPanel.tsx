@@ -3,6 +3,8 @@ import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
 import { useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
+import { Avatar } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
@@ -259,6 +261,11 @@ const TopPanel: React.FC<TopPanelProps> = ({
           sx={{
             backgroundColor: 'grey' }}
           startIcon={<HomeIcon/>}/>
+        <Button
+          onClick={() => {}} // Placeholder for future routing
+          sx={{
+            backgroundColor: "transparent" }}
+          startIcon={<Avatar><PersonIcon/></Avatar>}/>
       </div>
     </div>
   );
