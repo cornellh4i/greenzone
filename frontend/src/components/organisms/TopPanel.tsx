@@ -163,7 +163,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
   return (
     <div>
       <div style={{ display: "flex", gap: "10px" }}>
-        <div style={{ marginTop: "10px" }}>
+        <div>
           <SearchBar
             uniqueData={uniqueData}
             onValueSelect={handleValueSelect}
@@ -176,7 +176,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
             options={yearOptions}
             value={selectedYear.toString()}
             onChange={(val) => setSelectedYear(val)}
-            sx={{ width: "200px" }}/>
+            sx={{ width: "160px" }}/>
 
           )}
           {!isPanelOpen && (
