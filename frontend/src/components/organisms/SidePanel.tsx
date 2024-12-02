@@ -30,6 +30,8 @@ interface SidePanelProps {
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
   grazingRange: boolean | false;
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedOption: string | "carryingCapacity";
+  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
@@ -55,11 +57,12 @@ const SidePanel: React.FC<SidePanelProps> = ({
   setSelectedYear,
   grazingRange,
   setGrazingRange,
+  selectedOption,
+  setSelectedOption,
 }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const [selectedOption, setSelectedOption] = useState<string | null>("carryingCapacity");
 
   // Fetch data for the selected province
   const loadProvinceData = async (provinceName: string) => {
@@ -127,9 +130,31 @@ const SidePanel: React.FC<SidePanelProps> = ({
     setProvinceData(null);
   };
 
-  const handleOptionChange = (value: string) => {
-    setSelectedOption(value);
+  const handleOptionChange = (option: string) => {
+    setSelectedOption(option);
+    // Reset states when changing the option
+    if (option === "carryingCapacity") {
+      setCarryingCapacity(true);   // Activate Carrying Capacity
+      setNdviSelect(false);        // Deactivate NDVI
+      setShowPositiveCells(false);
+      setShowZeroCells(false);
+      setShowNegativeCells(false);
+      setShowBelowCells(false);    // Reset Carrying Capacity states
+      setShowAtCapCells(false);
+      setShowAboveCells(false);
+    } else if (option === "zScore") {
+      setCarryingCapacity(false);  // Deactivate Carrying Capacity
+      setNdviSelect(true);         // Activate NDVI
+      setShowBelowCells(false);    // Reset NDVI states
+      setShowAtCapCells(false);
+      setShowAboveCells(false);
+      setShowNegativeCells(false);
+      setShowPositiveCells(false);
+      setShowZeroCells(false);
+    }
   };
+
+  
 
   const options = [
     {

@@ -26,13 +26,36 @@ interface TopPanelProps {
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
   grazingRange: boolean | null;
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedOption: string | "carryingCapacity";
+  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, isPanelOpen, setPanelOpen, carryingCapacity, showBelowCells, 
-  showAtCapCells, showAboveCells, setCarryingCapacity, setShowBelowCells, setShowAtCapCells, 
-  setShowAboveCells, ndviSelect, showPositiveCells, showZeroCells, showNegativeCells, setNdviSelect,
-  setShowPositiveCells, setShowZeroCells, setShowNegativeCells, selectedYear, setSelectedYear,
-  grazingRange, setGrazingRange }) => {
+const TopPanel: React.FC<TopPanelProps> = ({
+  onProvinceSelect,
+  isPanelOpen,
+  setPanelOpen,
+  carryingCapacity,
+  showBelowCells, 
+  showAtCapCells,
+  showAboveCells,
+  setCarryingCapacity,
+  setShowBelowCells,
+  setShowAtCapCells, 
+  setShowAboveCells,
+  ndviSelect,
+  showPositiveCells,
+  showZeroCells,
+  showNegativeCells,
+  setNdviSelect,
+  setShowPositiveCells,
+  setShowZeroCells,
+  setShowNegativeCells,
+  selectedYear,
+  setSelectedYear,
+  grazingRange,
+  setGrazingRange,
+  selectedOption,
+  setSelectedOption }) => {
   const uniqueData = [
     "Dornod",
     "Bayan-Ölgiy",
@@ -194,9 +217,30 @@ const TopPanel: React.FC<TopPanelProps> = ({ onProvinceSelect, isPanelOpen, setP
           }
           {/* Toggle carrying capacity */}
           {!isPanelOpen && (<Button
-            onClick={() => {setCarryingCapacity((prev) => !prev); setNdviSelect((prev) => !prev); setShowAboveCells(false);
-              setShowAtCapCells(false); setShowBelowCells(false); setShowNegativeCells(false); setShowPositiveCells(false);
-              setShowZeroCells(false);}}
+            onClick={() => {    if (carryingCapacity) {
+              // If we're currently on Carrying Capacity, switch to NDVI
+              setCarryingCapacity(false);
+              setNdviSelect(true);
+              setSelectedOption("zScore");
+              // Reset NDVI-related states
+              setShowAboveCells(false);
+              setShowAtCapCells(false);
+              setShowBelowCells(false);
+              setShowNegativeCells(false);
+              setShowPositiveCells(false);
+              setShowZeroCells(false);
+            } else {
+              setCarryingCapacity(true);
+              setNdviSelect(false);
+              setSelectedOption("carryingCapacity");
+              setShowBelowCells(false);
+              setShowAtCapCells(false);
+              setShowAboveCells(false);
+              setShowNegativeCells(false);
+              setShowPositiveCells(false);
+              setShowZeroCells(false);
+            }
+          }}
             label={carryingCapacity ? "Switch to NDVI" : "Switch to Carrying Capacity"}
             sx={{ marginBottom: 2 }}
           />)

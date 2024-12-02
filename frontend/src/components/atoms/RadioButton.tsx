@@ -1,9 +1,9 @@
 import React from "react";
 
 interface RadioButtonGroupProps {
-  options: { name: string; label: string; content: React.ReactNode }[]; // Each option can have content under it
+  options: { name: string; label: string; content: React.ReactNode }[];
   selectedOption: string | null;
-  onChange: (value: string) => void; // Handle option change
+  onChange: (value: string) => void;
 }
 
 const RadioButton: React.FC<RadioButtonGroupProps> = ({
@@ -26,8 +26,8 @@ const RadioButton: React.FC<RadioButtonGroupProps> = ({
             <input
               type="radio"
               name="radio-group"
-              checked={selectedOption === option.name}
-              onChange={() => onChange(option.name)}
+              checked={selectedOption === option.name} // Check if the option is selected
+              onChange={() => onChange(option.name)}    // Call onChange when selected
               style={{
                 width: "20px",
                 height: "20px",
