@@ -3,7 +3,7 @@ import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer, Divider } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
-import Slide from "@/components/atoms/Slide";
+import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 
 interface SidePanelProps {
@@ -32,6 +32,7 @@ interface SidePanelProps {
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
   selectedOption: string | "carryingCapacity";
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+  yearOptions: string[];
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
@@ -59,6 +60,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   setGrazingRange,
   selectedOption,
   setSelectedOption,
+  yearOptions,
 }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
@@ -117,7 +119,6 @@ const SidePanel: React.FC<SidePanelProps> = ({
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
-    // setSelectedYear(2014);
     if (!isPanelOpen) {
       setProvinceData(null); // Clear province data when closing the panel
     }
@@ -132,20 +133,19 @@ const SidePanel: React.FC<SidePanelProps> = ({
 
   const handleOptionChange = (option: string) => {
     setSelectedOption(option);
-    // Reset states when changing the option
     if (option === "carryingCapacity") {
-      setCarryingCapacity(true);   // Activate Carrying Capacity
-      setNdviSelect(false);        // Deactivate NDVI
+      setCarryingCapacity(true);
+      setNdviSelect(false);
       setShowPositiveCells(false);
       setShowZeroCells(false);
       setShowNegativeCells(false);
-      setShowBelowCells(false);    // Reset Carrying Capacity states
+      setShowBelowCells(false);
       setShowAtCapCells(false);
       setShowAboveCells(false);
     } else if (option === "zScore") {
-      setCarryingCapacity(false);  // Deactivate Carrying Capacity
-      setNdviSelect(true);         // Activate NDVI
-      setShowBelowCells(false);    // Reset NDVI states
+      setCarryingCapacity(false);
+      setNdviSelect(true);
+      setShowBelowCells(false);
       setShowAtCapCells(false);
       setShowAboveCells(false);
       setShowNegativeCells(false);
@@ -247,6 +247,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 onChange={handleYearSlider}
                 min={2002}
                 max={2014}
+                options={yearOptions}
               />
               <h2>Grazing Range</h2>
               <Toggle initialChecked={grazingRange} onChange={(checked) => setGrazingRange(checked)} />

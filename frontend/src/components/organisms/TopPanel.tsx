@@ -1,6 +1,8 @@
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
+import { useRouter } from "next/router";
+import HomeIcon from "@mui/icons-material/Home";
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
@@ -28,6 +30,7 @@ interface TopPanelProps {
   setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
   selectedOption: string | "carryingCapacity";
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+  yearOptions: string[];
 }
 
 const TopPanel: React.FC<TopPanelProps> = ({
@@ -55,7 +58,8 @@ const TopPanel: React.FC<TopPanelProps> = ({
   grazingRange,
   setGrazingRange,
   selectedOption,
-  setSelectedOption }) => {
+  setSelectedOption,
+  yearOptions }) => {
   const uniqueData = [
     "Dornod",
     "Bayan-Ölgiy",
@@ -80,6 +84,12 @@ const TopPanel: React.FC<TopPanelProps> = ({
     "Govĭ-Sümber",
     "Ulaanbaatar", // Capital city (not a province but included for reference)
   ];
+
+  const router = useRouter();
+
+  const navigateTo = (path: string) => {
+    router.push(path);
+  };
 
   const toggleCellState = (cellType: string) => {
     switch (cellType) {
@@ -143,8 +153,6 @@ const TopPanel: React.FC<TopPanelProps> = ({
     return {}; // Default case (should never be reached if above logic is correct)
   };
 
-  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) => (2002 + index).toString());
-
   
   const handleValueSelect = (provinceData: { value: string }) => {
     onProvinceSelect(provinceData); // Pass the value up to MPP
@@ -164,7 +172,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           <Dropdown
             label="Select Year"
             options={yearOptions}
-            value={selectedYear}
+            value={selectedYear.toString()}
             onChange={(val) => setSelectedYear(val)}
             sx={{ width: "200px" }}/>
 
@@ -246,6 +254,11 @@ const TopPanel: React.FC<TopPanelProps> = ({
           />)
             }
         </div>
+        <Button
+          onClick={() => navigateTo("/landing")}
+          sx={{
+            backgroundColor: 'grey' }}
+          startIcon={<HomeIcon/>}/>
       </div>
     </div>
   );

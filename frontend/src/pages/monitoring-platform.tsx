@@ -20,10 +20,11 @@ const MonitoringPlatform = () => {
   const [showNegativeCells, setShowNegativeCells] = useState(false);
 
   const [selectedYear, setSelectedYear] = useState<number>(2014);
-
   const [grazingRange, setGrazingRange] = useState(false);
-
   const [selectedOption, setSelectedOption] = useState<string>("carryingCapacity");
+
+  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) => (2002 + index).toString());
+
 
   const handleProvinceSelect = (provinceName: string) => {
     setSelectedProvince(provinceName);
@@ -73,10 +74,7 @@ const MonitoringPlatform = () => {
     setGrazingRange(value);
   };
 
-  console.log("ndvi", ndviSelect);
-  console.log("cars", carryingCapacity);
-  // interface for SidePanel
-  // fetch coord data for all provinces
+
   return (
     <>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -108,6 +106,7 @@ const MonitoringPlatform = () => {
         setGrazingRange={handleGrazingRangeChange}
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
+        yearOptions={yearOptions}
       />
       </div>
       <div>
@@ -137,6 +136,7 @@ const MonitoringPlatform = () => {
           setGrazingRange={handleGrazingRangeChange}
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
+          yearOptions={yearOptions}
         />
       </div>
         <Map // fetches all coordinates Province/Counties/Cells
