@@ -3,42 +3,82 @@ import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer, Divider } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
-import Slide from "@/components/atoms/Slide";
+import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 
 interface SidePanelProps {
   provinceName: string | null;
+  isPanelOpen: boolean | null;
+  setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  carryingCapacity: boolean | null;
+  setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
   showBelowCells: boolean | null;
   setShowBelowCells: React.Dispatch<React.SetStateAction<boolean>>;
   showAtCapCells: boolean | null;
   setShowAtCapCells: React.Dispatch<React.SetStateAction<boolean>>;
   showAboveCells: boolean | null;
   setShowAboveCells: React.Dispatch<React.SetStateAction<boolean>>;
+  ndviSelect: boolean | null;
+  setNdviSelect: React.Dispatch<React.SetStateAction<boolean>>;
+  showPositiveCells: boolean | null;
+  setShowPositiveCells: React.Dispatch<React.SetStateAction<boolean>>;
+  showZeroCells: boolean | null;
+  setShowZeroCells: React.Dispatch<React.SetStateAction<boolean>>;
+  showNegativeCells: boolean | null;
+  setShowNegativeCells: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedYear: number | 2014;
+  setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+  grazingRange: boolean | false;
+  setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedOption: string | "carryingCapacity";
+  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+  yearOptions: string[];
+  displayName: string;
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
+  isPanelOpen,
+  setIsPanelOpen,
+  carryingCapacity,
+  setCarryingCapacity,
   showBelowCells,
   setShowBelowCells,
   showAtCapCells,
   setShowAtCapCells,
   showAboveCells,
   setShowAboveCells,
+  ndviSelect,
+  setNdviSelect,
+  showPositiveCells,
+  setShowPositiveCells,
+  showZeroCells,
+  setShowZeroCells,
+  showNegativeCells,
+  setShowNegativeCells,
+  selectedYear,
+  setSelectedYear,
+  grazingRange,
+  setGrazingRange,
+  selectedOption,
+  setSelectedOption,
+  yearOptions,
+  displayName,
 }) => {
-  const [selectedYear, setSelectedYear] = useState<number>(2014);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   // Fetch data for the selected province
-  const loadProvinceData = async (provinceName: string) => {
+  const loadProvinceData = async (
+    provinceName: string,
+    displayName: string
+  ) => {
     try {
-      console.log(provinceName.name);
       const response = await fetch(
         `http://localhost:8080/api/province/${provinceName.name}`
       );
       const json_object = await response.json();
+      console.log(provinceName);
 
       const { province_name, province_land_area, province_herders } =
         json_object;
@@ -64,6 +104,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       }));
 
       setProvinceData({
+        displayName,
         province_name,
         province_land_area,
         province_herders,
@@ -78,13 +119,12 @@ const SidePanel: React.FC<SidePanelProps> = ({
   useEffect(() => {
     if (provinceName) {
       setIsPanelOpen(true); // Open the panel when a province is selected
-      loadProvinceData(provinceName);
+      loadProvinceData(provinceName, displayName);
     }
   }, [provinceName]);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
-    // setSelectedYear(2014);
     if (!isPanelOpen) {
       setProvinceData(null); // Clear province data when closing the panel
     }
@@ -97,8 +137,27 @@ const SidePanel: React.FC<SidePanelProps> = ({
     setProvinceData(null);
   };
 
-  const handleOptionChange = (value: string) => {
-    setSelectedOption(value);
+  const handleOptionChange = (option: string) => {
+    setSelectedOption(option);
+    if (option === "carryingCapacity") {
+      setCarryingCapacity(true);
+      setNdviSelect(false);
+      setShowPositiveCells(false);
+      setShowZeroCells(false);
+      setShowNegativeCells(false);
+      setShowBelowCells(false);
+      setShowAtCapCells(false);
+      setShowAboveCells(false);
+    } else if (option === "zScore") {
+      setCarryingCapacity(false);
+      setNdviSelect(true);
+      setShowBelowCells(false);
+      setShowAtCapCells(false);
+      setShowAboveCells(false);
+      setShowNegativeCells(false);
+      setShowPositiveCells(false);
+      setShowZeroCells(false);
+    }
   };
 
   const options = [
@@ -110,14 +169,17 @@ const SidePanel: React.FC<SidePanelProps> = ({
           <Button
             onClick={() => setShowBelowCells(!showBelowCells)}
             label="Below"
+            sx={{ backgroundColor: showBelowCells ? "green" : "grey" }}
           />
           <Button
             onClick={() => setShowAtCapCells(!showAtCapCells)}
             label="At Capacity"
+            sx={{ backgroundColor: showAtCapCells ? "#C6BF31" : "grey" }}
           />
           <Button
             onClick={() => setShowAboveCells(!showAboveCells)}
             label="Above"
+            sx={{ backgroundColor: showAboveCells ? "red" : "grey" }}
           />
         </div>
       ),
@@ -127,9 +189,21 @@ const SidePanel: React.FC<SidePanelProps> = ({
       label: "Z-Score",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Button onClick={() => {}} label="Positive" />
-          <Button onClick={() => {}} label="Zero" />
-          <Button onClick={() => {}} label="Negative" />
+          <Button
+            onClick={() => setShowPositiveCells(!showPositiveCells)}
+            label="Positive"
+            sx={{ backgroundColor: showPositiveCells ? "teal" : "grey" }}
+          />
+          <Button
+            onClick={() => setShowZeroCells(!showZeroCells)}
+            label="Zero"
+            sx={{ backgroundColor: showZeroCells ? "darkblue" : "grey" }}
+          />
+          <Button
+            onClick={() => setShowNegativeCells(!showNegativeCells)}
+            label="Negative"
+            sx={{ backgroundColor: showNegativeCells ? "purple" : "grey" }}
+          />
         </div>
       ),
     },
@@ -138,7 +212,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   return (
     <div>
       {/* Toggle SidePanel Button */}
-      <Button onClick={handlePanelToggle} label="Toggle SidePanel" />
+      {/* <Button onClick={handlePanelToggle} label="Toggle SidePanel" /> */}
 
       {/* Persistent Drawer */}
       <Drawer
@@ -152,6 +226,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
             maxWidth: "400px",
             boxSizing: "border-box",
             p: 2,
+            paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
           },
@@ -176,9 +251,13 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 onChange={handleYearSlider}
                 min={2002}
                 max={2014}
+                options={yearOptions}
               />
               <h2>Grazing Range</h2>
-              <Toggle initialChecked={false} onChange={() => {}} />
+              <Toggle
+                initialChecked={grazingRange}
+                onChange={(checked) => setGrazingRange(checked)}
+              />
               <h2>Data Layers</h2>
               <RadioButton
                 options={options}

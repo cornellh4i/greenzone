@@ -63,10 +63,10 @@ export const getProvinceById = async (
   res: Response
 ): Promise<void> => {
   console.log("wwggeg");
-  const { id } = req.params; // Extract ID from the URL
+  const feature = req.params; // Extract ID from the URL
 
   try {
-    const province = await Province.findById(id);
+    const province = await Province.findById(feature.province_id);
     if (!province) {
       res.status(404).json({ message: "Provinceqwcqwdqwd not found" });
       return;
@@ -83,7 +83,7 @@ export const getProvinceByName = async (
   res: Response
 ): Promise<void> => {
   const { province_name } = req.params;
-
+  console.log(province_name);
   try {
     const province = await Province.findOne({ province_name: province_name });
     if (!province) {
@@ -103,9 +103,10 @@ export const updateProvince = async (
   try {
     const { province_id } = req.params;
     const updatedData = req.body;
-
-    const province = await Province.findByIdAndUpdate(
-      province_id,
+    console.log("were in update");
+    console.log(req.params);
+    const province = await Province.findOneAndUpdate(
+      { province_name: province_id },
       updatedData,
       {
         new: true,

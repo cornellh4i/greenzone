@@ -5,6 +5,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import * as d3Geo from "d3-geo";
 import proj4 from "proj4";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { FlyToInterpolator } from "@deck.gl/core";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -47,12 +48,14 @@ const MapComponent: React.FC<MapProps> = ({
   showBelowCells,
 }) => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
+  const [soums, setSoums] = useState<Geometry[]>([]);
   const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
   const [cells, setCells] = useState<CellGeometry[]>([]);
   const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
   const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
   const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
+  const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
   // const [showBelowCells, setShowBelowCells] = useState(false);
   // const [showAtCapCells, setShowAtCapCells] = useState(false);
   // const [showAboveCells, setShowAboveCells] = useState(false);
@@ -122,12 +125,24 @@ const MapComponent: React.FC<MapProps> = ({
       const projection = d3Geo.geoMercator();
       const deckProvinceProj = geojsonData.map((feature: any) => {
         feature.geometry.coordinates[0].map(projection);
+        const bounds = feature.geometry.coordinates[0].reduce(
+          (bbox, [lng, lat]) => {
+            return [
+              Math.min(bbox[0], lng), // Min longitude
+              Math.min(bbox[1], lat), // Min latitude
+              Math.max(bbox[2], lng), // Max longitude
+              Math.max(bbox[3], lat), // Max latitude
+            ];
+          },
+          [Infinity, Infinity, -Infinity, -Infinity]
+        );
 
         const provinceName = feature.province_name;
         return {
           type: "Polygon",
           name: provinceName,
           coordinates: feature.geometry.coordinates[0],
+          view: bounds,
         };
       });
       setProvinces(deckProvinceProj);
@@ -135,41 +150,51 @@ const MapComponent: React.FC<MapProps> = ({
       console.error("Error fetching province data:", error);
     }
   };
+  const loadCountiesGeometries = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/county");
+      const json_object = await response.json();
+      const geojsonData = json_object;
+      const projection = d3Geo.geoMercator();
+      const deckSoumProj = geojsonData.map((feature: any) => {
+        feature.geometry.coordinates[0].map(projection);
+
+        const soumName = feature.soum_name;
+        return {
+          type: "Polygon",
+          name: soumName,
+          coordinates: feature.geometry.coordinates[0],
+        };
+      });
+      setSoums(deckSoumProj);
+    } catch (error) {
+      console.error("Error fetching province data:", error);
+    }
+  };
+  const handleZoomToProvince = (bounds: [number, number, number, number]) => {
+    map.fitBounds(bounds, {
+      padding: 50, // Add padding to ensure the province is not cut off
+      maxZoom: 8, // Set a maximum zoom level
+      duration: 1500, // Smooth animation duration (in ms)
+    });
+  };
 
   const handleMapClick = (
     provinceName: string | null,
-    coordinates: number[] | null
+    coordinates: number[] | null,
+    view: [number, number, number, number] | null
   ) => {
     if (!map) return;
 
     if (provinceName && coordinates) {
-      // Center the map on the clicked province's coordinates
-      map.flyTo({
-        center: coordinates, // Coordinates of the province
-        zoom: 8, // Adjust zoom level as needed
-        speed: 1.5,
-        curve: 1,
-        essential: true,
-      });
-
+      handleZoomToProvince(view);
       // Trigger the onProvinceSelect callback
       onProvinceSelect({ name: provinceName });
-    } else {
-      // Recenter to the default view
-      map.flyTo({
-        center: [103.8467, 46.8625], // Default coordinates for the map's center
-        zoom: 5.5, // Default zoom level
-        speed: 1.5,
-        curve: 1,
-        essential: true,
-      });
-
-      // Reset selection (optional)
-      onProvinceSelect({ name: "Default View" });
     }
   };
 
   useEffect(() => {
+    loadCountiesGeometries();
     loadProvinceGeometries();
     loadCarryingCapacityCells();
   }, []);
@@ -184,14 +209,25 @@ const MapComponent: React.FC<MapProps> = ({
     lineWidthMinPixels: 1,
     pickable: true,
     autoHighlight: true,
-    highlightColor: [20, 20, 20, 20],
+    highlightColor: [1000, 20, 20, 20],
     onClick: ({ object }) => {
       if (object) {
-        handleMapClick(object.name, object.coordinates[0]);
+        handleMapClick(object.name, object.coordinates[0], object.view);
       } else {
-        handleMapClick(null, null); // Click outside the polygons
+        handleMapClick(null, null, null); // Click outside the polygons
       }
     },
+  });
+  const soumLayer = new PolygonLayer({
+    id: "soum-layer",
+    data: soums,
+    getPolygon: (d) => d.coordinates,
+    // filled: true,
+    getLineColor: [0, 0, 0, 70],
+    getFillColor: [0, 0, 0, 0],
+    lineWidthMinPixels: 0.5,
+    // pickable: true,
+    // autoHighlight: true,
   });
 
   const cellsBelowLayer = new PolygonLayer({
@@ -235,6 +271,7 @@ const MapComponent: React.FC<MapProps> = ({
     if (!map) return; // Ensure map is loaded
     const layers = [];
     layers.push(provinceLayer);
+    layers.push(soumLayer);
     // if (showCells) layers.push(cellLayer);
     // if (showCounties) layers.push(countyLayer);
     if (showBelowCells) layers.push(cellsBelowLayer);
@@ -247,7 +284,7 @@ const MapComponent: React.FC<MapProps> = ({
     };
   }, [map, showBelowCells, showAtCapCells, showAboveCells, showCells]);
 
-  if (!provinces || provinces.length === 0) {
+  if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -256,9 +293,11 @@ const MapComponent: React.FC<MapProps> = ({
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}
+        {...viewState}
         mapStyle={MAP_STYLE}
         style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
+        onMove={(evt) => setViewState(evt.viewState)}
       >
         <NavigationControl position="top-left" />
       </Map>

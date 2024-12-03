@@ -30,6 +30,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         <TextField {...params} label={label} variant="outlined" sx={sx} />
       )}
       freeSolo
+      disableClearable
     />
   );
 };
