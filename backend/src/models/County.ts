@@ -14,33 +14,24 @@ const countySchema = new Schema({
     type: Number,
     required: true,
   },
-  county_name: {
+  soum_name: {
     type: String,
     required: true,
   },
-  county_land_area: {
-    type: Number,
+  province_name: {
+    type: String,
     required: true,
   },
-  county_number_of_livestock: {
-    type: Number,
-    required: true,
-  },
-  county_number_of_cattle: {
-    type: Number,
-    required: true,
-  },
-  county_number_of_goat: {
-    type: Number,
-    required: true,
-  },
-  county_number_of_sheep: {
-    type: Number,
-    required: true,
-  },
-  county_number_of_camel: {
-    type: Number,
-    required: true,
+  geometry: {
+    type: {
+      type: String,
+      enum: ["Polygon"], // Ensure the geometry type is always "Polygon"
+      required: true,
+    },
+    coordinates: {
+      type: [[[Number]]], // Array of arrays of coordinates for a polygon
+      required: true,
+    },
   },
 });
 
