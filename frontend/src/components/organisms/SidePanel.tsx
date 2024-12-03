@@ -62,20 +62,23 @@ const SidePanel: React.FC<SidePanelProps> = ({
   selectedOption,
   setSelectedOption,
   yearOptions,
-  displayName
+  displayName,
 }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  const loadProvinceData = async (provinceName: string, displayName: string) => {
+  const loadProvinceData = async (
+    provinceName: string,
+    displayName: string
+  ) => {
     try {
       const response = await fetch(
         `http://localhost:8080/api/province/${provinceName.name}`
       );
       const json_object = await response.json();
-      console.log(provinceName)
+      console.log(provinceName);
 
       const { province_name, province_land_area, province_herders } =
         json_object;
@@ -156,8 +159,6 @@ const SidePanel: React.FC<SidePanelProps> = ({
       setShowZeroCells(false);
     }
   };
-
-  
 
   const options = [
     {
@@ -253,7 +254,10 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 options={yearOptions}
               />
               <h2>Grazing Range</h2>
-              <Toggle initialChecked={grazingRange} onChange={(checked) => setGrazingRange(checked)} />
+              <Toggle
+                initialChecked={grazingRange}
+                onChange={(checked) => setGrazingRange(checked)}
+              />
               <h2>Data Layers</h2>
               <RadioButton
                 options={options}
@@ -266,7 +270,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleBack} label="Back" />
               </div>
-              <h1>{provinceData.displayName.name}</h1>
+              <h1>{provinceData.province_name}</h1>
               <p>
                 <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
                 km²
