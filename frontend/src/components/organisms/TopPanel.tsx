@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
 import { Avatar } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
@@ -33,6 +34,7 @@ interface TopPanelProps {
   selectedOption: string | "carryingCapacity";
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
   yearOptions: string[];
+  setDisplayName: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const TopPanel: React.FC<TopPanelProps> = ({
@@ -61,37 +63,44 @@ const TopPanel: React.FC<TopPanelProps> = ({
   setGrazingRange,
   selectedOption,
   setSelectedOption,
-  yearOptions }) => {
-  const uniqueData = [
-    "Dornod",
-    "Bayan-Ölgiy",
-    "Hovd",
-    "Sühbaatar",
-    "Dornogovi",
-    "Govi-Altay",
-    "Bayanhongor",
-    "Ömnögovi",
-    "Hövsgöl",
-    "Bulgan",
-    "Uvs",
-    "Selenge",
-    "Dzavhan",
-    "Hentiy",
-    "Darhan-Uul",
-    "Töv",
-    "Arhangay",
-    "Orhon",
-    "Dundgovi",
-    "Övörhangay",
-    "Govĭ-Sümber",
-    "Ulaanbaatar", // Capital city (not a province but included for reference)
-  ];
+  yearOptions,
+  setDisplayName }) => {
 
   const router = useRouter();
 
   const navigateTo = (path: string) => {
     router.push(path);
   };
+
+  const specialCharsToEnglishMap = {
+    'Ö': 'U', 'ö': 'u',
+    'ü': 'u', 'ĭ': 'i',
+    'Ё': 'yo', 'ё': 'yo',
+  };
+
+  const uniqueData = [
+    "Dornod",
+    "Bayan-Ölgii",
+    "Khovd",
+    "Sükhbaatar",
+    "Dornogovi",
+    "Govi-Altai",
+    "Bayankhongor",
+    "Ömnögovi",
+    "Khövsgöl",
+    "Bulgan",
+    "Uvs",
+    "Selenge",
+    "Zavkhan",
+    "Khentii",
+    "Darkhan-Uul",
+    "Töv",
+    "Arkhangai",
+    "Orkhon",
+    "Dundgovi",
+    "Övörkhangai",
+    "Govisümber",
+  ];
 
   const toggleCellState = (cellType: string) => {
     switch (cellType) {
@@ -155,9 +164,24 @@ const TopPanel: React.FC<TopPanelProps> = ({
     return {}; // Default case (should never be reached if above logic is correct)
   };
 
+  const transformString = (name: string): string => {
+    let transformedName = '';
   
-  const handleValueSelect = (provinceData: { value: string }) => {
-    onProvinceSelect(provinceData); // Pass the value up to MPP
+    for (let char of name) {
+      // Log each character and its transformed value
+      const transformedChar = specialCharsToEnglishMap[char] || char;
+      transformedName += transformedChar;
+    }
+  
+    return transformedName;  // Return the transformed string
+  };
+  
+  const handleValueSelect = async (provinceData: { value: string }) => {
+      const transformedName = transformString(provinceData.name);
+      console.log(transformedName);
+      console.log(provinceData);
+      onProvinceSelect({name: transformedName});
+      setDisplayName(provinceData);
   };
 
   return (
@@ -189,7 +213,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           !isPanelOpen && carryingCapacity && (
             <><Button
                 onClick={() => toggleCellState("below")}
-                label="Below Cells"
+                label="Below"
                 sx={getButtonColor("below")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               /><Button
@@ -199,7 +223,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
                   disabled={!carryingCapacity} // Disable if carryingCapacity is false
                 /><Button
                   onClick={() => toggleCellState("above")}
-                  label="Above Cells"
+                  label="Above"
                   sx={getButtonColor("above")}
                   disabled={!carryingCapacity} // Disable if carryingCapacity is false
                 /></>
@@ -253,6 +277,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           }}
             label={carryingCapacity ? "Switch to NDVI" : "Switch to Carrying Capacity"}
             sx={{ marginBottom: 2 }}
+            startIcon={<SwapHorizIcon/>}
           />)
             }
         </div>

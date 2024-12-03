@@ -22,8 +22,10 @@ const MonitoringPlatform = () => {
   const [selectedYear, setSelectedYear] = useState<number>(2014);
   const [grazingRange, setGrazingRange] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>("carryingCapacity");
+  const [displayName, setDisplayName] = useState<string>("");
 
   const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) => (2002 + index).toString());
+
 
 
   const handleProvinceSelect = (provinceName: string) => {
@@ -107,6 +109,7 @@ const MonitoringPlatform = () => {
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
         yearOptions={yearOptions}
+        setDisplayName={setDisplayName}
       />
       </div>
       <div>
@@ -137,6 +140,7 @@ const MonitoringPlatform = () => {
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
           yearOptions={yearOptions}
+          displayName={displayName}
         />
       </div>
         <Map // fetches all coordinates Province/Counties/Cells

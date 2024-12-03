@@ -17,7 +17,6 @@ const SearchBar: React.FC<SearchBarParams> = ({
 
   const handleSearch = () => {
     if (selectedValue) {
-      console.log(selectedValue);
       // Ensure selectedValue is not null before calling onValueSelect
       onValueSelect({ name: selectedValue });
     }

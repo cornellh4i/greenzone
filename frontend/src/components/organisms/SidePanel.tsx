@@ -33,6 +33,7 @@ interface SidePanelProps {
   selectedOption: string | "carryingCapacity";
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
   yearOptions: string[];
+  displayName: string;
 }
 const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
@@ -61,19 +62,20 @@ const SidePanel: React.FC<SidePanelProps> = ({
   selectedOption,
   setSelectedOption,
   yearOptions,
+  displayName
 }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  const loadProvinceData = async (provinceName: string) => {
+  const loadProvinceData = async (provinceName: string, displayName: string) => {
     try {
-      console.log(provinceName.name);
       const response = await fetch(
         `http://localhost:8080/api/province/${provinceName.name}`
       );
       const json_object = await response.json();
+      console.log(provinceName)
 
       const { province_name, province_land_area, province_herders } =
         json_object;
@@ -99,6 +101,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       }));
 
       setProvinceData({
+        displayName,
         province_name,
         province_land_area,
         province_herders,
@@ -113,7 +116,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   useEffect(() => {
     if (provinceName) {
       setIsPanelOpen(true); // Open the panel when a province is selected
-      loadProvinceData(provinceName);
+      loadProvinceData(provinceName, displayName);
     }
   }, [provinceName]);
 
@@ -263,7 +266,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleBack} label="Back" />
               </div>
-              <h1>{provinceData.province_name}</h1>
+              <h1>{provinceData.displayName.name}</h1>
               <p>
                 <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
                 km²
