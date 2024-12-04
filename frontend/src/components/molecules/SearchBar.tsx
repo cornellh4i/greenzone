@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import Fuse from "fuse.js";
+import { Box } from "@mui/material";
+
+import Dropdown from "../atoms/DropDown";
+import Button from "../atoms/Button";
 
 interface SearchBarParams {
   uniqueData: string[];
@@ -10,64 +14,51 @@ const SearchBar: React.FC<SearchBarParams> = ({
   uniqueData,
   onValueSelect,
 }) => {
-  const [selectedValue, setSelectedValue] = useState<string>(""); // Start with an empty string
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const fuse = new Fuse(uniqueData, { threshold: 0.3 });
 
   const filteredOptions = selectedValue
     ? fuse.search(selectedValue).map((result) => result.item)
     : uniqueData;
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(event.target.value);
-  };
-
-  const handleOptionClick = (option: string) => {
-    setSelectedValue(option); // Set the selected option
-    onValueSelect({ value: option }); // Correct key: 'value'
+  const handleOptionClick = () => {
+    if (selectedValue) {
+      // Ensure selectedValue is not null before calling onValueSelect
+      onValueSelect({ value: selectedValue });
+      setSelectedValue("");
+    }
   };
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
-      <input
-        type="text"
-        placeholder="Search Aimag"
-        value={selectedValue}
-        onChange={handleInputChange}
-        onFocus={() => setSelectedValue("")} // Show all options on focus
-        style={{
-          width: "100%",
-          padding: "8px",
-          boxSizing: "border-box",
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      {" "}
+      <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
+        <Dropdown
+          options={filteredOptions}
+          value={selectedValue}
+          onChange={setSelectedValue}
+          label="Select Aimag"
+          sx={{ width: "100%" }}
+        />
+      </Box>
+      <Button
+        onClick={handleOptionClick}
+        label="Search"
+        sx={{
+          height: "50px",
+          width: "150px",
+          marginLeft: "auto",
+          flexShrink: 0,
         }}
+        disabled={!selectedValue}
       />
-      {filteredOptions.length > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            width: "100%",
-            backgroundColor: "white",
-            border: "1px solid #ccc",
-            maxHeight: "150px",
-            overflowY: "auto",
-            zIndex: 1000,
-          }}
-        >
-          {filteredOptions.map((option) => (
-            <div
-              key={option}
-              onClick={() => handleOptionClick(option)}
-              style={{
-                padding: "8px",
-                cursor: "pointer",
-                borderBottom: "1px solid #eee",
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    </Box>
   );
 };
 

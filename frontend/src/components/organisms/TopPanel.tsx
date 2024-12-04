@@ -182,7 +182,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
   const handleValueSelect = async (provinceData: { value: string }) => {
     console.log(provinceData.name);
     console.log(provinceData.value);
-    const transformedName = transformString(provinceData.name);
+    const transformedName = transformString(provinceData.value);
     console.log(transformedName);
     console.log(provinceData);
     onProvinceSelect({ name: transformedName });
