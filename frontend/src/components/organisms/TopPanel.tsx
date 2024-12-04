@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
 import { Avatar } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
@@ -42,12 +42,12 @@ const TopPanel: React.FC<TopPanelProps> = ({
   isPanelOpen,
   setPanelOpen,
   carryingCapacity,
-  showBelowCells, 
+  showBelowCells,
   showAtCapCells,
   showAboveCells,
   setCarryingCapacity,
   setShowBelowCells,
-  setShowAtCapCells, 
+  setShowAtCapCells,
   setShowAboveCells,
   ndviSelect,
   showPositiveCells,
@@ -64,8 +64,8 @@ const TopPanel: React.FC<TopPanelProps> = ({
   selectedOption,
   setSelectedOption,
   yearOptions,
-  setDisplayName }) => {
-
+  setDisplayName,
+}) => {
   const router = useRouter();
 
   const navigateTo = (path: string) => {
@@ -73,9 +73,12 @@ const TopPanel: React.FC<TopPanelProps> = ({
   };
 
   const specialCharsToEnglishMap = {
-    'Ö': 'U', 'ö': 'u',
-    'ü': 'u', 'ĭ': 'i',
-    'Ё': 'yo', 'ё': 'yo',
+    Ö: "U",
+    ö: "u",
+    ü: "u",
+    ĭ: "i",
+    Ё: "yo",
+    ё: "yo",
   };
 
   const uniqueData = [
@@ -132,7 +135,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
     if (!carryingCapacity && !ndviSelect) {
       return { backgroundColor: "gray" }; // Disable if neither are selected
     }
-  
+
     // If carryingCapacity is true, handle colors for "below", "atCap", "above" cells
     if (carryingCapacity) {
       switch (cellType) {
@@ -146,7 +149,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           return {};
       }
     }
-  
+
     // If ndviSelect is true, handle colors for "positive", "zero", "negative" cells
     if (ndviSelect) {
       switch (cellType) {
@@ -160,28 +163,30 @@ const TopPanel: React.FC<TopPanelProps> = ({
           return {};
       }
     }
-  
+
     return {}; // Default case (should never be reached if above logic is correct)
   };
 
   const transformString = (name: string): string => {
-    let transformedName = '';
-  
+    let transformedName = "";
+    console.log(name);
     for (let char of name) {
       // Log each character and its transformed value
       const transformedChar = specialCharsToEnglishMap[char] || char;
       transformedName += transformedChar;
     }
-  
-    return transformedName;  // Return the transformed string
+
+    return transformedName; // Return the transformed string
   };
-  
+
   const handleValueSelect = async (provinceData: { value: string }) => {
-      const transformedName = transformString(provinceData.name);
-      console.log(transformedName);
-      console.log(provinceData);
-      onProvinceSelect({name: transformedName});
-      setDisplayName(provinceData);
+    console.log(provinceData.name);
+    console.log(provinceData.value);
+    const transformedName = transformString(provinceData.name);
+    console.log(transformedName);
+    console.log(provinceData);
+    onProvinceSelect({ name: transformedName });
+    setDisplayName(provinceData);
   };
 
   return (
@@ -193,104 +198,132 @@ const TopPanel: React.FC<TopPanelProps> = ({
             onValueSelect={handleValueSelect}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', width: '100%' }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            width: "100%",
+          }}
+        >
           {!isPanelOpen && (
-          <Dropdown
-            label="Select Year"
-            options={yearOptions}
-            value={selectedYear.toString()}
-            onChange={(val) => setSelectedYear(val)}
-            sx={{ width: "160px" }}/>
-
+            <Dropdown
+              label="Select Year"
+              options={yearOptions}
+              value={selectedYear.toString()}
+              onChange={(val) => setSelectedYear(val)}
+              sx={{ width: "160px" }}
+            />
           )}
           {!isPanelOpen && (
             <Button
               onClick={() => setGrazingRange((prev) => !prev)}
               label="Grazing Range"
               sx={{
-                backgroundColor: grazingRange ? 'green' : 'grey'}}/>)}
-          {
-          !isPanelOpen && carryingCapacity && (
-            <><Button
+                backgroundColor: grazingRange ? "green" : "grey",
+              }}
+            />
+          )}
+          {!isPanelOpen && carryingCapacity && (
+            <>
+              <Button
                 onClick={() => toggleCellState("below")}
                 label="Below"
                 sx={getButtonColor("below")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
-              /><Button
-                  onClick={() => toggleCellState("atCap")}
-                  label="At Capacity"
-                  sx={getButtonColor("atCap")}
-                  disabled={!carryingCapacity} // Disable if carryingCapacity is false
-                /><Button
-                  onClick={() => toggleCellState("above")}
-                  label="Above"
-                  sx={getButtonColor("above")}
-                  disabled={!carryingCapacity} // Disable if carryingCapacity is false
-                /></>
-          )
-          }
-          {
-          !isPanelOpen && ndviSelect && (
-            <><Button
+              />
+              <Button
+                onClick={() => toggleCellState("atCap")}
+                label="At Capacity"
+                sx={getButtonColor("atCap")}
+                disabled={!carryingCapacity} // Disable if carryingCapacity is false
+              />
+              <Button
+                onClick={() => toggleCellState("above")}
+                label="Above"
+                sx={getButtonColor("above")}
+                disabled={!carryingCapacity} // Disable if carryingCapacity is false
+              />
+            </>
+          )}
+          {!isPanelOpen && ndviSelect && (
+            <>
+              <Button
                 onClick={() => toggleCellState("positive")}
                 label="Positive"
                 sx={getButtonColor("positive")}
                 disabled={!ndviSelect} // Disable if carryingCapacity is false
-              /><Button
-                  onClick={() => toggleCellState("zero")}
-                  label="Zero"
-                  sx={getButtonColor("zero")}
-                  disabled={!ndviSelect} // Disable if carryingCapacity is false
-                /><Button
-                  onClick={() => toggleCellState("negative")}
-                  label="Negative"
-                  sx={getButtonColor("negative")}
-                  disabled={!ndviSelect} // Disable if carryingCapacity is false
-                /></>
-          )
-          }
+              />
+              <Button
+                onClick={() => toggleCellState("zero")}
+                label="Zero"
+                sx={getButtonColor("zero")}
+                disabled={!ndviSelect} // Disable if carryingCapacity is false
+              />
+              <Button
+                onClick={() => toggleCellState("negative")}
+                label="Negative"
+                sx={getButtonColor("negative")}
+                disabled={!ndviSelect} // Disable if carryingCapacity is false
+              />
+            </>
+          )}
           {/* Toggle carrying capacity */}
-          {!isPanelOpen && (<Button
-            onClick={() => {    if (carryingCapacity) {
-              // If we're currently on Carrying Capacity, switch to NDVI
-              setCarryingCapacity(false);
-              setNdviSelect(true);
-              setSelectedOption("zScore");
-              // Reset NDVI-related states
-              setShowAboveCells(false);
-              setShowAtCapCells(false);
-              setShowBelowCells(false);
-              setShowNegativeCells(false);
-              setShowPositiveCells(false);
-              setShowZeroCells(false);
-            } else {
-              setCarryingCapacity(true);
-              setNdviSelect(false);
-              setSelectedOption("carryingCapacity");
-              setShowBelowCells(false);
-              setShowAtCapCells(false);
-              setShowAboveCells(false);
-              setShowNegativeCells(false);
-              setShowPositiveCells(false);
-              setShowZeroCells(false);
-            }
-          }}
-            label={carryingCapacity ? "Switch to NDVI" : "Switch to Carrying Capacity"}
-            sx={{ marginBottom: 2 }}
-            startIcon={<SwapHorizIcon/>}
-          />)
-            }
+          {!isPanelOpen && (
+            <Button
+              onClick={() => {
+                if (carryingCapacity) {
+                  // If we're currently on Carrying Capacity, switch to NDVI
+                  setCarryingCapacity(false);
+                  setNdviSelect(true);
+                  setSelectedOption("zScore");
+                  // Reset NDVI-related states
+                  setShowAboveCells(false);
+                  setShowAtCapCells(false);
+                  setShowBelowCells(false);
+                  setShowNegativeCells(false);
+                  setShowPositiveCells(false);
+                  setShowZeroCells(false);
+                } else {
+                  setCarryingCapacity(true);
+                  setNdviSelect(false);
+                  setSelectedOption("carryingCapacity");
+                  setShowBelowCells(false);
+                  setShowAtCapCells(false);
+                  setShowAboveCells(false);
+                  setShowNegativeCells(false);
+                  setShowPositiveCells(false);
+                  setShowZeroCells(false);
+                }
+              }}
+              label={
+                carryingCapacity
+                  ? "Switch to NDVI"
+                  : "Switch to Carrying Capacity"
+              }
+              sx={{ marginBottom: 2 }}
+              startIcon={<SwapHorizIcon />}
+            />
+          )}
         </div>
         <Button
           onClick={() => navigateTo("/landing")}
           sx={{
-            backgroundColor: 'grey' }}
-          startIcon={<HomeIcon/>}/>
+            backgroundColor: "grey",
+          }}
+          startIcon={<HomeIcon />}
+        />
         <Button
           onClick={() => {}} // Placeholder for future routing
           sx={{
-            backgroundColor: "transparent" }}
-          startIcon={<Avatar><PersonIcon/></Avatar>}/>
+            backgroundColor: "transparent",
+          }}
+          startIcon={
+            <Avatar>
+              <PersonIcon />
+            </Avatar>
+          }
+        />
       </div>
     </div>
   );
