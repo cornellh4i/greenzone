@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Fuse from "fuse.js";
 import { Box } from "@mui/material";
 
 import Dropdown from "../atoms/DropDown";
@@ -14,11 +15,17 @@ const SearchBar: React.FC<SearchBarParams> = ({
   onValueSelect,
 }) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const fuse = new Fuse(uniqueData, { threshold: 0.3 });
 
-  const handleSearch = () => {
+  const filteredOptions = selectedValue
+    ? fuse.search(selectedValue).map((result) => result.item)
+    : uniqueData;
+
+  const handleOptionClick = () => {
     if (selectedValue) {
       // Ensure selectedValue is not null before calling onValueSelect
-      onValueSelect({ name: selectedValue });
+      onValueSelect({ value: selectedValue });
+      setSelectedValue("");
     }
   };
 
@@ -33,7 +40,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
       {" "}
       <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
         <Dropdown
-          options={uniqueData}
+          options={filteredOptions}
           value={selectedValue}
           onChange={setSelectedValue}
           label="Select Aimag"
@@ -41,7 +48,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
         />
       </Box>
       <Button
-        onClick={handleSearch}
+        onClick={handleOptionClick}
         label="Search"
         sx={{
           height: "50px",
