@@ -5,7 +5,7 @@ import SidePanel from "../components/organisms/SidePanel";
 const MonitoringPlatform = () => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
-  const [isTopPanelOpen, setTopPanelOpen] = useState(true);
+  const [isTopPanelOpen, setTopPanelOpen] = useState(false);
   const [searched, setSearched] = useState<string | null>(null);
 
   // Associated with Carrying Capacity
