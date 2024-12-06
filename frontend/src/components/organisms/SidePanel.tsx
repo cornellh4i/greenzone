@@ -10,6 +10,7 @@ interface SidePanelProps {
   provinceName: string | null;
   isPanelOpen: boolean | null;
   setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setTopPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   carryingCapacity: boolean | null;
   setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
   showBelowCells: boolean | null;
@@ -39,6 +40,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   provinceName,
   isPanelOpen,
   setIsPanelOpen,
+  setTopPanelOpen,
   carryingCapacity,
   setCarryingCapacity,
   showBelowCells,
@@ -117,14 +119,23 @@ const SidePanel: React.FC<SidePanelProps> = ({
   };
 
   useEffect(() => {
+    if (provinceData) {
+      setTopPanelOpen(true);
+    } else {
+      setTopPanelOpen(false);
+    }
+  }, [provinceData]);
+
+  useEffect(() => {
     if (provinceName) {
       setIsPanelOpen(true); // Open the panel when a province is selected
       loadProvinceData(provinceName, displayName);
     }
-  }, [provinceName]);
+  }, [provinceName, selectedYear]);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
+    setTopPanelOpen(true);
     if (!isPanelOpen) {
       setProvinceData(null); // Clear province data when closing the panel
     }
@@ -219,29 +230,32 @@ const SidePanel: React.FC<SidePanelProps> = ({
         anchor="left"
         open={isPanelOpen}
         onClose={handlePanelToggle}
-        variant="persistent" // Allows interaction with background
+        variant="persistent" // Allows interaction with the background
         PaperProps={{
           sx: {
-            width: "25vw",
+            width: "35vw",
             maxWidth: "400px",
             boxSizing: "border-box",
             p: 2,
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
+            marginTop: "6.1%", // Ensures the Drawer starts below the TopPanel
           },
+        }}
+        sx={{
+          zIndex: 1200, // Adjust if necessary to avoid overlapping TopPanel
+          position: "relative", // Avoid fixed positioning that overlaps
         }}
       >
         <Box>
-          <h2>SidePanel</h2>
-          <Divider sx={{ mb: 2 }} />
-
           {!provinceData ? (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
               </div>
               <h1>Carrying Capacity Early Warning System</h1>
+              <Divider sx={{ mb: 2 }} />
               <p>
                 Please select a province or adjust the year slider to view data.
               </p>

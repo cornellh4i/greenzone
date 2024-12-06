@@ -9,12 +9,13 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
-  isPanelOpen: boolean | null;
-  setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isTopPanelOpen: boolean | null;
+  setTopPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   carryingCapacity: boolean | null;
   showBelowCells: boolean | null;
   showAtCapCells: boolean | null;
   showAboveCells: boolean | null;
+  setSearched: React.Dispatch<React.SetStateAction<string | null>>;
   setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
   setShowBelowCells: React.Dispatch<React.SetStateAction<boolean>>;
   setShowAtCapCells: React.Dispatch<React.SetStateAction<boolean>>;
@@ -39,9 +40,10 @@ interface TopPanelProps {
 
 const TopPanel: React.FC<TopPanelProps> = ({
   onProvinceSelect,
-  isPanelOpen,
-  setPanelOpen,
+  isTopPanelOpen,
+  setTopPanelOpen,
   carryingCapacity,
+  setSearched,
   showBelowCells,
   showAtCapCells,
   showAboveCells,
@@ -180,13 +182,13 @@ const TopPanel: React.FC<TopPanelProps> = ({
   };
 
   const handleValueSelect = async (provinceData: { value: string }) => {
-    console.log(provinceData.name);
-    console.log(provinceData.value);
     const transformedName = transformString(provinceData.value);
     console.log(transformedName);
     console.log(provinceData);
-    onProvinceSelect({ name: transformedName });
+    setSearched(transformedName);
+    // onProvinceSelect({ name: transformedName });
     setDisplayName(provinceData);
+    setTopPanelOpen(true);
   };
 
   return (
@@ -206,7 +208,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
             width: "100%",
           }}
         >
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Dropdown
               label="Select Year"
               options={yearOptions}
@@ -215,7 +217,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               sx={{ width: "160px" }}
             />
           )}
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Button
               onClick={() => setGrazingRange((prev) => !prev)}
               label="Grazing Range"
@@ -224,7 +226,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               }}
             />
           )}
-          {!isPanelOpen && carryingCapacity && (
+          {isTopPanelOpen && carryingCapacity && (
             <>
               <Button
                 onClick={() => toggleCellState("below")}
@@ -234,7 +236,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               />
               <Button
                 onClick={() => toggleCellState("atCap")}
-                label="At Capacity"
+                label="AtCap"
                 sx={getButtonColor("atCap")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               />
@@ -246,7 +248,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               />
             </>
           )}
-          {!isPanelOpen && ndviSelect && (
+          {isTopPanelOpen && ndviSelect && (
             <>
               <Button
                 onClick={() => toggleCellState("positive")}
@@ -269,7 +271,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
             </>
           )}
           {/* Toggle carrying capacity */}
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Button
               onClick={() => {
                 if (carryingCapacity) {
@@ -296,11 +298,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
                   setShowZeroCells(false);
                 }
               }}
-              label={
-                carryingCapacity
-                  ? "Switch to NDVI"
-                  : "Switch to Carrying Capacity"
-              }
+              label={carryingCapacity ? "Switch to NDVI" : "Switch to CarCap"}
               sx={{ marginBottom: 2 }}
               startIcon={<SwapHorizIcon />}
             />

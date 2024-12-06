@@ -33,6 +33,7 @@ interface MapProps {
   showBelowCells: boolean | null;
   showAtCapCells: boolean | null;
   showAboveCells: boolean | null;
+  searched: string | null;
 }
 
 const MAP_STYLE =
@@ -46,6 +47,7 @@ const MapComponent: React.FC<MapProps> = ({
   showAboveCells,
   showAtCapCells,
   showBelowCells,
+  searched,
 }) => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
@@ -55,10 +57,6 @@ const MapComponent: React.FC<MapProps> = ({
   const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
   const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
   const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
-  const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
-  // const [showBelowCells, setShowBelowCells] = useState(false);
-  // const [showAtCapCells, setShowAtCapCells] = useState(false);
-  // const [showAboveCells, setShowAboveCells] = useState(false);
 
   const loadCarryingCapacityCells = async () => {
     try {
@@ -185,13 +183,23 @@ const MapComponent: React.FC<MapProps> = ({
     view: [number, number, number, number] | null
   ) => {
     if (!map) return;
-
+    if (!coordinates && !view) {
+      // find province
+      const province = provinces.filter((p) => p.name === provinceName)[0];
+      console.log(province);
+      coordinates = province.coordinates;
+      view = province.view;
+    }
     if (provinceName && coordinates) {
       handleZoomToProvince(view);
       // Trigger the onProvinceSelect callback
       onProvinceSelect({ name: provinceName });
     }
   };
+
+  useEffect(() => {
+    handleMapClick(searched);
+  }, [searched]);
 
   useEffect(() => {
     loadCountiesGeometries();
@@ -212,7 +220,7 @@ const MapComponent: React.FC<MapProps> = ({
     highlightColor: [1000, 20, 20, 20],
     onClick: ({ object }) => {
       if (object) {
-        handleMapClick(object.name, object.coordinates[0], object.view);
+        handleMapClick(object.name, null, null);
       } else {
         handleMapClick(null, null, null); // Click outside the polygons
       }
@@ -293,11 +301,11 @@ const MapComponent: React.FC<MapProps> = ({
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}
-        {...viewState}
+        // {...viewState}
         mapStyle={MAP_STYLE}
         style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
-        onMove={(evt) => setViewState(evt.viewState)}
+        // onMove={(evt) => setViewState(evt.viewState)}
       >
         <NavigationControl position="top-left" />
       </Map>
