@@ -12,30 +12,10 @@ i18n
     interpolation: {
       escapeValue: false, // Prevents escaping of values (React handles XSS protection automatically)
     },
-    resources: {
-      en: {
-        translation: {
-          title: "Multi-language app",
-          label: "Select another language!",
-          about: "About",
-          home: "Home",
-          text: "Hello! Welcome to GreenZone's multi-language app🐐",
-        },
-      },
-      mong: {
-        translation: {
-          title: "Aplicación en varios idiomas",
-          label: "Selecciona otro lenguaje!",
-          about: "Sobre mí",
-          home: "Inicio",
-          text: "Сайн байна уу! GreenZone-н олон хэл дээрх програмд ​​тавтай морилно уу🐐",
-        },
-      },
+    backend: {
+      // Configuring the path for loading translation files
+      loadPath: "http://localhost:3005/languages/{{lng}}-translation.json", // URL pattern to fetch translations
     },
-    // backend: {
-    //   // Configuring the path for loading translation files
-    //   loadPath: "http://localhost:3005/languages/{{lng}}-translation.json", // URL pattern to fetch translations
-    // },
   })
   .then(() => {
     // This logs once i18n has been successfully initialized
