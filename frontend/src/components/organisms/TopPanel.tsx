@@ -7,6 +7,11 @@ import { Avatar } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
+import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import "../multi-Lang/i18n"; // This will trigger i18n initialization
+import LangChange from "../multi-Lang/LangSwitch";
+
 interface TopPanelProps {
   onProvinceSelect: (provinceName: { value: string }) => void;
   isPanelOpen: boolean | null;
@@ -66,7 +71,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
   yearOptions,
   setDisplayName,
 }) => {
-  const router = useRouter();
+  const { t } = useTranslation();
 
   const navigateTo = (path: string) => {
     router.push(path);
@@ -189,6 +194,11 @@ const TopPanel: React.FC<TopPanelProps> = ({
     setDisplayName(provinceData);
   };
 
+  useEffect(() => {
+    // Any effect or side-effect you need when translations change
+  }, [t]); // Re-run when t changes
+  const router = useRouter();
+
   return (
     <div>
       <div style={{ display: "flex", gap: "10px" }}>
@@ -208,7 +218,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
         >
           {!isPanelOpen && (
             <Dropdown
-              label="Select Year"
+              label={t("selectYear")}
               options={yearOptions}
               value={selectedYear.toString()}
               onChange={(val) => setSelectedYear(val)}
@@ -218,7 +228,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           {!isPanelOpen && (
             <Button
               onClick={() => setGrazingRange((prev) => !prev)}
-              label="Grazing Range"
+              label={t("grazingRange")}
               sx={{
                 backgroundColor: grazingRange ? "green" : "grey",
               }}
@@ -228,19 +238,19 @@ const TopPanel: React.FC<TopPanelProps> = ({
             <>
               <Button
                 onClick={() => toggleCellState("below")}
-                label="Below"
+                label={t("below")}
                 sx={getButtonColor("below")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               />
               <Button
                 onClick={() => toggleCellState("atCap")}
-                label="At Capacity"
+                label={t("atCapacity")}
                 sx={getButtonColor("atCap")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               />
               <Button
                 onClick={() => toggleCellState("above")}
-                label="Above"
+                label={t("above")}
                 sx={getButtonColor("above")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               />
@@ -250,19 +260,19 @@ const TopPanel: React.FC<TopPanelProps> = ({
             <>
               <Button
                 onClick={() => toggleCellState("positive")}
-                label="Positive"
+                label={t("positive")}
                 sx={getButtonColor("positive")}
                 disabled={!ndviSelect} // Disable if carryingCapacity is false
               />
               <Button
                 onClick={() => toggleCellState("zero")}
-                label="Zero"
+                label={t("zero")}
                 sx={getButtonColor("zero")}
                 disabled={!ndviSelect} // Disable if carryingCapacity is false
               />
               <Button
                 onClick={() => toggleCellState("negative")}
-                label="Negative"
+                label={t("negative")}
                 sx={getButtonColor("negative")}
                 disabled={!ndviSelect} // Disable if carryingCapacity is false
               />
@@ -297,9 +307,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
                 }
               }}
               label={
-                carryingCapacity
-                  ? "Switch to NDVI"
-                  : "Switch to Carrying Capacity"
+                carryingCapacity ? t("switchToNDVI") : t("switchToCarryCap")
               }
               sx={{ marginBottom: 2 }}
               startIcon={<SwapHorizIcon />}
@@ -325,6 +333,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
           }
         />
       </div>
+      <LangChange />
     </div>
   );
 };

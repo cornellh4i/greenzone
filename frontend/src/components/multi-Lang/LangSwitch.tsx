@@ -44,7 +44,9 @@ const LangChange: React.FC = () => {
           />
         }
         label={
-          currentLanguage === "en" ? "Switch to Mongolian" : "Switch to English"
+          currentLanguage === "en"
+            ? "Монгол хэл рүү шилжих"
+            : "Switch to English"
         }
       />
     </div>
