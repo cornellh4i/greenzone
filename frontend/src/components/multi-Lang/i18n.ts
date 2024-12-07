@@ -14,7 +14,7 @@ i18n
     },
     backend: {
       // Configuring the path for loading translation files
-      loadPath: "http://localhost:3005/languages/{{lng}}-translation.json", // URL pattern to fetch translations
+      loadPath: "http://localhost:8080/languages/{{lng}}-translation.json", // URL pattern to fetch translations
     },
   })
   .then(() => {
