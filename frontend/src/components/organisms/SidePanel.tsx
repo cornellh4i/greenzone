@@ -6,6 +6,10 @@ import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 
+import { useTranslation } from "react-i18next";
+import "../multi-Lang/i18n"; // This will trigger i18n initialization
+import LangChange from "../multi-Lang/LangSwitch";
+
 interface SidePanelProps {
   provinceName: string | null;
   isPanelOpen: boolean | null;
@@ -64,6 +68,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   yearOptions,
   displayName,
 }) => {
+  const { t } = useTranslation();
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
@@ -117,6 +122,10 @@ const SidePanel: React.FC<SidePanelProps> = ({
   };
 
   useEffect(() => {
+    // Any effect or side-effect you need when translations change
+  }, [t]); // Re-run when t changes
+
+  useEffect(() => {
     if (provinceName) {
       setIsPanelOpen(true); // Open the panel when a province is selected
       loadProvinceData(provinceName, displayName);
@@ -163,22 +172,22 @@ const SidePanel: React.FC<SidePanelProps> = ({
   const options = [
     {
       name: "carryingCapacity",
-      label: "Carrying Capacity",
+      label: t("carryingCapacity"),
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
           <Button
             onClick={() => setShowBelowCells(!showBelowCells)}
-            label="Below"
+            label={t("below")}
             sx={{ backgroundColor: showBelowCells ? "green" : "grey" }}
           />
           <Button
             onClick={() => setShowAtCapCells(!showAtCapCells)}
-            label="At Capacity"
+            label={t("atCapacity")}
             sx={{ backgroundColor: showAtCapCells ? "#C6BF31" : "grey" }}
           />
           <Button
             onClick={() => setShowAboveCells(!showAboveCells)}
-            label="Above"
+            label={t("above")}
             sx={{ backgroundColor: showAboveCells ? "red" : "grey" }}
           />
         </div>
@@ -186,22 +195,22 @@ const SidePanel: React.FC<SidePanelProps> = ({
     },
     {
       name: "zScore",
-      label: "Z-Score",
+      label: t("zScore"),
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
           <Button
             onClick={() => setShowPositiveCells(!showPositiveCells)}
-            label="Positive"
+            label={t("positive")}
             sx={{ backgroundColor: showPositiveCells ? "teal" : "grey" }}
           />
           <Button
             onClick={() => setShowZeroCells(!showZeroCells)}
-            label="Zero"
+            label={t("zero")}
             sx={{ backgroundColor: showZeroCells ? "darkblue" : "grey" }}
           />
           <Button
             onClick={() => setShowNegativeCells(!showNegativeCells)}
-            label="Negative"
+            label={t("negative")}
             sx={{ backgroundColor: showNegativeCells ? "purple" : "grey" }}
           />
         </div>
@@ -233,7 +242,8 @@ const SidePanel: React.FC<SidePanelProps> = ({
         }}
       >
         <Box>
-          <h2>SidePanel</h2>
+          <h2>{t("sidePanel")}</h2>
+          <LangChange />
           <Divider sx={{ mb: 2 }} />
 
           {!provinceData ? (
@@ -241,24 +251,22 @@ const SidePanel: React.FC<SidePanelProps> = ({
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
               </div>
-              <h1>Carrying Capacity Early Warning System</h1>
-              <p>
-                Please select a province or adjust the year slider to view data.
-              </p>
+              <h1>{t("warning")}</h1>
+              <p>{t("sliderQuestion")}</p>
               <Slide
-                name="Year"
+                name={t("year")}
                 selectedValue={selectedYear}
                 onChange={handleYearSlider}
                 min={2002}
                 max={2014}
                 options={yearOptions}
               />
-              <h2>Grazing Range</h2>
+              <h2>{t("grazingRange")}</h2>
               <Toggle
                 initialChecked={grazingRange}
                 onChange={(checked) => setGrazingRange(checked)}
               />
-              <h2>Data Layers</h2>
+              <h2>{t("dataLayers")}</h2>
               <RadioButton
                 options={options}
                 selectedOption={selectedOption}
@@ -270,16 +278,18 @@ const SidePanel: React.FC<SidePanelProps> = ({
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleBack} label="Back" />
               </div>
-              <h1>{provinceData.province_name}</h1>
+              <h1>{t(provinceData.province_name)}</h1>
               <p>
-                <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
-                km²
+                <strong>{t("dataLayers")}</strong>{" "}
+                {provinceData.province_land_area} km²
               </p>
               <p>
-                <strong>Number of Herders:</strong>{" "}
+                <strong>{t("numHerders")}</strong>{" "}
                 {provinceData.province_herders}
               </p>
-              <h2>Livestock Data for {selectedYear}</h2>
+              <h2>
+                {t("livestockData")} {selectedYear}
+              </h2>
               {provinceData.formattedData.length > 0 && (
                 <BarChart
                   datasets={[

@@ -1,6 +1,6 @@
 import React from "react";
 import MapComponent from "@/components/Map";
-import SimpleMap from "@/components/MapWrapper";
+// import SimpleMap from "@/components/MapWrapper";
 /** An About page */
 /*const About = () => {
   return <>Hello there</>;
