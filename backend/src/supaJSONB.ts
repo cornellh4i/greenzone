@@ -3,9 +3,9 @@ import ProvinceModel from "../src/models/Province";
 import { Request, Response } from "express";
 import * as dotenv from 'dotenv';
 import connectToServer from './db/conn';
+
+
 dotenv.config({ path: './config.env' });
-
-
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_KEY!;
@@ -19,25 +19,42 @@ const getProvinces = async () => {
   try {
     await connectToServer(() => console.log('Extracting province data...'));
     const provinces = await ProvinceModel.find();
-    const dummy = provinces[0];
-    return [{ data: dummy}];
+    return provinces;
   } catch (error: any) {
     console.error('Error fetching province data:', error);
     return [];
   }
 };
 
+
+// insert
 (async () => {
   const provinces = await getProvinces();
-
-    const { error: insertError } = await supabase
-      .from('DataTable')
-      .insert(provinces);
-
-    if (insertError) {
-      console.error('Error inserting data:', insertError.message);
+  const size = provinces.length;
+  var i: number = 0;
+  for (i; i < size; i++) {
+    console.log(provinces[i]);
+    const { error } = await supabase
+      .from('Provinces')
+      .insert([{province_data: provinces[i]}]);
+    if (error) {
+      console.error('Error inserting data:', error);
     } else {
       console.log(`Data was inserted successfully.`);
     }
   }
+}
 )();
+
+export const createProvince = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const province = new ProvinceModel(req.body);
+    await supabase.from('DataTable').insert([{province_data: province}]);
+    res.status(201).json(province);
+  } catch (error: any) {
+      res.status(400).json({ message: error.message });
+  }
+};
