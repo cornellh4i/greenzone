@@ -27,6 +27,7 @@ const connectToServer = () => {
     }
     try{
       const client = createClient(supabaseUrl,supabaseKey);
+      console.log("PostGreSql ")
       supabase = client
     }catch(error){
         console.log("Error creating supabase client")

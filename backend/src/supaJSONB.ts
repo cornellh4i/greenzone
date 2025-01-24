@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import ProvinceModel from "../src/models/Province";
+import CountyModel from './models/County';
+import HexagonModel from './models/Hexagon';
 import { Request, Response } from "express";
 import * as dotenv from 'dotenv';
 import connectToServer from './db/conn';
@@ -33,10 +35,14 @@ const getProvinces = async () => {
   const size = provinces.length;
   var i: number = 0;
   for (i; i < size; i++) {
-    console.log(provinces[i]);
+    const province = provinces[i];
+    const provinceID = province.aid;
+    const provinceGeo = province.geometry;
+    const prov_json =  province.toObject();
+    const province_json = Object.fromEntries(Object.entries(prov_json).filter(([key]) => key !== '_id' && key !== '__v' && key !== 'aid' && key !== 'geometry'));
     const { error } = await supabase
-      .from('Provinces')
-      .insert([{province_data: provinces[i]}]);
+      .from('ProvinceGeometry')
+      .insert([{province_id: provinceID, province_geometry:provinceGeo }]);
     if (error) {
       console.error('Error inserting data:', error);
     } else {
@@ -58,3 +64,5 @@ export const createProvince = async (
       res.status(400).json({ message: error.message });
   }
 };
+
+
