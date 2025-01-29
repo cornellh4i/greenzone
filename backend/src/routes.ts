@@ -21,7 +21,10 @@ import {
   createCounty,
   deleteCounty,
   getCounties,
+  getCountyByID,
   updateCounty,
+  getCountyGeometry,
+  getCountyGeometryByID,
 } from "./controller/County";
 
 const router = express.Router();
@@ -72,6 +75,9 @@ router.post("/county", createCounty);
 
 // Route to get all counties
 router.get("/county", getCounties);
+router.get("/countygeo", getCountyGeometry);
+router.get("/county/:county_id", getCountyByID);
+router.get("/countygeo/:county_id", getCountyGeometryByID);
 
 // Route to update a county
 router.put("/county/:county_id", updateCounty);
