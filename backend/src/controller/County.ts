@@ -47,7 +47,7 @@ export const getCounties = async (
       const { data, error } = await supabase
         .from("Counties")
         .select("county_id,province_id,county_data");
-      // error handling in case the insertion doesn't work
+      // error handling in case the collection doesn't work
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",

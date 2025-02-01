@@ -150,18 +150,13 @@ const MapComponent: React.FC<MapProps> = ({
   };
   const loadCountiesGeometries = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/county");
+      const response = await fetch("http://localhost:8080/api/countygeo");
       const json_object = await response.json();
-      const geojsonData = json_object;
-      const projection = d3Geo.geoMercator();
+      const geojsonData = json_object.data;
       const deckSoumProj = geojsonData.map((feature: any) => {
-        feature.geometry.coordinates[0].map(projection);
-
-        const soumName = feature.soum_name;
         return {
           type: "Polygon",
-          name: soumName,
-          coordinates: feature.geometry.coordinates[0],
+          coordinates: feature.county_geometry.coordinates[0],
         };
       });
       setSoums(deckSoumProj);
@@ -203,8 +198,8 @@ const MapComponent: React.FC<MapProps> = ({
 
   useEffect(() => {
     loadCountiesGeometries();
-    loadProvinceGeometries();
-    loadCarryingCapacityCells();
+    // loadProvinceGeometries();
+    // loadCarryingCapacityCells();
   }, []);
 
   const provinceLayer = new PolygonLayer({
@@ -233,9 +228,10 @@ const MapComponent: React.FC<MapProps> = ({
     // filled: true,
     getLineColor: [0, 0, 0, 70],
     getFillColor: [0, 0, 0, 0],
-    lineWidthMinPixels: 0.5,
-    // pickable: true,
-    // autoHighlight: true,
+    lineWidthMinPixels: 0.8,
+
+    pickable: true,
+    autoHighlight: true,
   });
 
   const cellsBelowLayer = new PolygonLayer({
@@ -278,13 +274,13 @@ const MapComponent: React.FC<MapProps> = ({
   useEffect(() => {
     if (!map) return; // Ensure map is loaded
     const layers = [];
-    layers.push(provinceLayer);
+    // layers.push(provinceLayer);
     layers.push(soumLayer);
     // if (showCells) layers.push(cellLayer);
     // if (showCounties) layers.push(countyLayer);
-    if (showBelowCells) layers.push(cellsBelowLayer);
-    if (showAtCapCells) layers.push(cellsAtCapLayer);
-    if (showAboveCells) layers.push(cellsAboveLayer);
+    // if (showBelowCells) layers.push(cellsBelowLayer);
+    // if (showAtCapCells) layers.push(cellsAtCapLayer);
+    // if (showAboveCells) layers.push(cellsAboveLayer);
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
     return () => {
