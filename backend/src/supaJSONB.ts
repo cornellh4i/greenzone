@@ -61,16 +61,3 @@ const getProvinces = async () => {
     }
   }
 })();
-
-export const createProvince = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const province = new ProvinceModel(req.body);
-    await supabase.from("DataTable").insert([{ province_data: province }]);
-    res.status(201).json(province);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};

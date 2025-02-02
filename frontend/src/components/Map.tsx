@@ -117,13 +117,13 @@ const MapComponent: React.FC<MapProps> = ({
   };
   const loadProvinceGeometries = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/province");
+      const response = await fetch("http://localhost:8080/api/provincegeo");
       const json_object = await response.json();
-      const geojsonData = json_object;
+      const geojsonData = json_object.data;
       const projection = d3Geo.geoMercator();
-      const deckProvinceProj = geojsonData.map((feature: any) => {
-        feature.geometry.coordinates[0].map(projection);
-        const bounds = feature.geometry.coordinates[0].reduce(
+      const deckProvinceProj = geojsonData.filter((province: any) => province.province_id != 11).map((feature: any) => {
+        feature.province_geometry.coordinates[0].map(projection);
+        const bounds = feature.province_geometry.coordinates[0].reduce(
           (bbox, [lng, lat]) => {
             return [
               Math.min(bbox[0], lng), // Min longitude
@@ -137,9 +137,9 @@ const MapComponent: React.FC<MapProps> = ({
 
         const provinceName = feature.province_name;
         return {
-          type: "Polygon",
+          type: "MultiPolygon",
           name: provinceName,
-          coordinates: feature.geometry.coordinates[0],
+          coordinates: feature.province_geometry.coordinates[0],
           view: bounds,
         };
       });
@@ -148,6 +148,7 @@ const MapComponent: React.FC<MapProps> = ({
       console.error("Error fetching province data:", error);
     }
   };
+  
   const loadCountiesGeometries = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/countygeo");
@@ -164,6 +165,7 @@ const MapComponent: React.FC<MapProps> = ({
       console.error("Error fetching province data:", error);
     }
   };
+
   const handleZoomToProvince = (bounds: [number, number, number, number]) => {
     map.fitBounds(bounds, {
       padding: 50, // Add padding to ensure the province is not cut off
@@ -197,8 +199,8 @@ const MapComponent: React.FC<MapProps> = ({
   }, [searched]);
 
   useEffect(() => {
-    loadCountiesGeometries();
-    // loadProvinceGeometries();
+    // loadCountiesGeometries();
+    loadProvinceGeometries();
     // loadCarryingCapacityCells();
   }, []);
 

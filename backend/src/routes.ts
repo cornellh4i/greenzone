@@ -10,12 +10,14 @@ import {
 } from "./controller/Hexagon";
 import {
   createProvince,
-  createAllProvinces,
-  deleteProvince,
+  // createAllProvinces,
+  // deleteProvince,
   getProvinces,
-  updateProvince,
-  getProvinceById,
-  getProvinceByName,
+  // updateProvince,
+  getProvinceByID,
+  getProvinceGeometry,
+  getProvinceGeometryByID,
+  // getProvinceByName,
 } from "./controller/Province";
 import {
   createCounty,
@@ -54,21 +56,23 @@ router.delete("/hexagons/:hexagon_id", deleteHexagon);
 router.post("/province", createProvince);
 
 // Route to create all provinces
-router.post("/province/all", createAllProvinces);
+// router.post("/province/all", createAllProvinces);
 
 // Route to get all provinces
 router.get("/province", getProvinces);
+router.get("/provincegeo", getProvinceGeometry);
+router.get("/provincegeo/:province_id", getProvinceGeometryByID)
 
-router.get("/province/:province_name", getProvinceByName);
+// router.get("/province/:province_name", getProvinceByName);
 
 // Route to get a specific province by ID
-router.get("/province/:province_id", getProvinceById);
+router.get("/province/:province_id", getProvinceByID);
 
 // Route to update a province
-router.put("/province/:province_id", updateProvince);
+// router.put("/province/:province_id", updateProvince);
 
 // Route to delete a province
-router.delete("/province/:province_id", deleteProvince);
+// router.delete("/province/:province_id", deleteProvince);
 
 // Route to create a new county
 router.post("/county", createCounty);
