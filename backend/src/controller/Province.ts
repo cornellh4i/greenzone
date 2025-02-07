@@ -102,7 +102,7 @@ export const getProvinceGeometry = async (
     try {
       const { data, error } = await supabase
         .from("Provinces")
-        .select("province_id,province_geometry");
+        .select("province_id, province_data->province_name, province_geometry");
       // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
