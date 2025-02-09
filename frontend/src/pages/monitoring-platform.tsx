@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import Map from "../components/Map";
 import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
-const MonitoringPlatform = () => {
+import { Context } from "../utils/global";
+
+const MonitoringPlatform: React.FC = () => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isTopPanelOpen, setTopPanelOpen] = useState(false);
@@ -25,61 +27,51 @@ const MonitoringPlatform = () => {
   const [selectedOption, setSelectedOption] =
     useState<string>("carryingCapacity");
   const [displayName, setDisplayName] = useState<string>("");
+  const contextDict = {
+    // Province & Selection
+    selectedProvince,
+    setSelectedProvince,
+    isPanelOpen,
+    setIsPanelOpen,
+    isTopPanelOpen,
+    setTopPanelOpen,
+    searched,
+    setSearched,
 
+    // Carrying Capacity Related
+    carryingCapacity,
+    setCarryingCapacity,
+    showBelowCells,
+    setShowBelowCells,
+    showAtCapCells,
+    setShowAtCapCells,
+    showAboveCells,
+    setShowAboveCells,
+
+    // Z-Score NDVI Related
+    ndviSelect,
+    setNdviSelect,
+    showPositiveCells,
+    setShowPositiveCells,
+    showZeroCells,
+    setShowZeroCells,
+    showNegativeCells,
+    setShowNegativeCells,
+
+    // Other
+    selectedYear,
+    setSelectedYear,
+    grazingRange,
+    setGrazingRange,
+    selectedOption,
+    setSelectedOption,
+    displayName,
+    setDisplayName,
+  };
+  console.log("In the map selecteProvince is" + selectedProvince);
   const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>
     (2002 + index).toString()
   );
-
-  const handleProvinceSelect = (provinceName: string) => {
-    setSelectedProvince(provinceName);
-  };
-
-  const handleIsTopPanelOpenChange = (value) => {
-    setTopPanelOpen(value);
-  };
-  const handleIsPanelOpenChange = (value) => {
-    setIsPanelOpen(value);
-  };
-
-  const handleCarryingCapacityChange = (value) => {
-    setCarryingCapacity(value);
-  };
-
-  const handleShowBelowCellsChange = (value) => {
-    setShowBelowCells(value);
-  };
-
-  const handleShowAtCapCellsChange = (value) => {
-    setShowAtCapCells(value);
-  };
-
-  const handleShowAboveCellsChange = (value) => {
-    setShowAboveCells(value);
-  };
-
-  const handleNdviSelectChange = (value) => {
-    setNdviSelect(value);
-  };
-
-  const handleShowPositiveCellsChange = (value) => {
-    setShowPositiveCells(value);
-  };
-
-  const handleShowZeroCellsChange = (value) => {
-    setShowZeroCells(value);
-  };
-
-  const handleShowNegativeCellsChange = (value) => {
-    setShowNegativeCells(value);
-  };
-
-  const handleSelectedYearChange = (value) => {
-    setSelectedYear(value);
-  };
-
-  const handleGrazingRangeChange = (value) => {
-    setGrazingRange(value);
-  };
 
   return (
     <>
@@ -88,76 +80,18 @@ const MonitoringPlatform = () => {
       >
         <div style={{ height: "35px", padding: "30px", zIndex: 1 }}>
           {/* Top Panel */}
-          <TopPanel
-            onProvinceSelect={handleProvinceSelect}
-            isTopPanelOpen={isTopPanelOpen}
-            setSearched={setSearched}
-            setTopPanelOpen={handleIsTopPanelOpenChange}
-            carryingCapacity={carryingCapacity}
-            showBelowCells={showBelowCells}
-            showAtCapCells={showAtCapCells}
-            showAboveCells={showAboveCells}
-            setCarryingCapacity={handleCarryingCapacityChange}
-            setShowBelowCells={handleShowBelowCellsChange}
-            setShowAtCapCells={handleShowAtCapCellsChange}
-            setShowAboveCells={handleShowAboveCellsChange}
-            ndviSelect={ndviSelect}
-            showPositiveCells={showPositiveCells}
-            showZeroCells={showZeroCells}
-            showNegativeCells={showNegativeCells}
-            setNdviSelect={handleNdviSelectChange}
-            setShowPositiveCells={handleShowPositiveCellsChange}
-            setShowZeroCells={handleShowZeroCellsChange}
-            setShowNegativeCells={handleShowNegativeCellsChange}
-            selectedYear={selectedYear}
-            setSelectedYear={handleSelectedYearChange}
-            grazingRange={grazingRange}
-            setGrazingRange={handleGrazingRangeChange}
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectedOption}
-            yearOptions={yearOptions}
-            setDisplayName={setDisplayName}
-          />
+          <Context.Provider value={contextDict}>
+            <TopPanel yearOptions={yearOptions} />
+          </Context.Provider>
         </div>
         <div>
-          <SidePanel // fetch for specific info
-            provinceName={selectedProvince}
-            isPanelOpen={isPanelOpen}
-            setIsPanelOpen={handleIsPanelOpenChange}
-            setTopPanelOpen={handleIsTopPanelOpenChange}
-            carryingCapacity={carryingCapacity}
-            setCarryingCapacity={handleCarryingCapacityChange}
-            showBelowCells={showBelowCells}
-            setShowBelowCells={handleShowBelowCellsChange}
-            showAtCapCells={showAtCapCells}
-            setShowAtCapCells={handleShowAtCapCellsChange}
-            showAboveCells={showAboveCells}
-            setShowAboveCells={handleShowAboveCellsChange}
-            ndviSelect={ndviSelect}
-            setNdviSelect={handleNdviSelectChange}
-            showPositiveCells={showPositiveCells}
-            setShowPositiveCells={handleShowPositiveCellsChange}
-            showZeroCells={showZeroCells}
-            setShowZeroCells={handleShowZeroCellsChange}
-            showNegativeCells={showNegativeCells}
-            setShowNegativeCells={handleShowNegativeCellsChange}
-            selectedYear={selectedYear}
-            setSelectedYear={handleSelectedYearChange}
-            grazingRange={grazingRange}
-            setGrazingRange={handleGrazingRangeChange}
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectedOption}
-            yearOptions={yearOptions}
-            displayName={displayName}
-          />
+          <Context.Provider value={contextDict}>
+            <SidePanel yearOptions={yearOptions} />
+          </Context.Provider>
         </div>
-        <Map // fetches all coordinates Province/Counties/Cells
-          onProvinceSelect={handleProvinceSelect}
-          searched={searched}
-          showAboveCells={showAboveCells}
-          showAtCapCells={showAtCapCells}
-          showBelowCells={showBelowCells}
-        />
+        <Context.Provider value={contextDict}>
+          <Map />
+        </Context.Provider>
       </div>
     </>
   );
