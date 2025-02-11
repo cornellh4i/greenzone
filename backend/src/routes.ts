@@ -28,6 +28,11 @@ import {
   getCountyGeometry,
   getCountyGeometryByID,
 } from "./controller/County";
+import {
+  getBMCellsBelow,
+  getBMCellsAtCap,
+  getBMCellsAbove,
+} from "./controller/Cell";
 
 const router = express.Router();
 
@@ -46,6 +51,15 @@ router.get("/hexagons/bm_pred_at_cap", getAtCapHexagons);
 //Route to get all hexagons with a bm_pred between 0.4 and 0.6
 router.get("/hexagons/bm_pred_above", getAboveHexagons);
 
+//Route to get all hexagons with a bm_pred of <= 0.4
+router.get("/cells/bm_pred_below", getBMCellsBelow);
+
+//Route to get all hexagons with a bm_pred between 0.4 and 0.6
+router.get("/cells/bm_pred_at_cap", getBMCellsAtCap);
+
+//Route to get all hexagons with a bm_pred between 0.4 and 0.6
+router.get("/cells/bm_pred_above", getBMCellsAbove);
+
 // Route to update a hexagon
 router.put("/hexagons/:hexagon_id", updateHexagon);
 
@@ -61,7 +75,7 @@ router.post("/province", createProvince);
 // Route to get all provinces
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
-router.get("/provincegeo/:province_id", getProvinceGeometryByID)
+router.get("/provincegeo/:province_id", getProvinceGeometryByID);
 
 // router.get("/province/:province_name", getProvinceByName);
 

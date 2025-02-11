@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Map, MapRef } from "react-map-gl/maplibre";
-import { PolygonLayer } from "deck.gl";
+import { PolygonLayer, ScatterplotLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -22,12 +22,12 @@ interface Geometry {
   coordinates: number[];
 }
 // For the Geometrical Shapes on the Maps like Province And Counties
-// interface CellGeometry {
-//   type: string;
-//   name: string;
-//   coordinates: number[];
-//   vertices: [number, number][];
-// }
+interface CellGeometry {
+  type: string;
+  name: string;
+  coordinates: number[];
+  vertices: [number, number][];
+}
 
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -38,9 +38,9 @@ const MapComponent: React.FC = () => {
   // const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
   // const [cells, setCells] = useState<CellGeometry[]>([]);
-  // const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
-  // const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
-  // const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
+  const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
+  const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
+  const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
   const context = useContext(Context);
 
   if (!context) {
@@ -53,6 +53,55 @@ const MapComponent: React.FC = () => {
     showAtCapCells,
     // searched,
   } = context;
+
+  // This is for the circular elements
+  const loadCarryingCapacityCells = async () => {
+    try {
+      const below_response = await fetch(
+        "http://localhost:8080/api//cells/bm_pred_below"
+      );
+      const at_cap_response = await fetch(
+        "http://localhost:8080/api//cells/bm_pred_at_cap"
+      );
+      const above_response = await fetch(
+        "http://localhost:8080/api//cells/bm_pred_above"
+      );
+
+      const json_object_below = await below_response.json();
+      const geojsonDataBelow = json_object_below;
+      console.log(geojsonDataBelow);
+
+      const json_object_at_cap = await at_cap_response.json();
+      const geojsonDataAtCap = json_object_at_cap;
+
+      const json_object_above = await above_response.json();
+      const geojsonDataAbove = json_object_above;
+
+      const deckCellProjBelow = geojsonDataBelow.data.map((feature: any) => {
+        return {
+          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      const deckCellProjAtCap = geojsonDataAtCap.data.map((feature: any) => {
+        return {
+          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      const deckCellProjAbove = geojsonDataAbove.data.map((feature: any) => {
+        return {
+          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
+          bm_pred: feature.bm_pred,
+        };
+      });
+      setBelowCells(deckCellProjBelow);
+      setAtCapCells(deckCellProjAtCap);
+      setAboveCells(deckCellProjAbove);
+    } catch (error) {
+      console.error("Error fetching data from Express:", error);
+    }
+  };
 
   // const loadCarryingCapacityCells = async () => {
   //   try {
@@ -211,7 +260,7 @@ const MapComponent: React.FC = () => {
   useEffect(() => {
     loadCountiesGeometries();
     loadProvinceGeometries();
-    // loadCarryingCapacityCells();
+    loadCarryingCapacityCells();
   }, []);
 
   const provinceLayer = new PolygonLayer({
@@ -244,6 +293,31 @@ const MapComponent: React.FC = () => {
 
     // pickable: true,
     // autoHighlight: true,
+  });
+
+  const cellsBelowLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: belowCells, // Point Data
+    getPosition: (d) => d.vertices,
+    getRadius: 5000, // Adjust size
+    getFillColor: [0, 170, 60, 200], // Red color for visibility
+    pickable: true,
+  });
+  const cellsAtCapLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: atCapCells, // Point Data
+    getPosition: (d) => d.vertices,
+    getRadius: 5000, // Adjust size
+    getFillColor: [255, 140, 90, 200], // Red color for visibility
+    pickable: true,
+  });
+  const cellsAboveLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: aboveCells, // Point Data
+    getPosition: (d) => d.vertices,
+    getRadius: 5000, // Adjust size
+    getFillColor: [214, 15, 2, 150], // Red color for visibility
+    pickable: true,
   });
 
   // const cellsBelowLayer = new PolygonLayer({
@@ -290,9 +364,9 @@ const MapComponent: React.FC = () => {
     layers.push(soumLayer);
     // if (showCells) layers.push(cellLayer);
     // if (showCounties) layers.push(countyLayer);
-    // if (showBelowCells) layers.push(cellsBelowLayer);
-    // if (showAtCapCells) layers.push(cellsAtCapLayer);
-    // if (showAboveCells) layers.push(cellsAboveLayer);
+    if (showBelowCells) layers.push(cellsBelowLayer);
+    if (showAtCapCells) layers.push(cellsAtCapLayer);
+    if (showAboveCells) layers.push(cellsAboveLayer);
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
     return () => {
