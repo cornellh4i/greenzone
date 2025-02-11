@@ -65,7 +65,7 @@ const BarChart: React.FC<Props> = ({ datasets, livestock }) => {
       .attr("x", w / 2)
       .attr("y", h - 10)
       .style("font-size", "14px")
-      .text("Types of Livesstock");
+      .text("Types of Livestock");
 
     // Draw y-axis
     d3svg.append("g")

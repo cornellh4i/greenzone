@@ -1,130 +1,118 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer, Divider } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
+import { Context } from "../../utils/global";
 
 interface SidePanelProps {
-  provinceName: string | null;
-  isPanelOpen: boolean | null;
-  setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  carryingCapacity: boolean | null;
-  setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
-  showBelowCells: boolean | null;
-  setShowBelowCells: React.Dispatch<React.SetStateAction<boolean>>;
-  showAtCapCells: boolean | null;
-  setShowAtCapCells: React.Dispatch<React.SetStateAction<boolean>>;
-  showAboveCells: boolean | null;
-  setShowAboveCells: React.Dispatch<React.SetStateAction<boolean>>;
-  ndviSelect: boolean | null;
-  setNdviSelect: React.Dispatch<React.SetStateAction<boolean>>;
-  showPositiveCells: boolean | null;
-  setShowPositiveCells: React.Dispatch<React.SetStateAction<boolean>>;
-  showZeroCells: boolean | null;
-  setShowZeroCells: React.Dispatch<React.SetStateAction<boolean>>;
-  showNegativeCells: boolean | null;
-  setShowNegativeCells: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedYear: number | 2014;
-  setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-  grazingRange: boolean | false;
-  setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedOption: string | "carryingCapacity";
-  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
   yearOptions: string[];
-  displayName: string;
 }
-const SidePanel: React.FC<SidePanelProps> = ({
-  provinceName,
-  isPanelOpen,
-  setIsPanelOpen,
-  carryingCapacity,
-  setCarryingCapacity,
-  showBelowCells,
-  setShowBelowCells,
-  showAtCapCells,
-  setShowAtCapCells,
-  showAboveCells,
-  setShowAboveCells,
-  ndviSelect,
-  setNdviSelect,
-  showPositiveCells,
-  setShowPositiveCells,
-  showZeroCells,
-  setShowZeroCells,
-  showNegativeCells,
-  setShowNegativeCells,
-  selectedYear,
-  setSelectedYear,
-  grazingRange,
-  setGrazingRange,
-  selectedOption,
-  setSelectedOption,
-  yearOptions,
-  displayName,
-}) => {
+const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
+  const context = useContext(Context);
+
+  if (!context) {
+    throw new Error("Context must be used within a ContextProvider");
+  }
+  const {
+    selectedProvince,
+    isPanelOpen,
+    setIsPanelOpen,
+    setTopPanelOpen,
+    setCarryingCapacity,
+    showBelowCells,
+    setShowBelowCells,
+    showAtCapCells,
+    setShowAtCapCells,
+    showAboveCells,
+    setShowAboveCells,
+    setNdviSelect,
+    showPositiveCells,
+    setShowPositiveCells,
+    showZeroCells,
+    setShowZeroCells,
+    showNegativeCells,
+    setShowNegativeCells,
+    selectedYear,
+    setSelectedYear,
+    grazingRange,
+    setGrazingRange,
+    selectedOption,
+    setSelectedOption,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    displayName,
+  } = context;
+
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  const loadProvinceData = async (
-    provinceName: string,
-    displayName: string
-  ) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/province/${provinceName.name}`
-      );
-      const json_object = await response.json();
-      console.log(provinceName);
+  // const loadProvinceData = async (
+  //   provinceName: string,
+  //   displayName: string
+  // ) => {
+  //   try {
+  //     const response = await fetch(`http://localhost:8080/api/province/21`);
+  //     const json_object = await response.json();
+  //     console.log(json_object);
 
-      const { province_name, province_land_area, province_herders } =
-        json_object;
+  //     const { province_name, province_land_area, province_herders } =
+  //       json_object;
 
-      const selectedYearData = {
-        number_of_livestock:
-          json_object.province_number_of_livestock[selectedYear || 2014],
-        number_of_cattle:
-          json_object.province_number_of_cattle[selectedYear || 2014],
-        number_of_goat:
-          json_object.province_number_of_goat[selectedYear || 2014],
-        number_of_sheep:
-          json_object.province_number_of_sheep[selectedYear || 2014],
-        number_of_camel:
-          json_object.province_number_of_camel[selectedYear || 2014],
-        number_of_horse:
-          json_object.province_number_of_horse[selectedYear || 2014],
-      };
+  //     const selectedYearData = {
+  //       number_of_livestock:
+  //         json_object.province_number_of_livestock[selectedYear || 2014],
+  //       number_of_cattle:
+  //         json_object.province_number_of_cattle[selectedYear || 2014],
+  //       number_of_goat:
+  //         json_object.province_number_of_goat[selectedYear || 2014],
+  //       number_of_sheep:
+  //         json_object.province_number_of_sheep[selectedYear || 2014],
+  //       number_of_camel:
+  //         json_object.province_number_of_camel[selectedYear || 2014],
+  //       number_of_horse:
+  //         json_object.province_number_of_horse[selectedYear || 2014],
+  //     };
 
-      const formattedData = livestockTypes.map((livestockType) => ({
-        x: livestockType,
-        y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-      }));
+  //     const formattedData = livestockTypes.map((livestockType) => ({
+  //       x: livestockType,
+  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
+  //     }));
 
-      setProvinceData({
-        displayName,
-        province_name,
-        province_land_area,
-        province_herders,
-        selectedYear,
-        formattedData,
-      });
-    } catch (error) {
-      console.error("Error fetching province data:", error);
-    }
-  };
+  //     setProvinceData({
+  //       displayName,
+  //       province_name,
+  //       province_land_area,
+  //       province_herders,
+  //       selectedYear,
+  //       formattedData,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching province data:", error);
+  //   }
+  // };
 
   useEffect(() => {
-    if (provinceName) {
-      setIsPanelOpen(true); // Open the panel when a province is selected
-      loadProvinceData(provinceName, displayName);
+    if (provinceData) {
+      setTopPanelOpen(true);
+    } else {
+      setTopPanelOpen(false);
     }
-  }, [provinceName]);
+  }, [provinceData, setTopPanelOpen]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      setIsPanelOpen(true);
+      //loadProvinceData(selectedProvince, displayName);
+    }
+  }, [selectedProvince, selectedYear, setIsPanelOpen]);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
+    setTopPanelOpen(true);
     if (!isPanelOpen) {
       setProvinceData(null); // Clear province data when closing the panel
     }
@@ -214,34 +202,36 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Toggle SidePanel Button */}
       {/* <Button onClick={handlePanelToggle} label="Toggle SidePanel" /> */}
 
-      {/* Persistent Drawer */}
       <Drawer
         anchor="left"
-        open={isPanelOpen}
+        open={isPanelOpen ?? false}
         onClose={handlePanelToggle}
-        variant="persistent" // Allows interaction with background
+        variant="persistent" // Allows interaction with the background
         PaperProps={{
           sx: {
-            width: "25vw",
+            width: "35vw",
             maxWidth: "400px",
             boxSizing: "border-box",
             p: 2,
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
+            marginTop: "6.1%", // Ensures the Drawer starts below the TopPanel
           },
+        }}
+        sx={{
+          zIndex: 1200,
+          position: "relative",
         }}
       >
         <Box>
-          <h2>SidePanel</h2>
-          <Divider sx={{ mb: 2 }} />
-
           {!provinceData ? (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
               </div>
               <h1>Carrying Capacity Early Warning System</h1>
+              <Divider sx={{ mb: 2 }} />
               <p>
                 Please select a province or adjust the year slider to view data.
               </p>
@@ -255,7 +245,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
               />
               <h2>Grazing Range</h2>
               <Toggle
-                initialChecked={grazingRange}
+                initialChecked={grazingRange ?? false}
                 onChange={(checked) => setGrazingRange(checked)}
               />
               <h2>Data Layers</h2>
