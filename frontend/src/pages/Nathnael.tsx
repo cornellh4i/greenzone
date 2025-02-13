@@ -1,5 +1,6 @@
 import React from 'react';
 import LineGraph from '../components/charts/line-graph-Nathnael';
+import MapComponent from '@/components/map-Nathnael';
 const NewbiePage = () => {
     const data = [
         { x: 1.0, y: 9.0 },
@@ -15,6 +16,7 @@ const NewbiePage = () => {
   return (
     <div>
        <LineGraph info = {data}></LineGraph>
+       <MapComponent></MapComponent>
     </div>
   );
 };
