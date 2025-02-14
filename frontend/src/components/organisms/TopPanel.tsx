@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck comment
+=======
+import React, { useContext, useState, useEffect } from "react";
+>>>>>>> origin/main
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
@@ -10,66 +14,49 @@ import HomeIcon from "@mui/icons-material/Home";
 import { Avatar } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import { Context } from "../../utils/global";
 
 interface TopPanelProps {
-  onProvinceSelect: (provinceName: { value: string }) => void;
-  isPanelOpen: boolean | null;
-  setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  carryingCapacity: boolean | null;
-  showBelowCells: boolean | null;
-  showAtCapCells: boolean | null;
-  showAboveCells: boolean | null;
-  setCarryingCapacity: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowBelowCells: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowAtCapCells: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowAboveCells: React.Dispatch<React.SetStateAction<boolean>>;
-  ndviSelect: boolean | null;
-  showPositiveCells: boolean | null;
-  showZeroCells: boolean | null;
-  showNegativeCells: boolean | null;
-  setNdviSelect: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowPositiveCells: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowZeroCells: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowNegativeCells: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedYear: number | 2014;
-  setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-  grazingRange: boolean | null;
-  setGrazingRange: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedOption: string | "carryingCapacity";
-  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
-  yearOptions: string[];
-  setDisplayName: React.Dispatch<React.SetStateAction<string>>;
+  yearOptions: string[]; // ✅ Define expected prop
 }
 
-const TopPanel: React.FC<TopPanelProps> = ({
-  onProvinceSelect,
-  isPanelOpen,
-  setPanelOpen,
-  carryingCapacity,
-  showBelowCells,
-  showAtCapCells,
-  showAboveCells,
-  setCarryingCapacity,
-  setShowBelowCells,
-  setShowAtCapCells,
-  setShowAboveCells,
-  ndviSelect,
-  showPositiveCells,
-  showZeroCells,
-  showNegativeCells,
-  setNdviSelect,
-  setShowPositiveCells,
-  setShowZeroCells,
-  setShowNegativeCells,
-  selectedYear,
-  setSelectedYear,
-  grazingRange,
-  setGrazingRange,
-  selectedOption,
-  setSelectedOption,
-  yearOptions,
-  setDisplayName,
-}) => {
+const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
+  console.log(yearOptions);
+  const context = useContext(Context);
+
+  if (!context) {
+    throw new Error("Context must be used within a ContextProvider");
+  }
+  const {
+    selectedProvince,
+    isPanelOpen,
+    setIsPanelOpen,
+    isTopPanelOpen,
+    setTopPanelOpen,
+    carryingCapacity,
+    setCarryingCapacity,
+    showBelowCells,
+    setShowBelowCells,
+    showAtCapCells,
+    setShowAtCapCells,
+    showAboveCells,
+    setShowAboveCells,
+    ndviSelect,
+    setNdviSelect,
+    showPositiveCells,
+    setShowPositiveCells,
+    showZeroCells,
+    setShowZeroCells,
+    showNegativeCells,
+    setShowNegativeCells,
+    selectedYear,
+    setSelectedYear,
+    grazingRange,
+    setGrazingRange,
+    selectedOption,
+    setSelectedOption,
+    displayName,
+  } = context;
   const router = useRouter();
 
   const navigateTo = (path: string) => {
@@ -184,13 +171,13 @@ const TopPanel: React.FC<TopPanelProps> = ({
   };
 
   const handleValueSelect = async (provinceData: { value: string }) => {
-    console.log(provinceData.name);
-    console.log(provinceData.value);
     const transformedName = transformString(provinceData.value);
     console.log(transformedName);
     console.log(provinceData);
-    onProvinceSelect({ name: transformedName });
+    setSearched(transformedName);
+    // onProvinceSelect({ name: transformedName });
     setDisplayName(provinceData);
+    setTopPanelOpen(true);
   };
 
   return (
@@ -210,7 +197,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
             width: "100%",
           }}
         >
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Dropdown
               label="Select Year"
               options={yearOptions}
@@ -219,7 +206,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               sx={{ width: "160px" }}
             />
           )}
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Button
               onClick={() => setGrazingRange((prev) => !prev)}
               label="Grazing Range"
@@ -228,7 +215,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               }}
             />
           )}
-          {!isPanelOpen && carryingCapacity && (
+          {isTopPanelOpen && carryingCapacity && (
             <>
               <Button
                 onClick={() => toggleCellState("below")}
@@ -238,7 +225,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               />
               <Button
                 onClick={() => toggleCellState("atCap")}
-                label="At Capacity"
+                label="AtCap"
                 sx={getButtonColor("atCap")}
                 disabled={!carryingCapacity} // Disable if carryingCapacity is false
               />
@@ -250,7 +237,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
               />
             </>
           )}
-          {!isPanelOpen && ndviSelect && (
+          {isTopPanelOpen && ndviSelect && (
             <>
               <Button
                 onClick={() => toggleCellState("positive")}
@@ -273,7 +260,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
             </>
           )}
           {/* Toggle carrying capacity */}
-          {!isPanelOpen && (
+          {isTopPanelOpen && (
             <Button
               onClick={() => {
                 if (carryingCapacity) {
@@ -300,11 +287,7 @@ const TopPanel: React.FC<TopPanelProps> = ({
                   setShowZeroCells(false);
                 }
               }}
-              label={
-                carryingCapacity
-                  ? "Switch to NDVI"
-                  : "Switch to Carrying Capacity"
-              }
+              label={carryingCapacity ? "Switch to NDVI" : "Switch to CarCap"}
               sx={{ marginBottom: 2 }}
               startIcon={<SwapHorizIcon />}
             />

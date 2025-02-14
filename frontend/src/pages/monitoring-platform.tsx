@@ -2,154 +2,97 @@ import React, { useState } from "react";
 import Map from "../components/Map";
 import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
-const MonitoringPlatform = () => {
+import { Context } from "../utils/global";
 
+const MonitoringPlatform: React.FC = () => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
+  const [isTopPanelOpen, setTopPanelOpen] = useState(false);
+  const [searched, setSearched] = useState<string | null>(null);
 
   // Associated with Carrying Capacity
-  const [carryingCapacity, setCarryingCapacity]= useState(true);
+  const [carryingCapacity, setCarryingCapacity] = useState(true);
   const [showBelowCells, setShowBelowCells] = useState(false);
   const [showAtCapCells, setShowAtCapCells] = useState(false);
   const [showAboveCells, setShowAboveCells] = useState(false);
 
   //Associated with Z-Score NDVI
-  const [ndviSelect, setNdviSelect]= useState(false);
+  const [ndviSelect, setNdviSelect] = useState(false);
   const [showPositiveCells, setShowPositiveCells] = useState(false);
   const [showZeroCells, setShowZeroCells] = useState(false);
   const [showNegativeCells, setShowNegativeCells] = useState(false);
 
   const [selectedYear, setSelectedYear] = useState<number>(2014);
   const [grazingRange, setGrazingRange] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string>("carryingCapacity");
+  const [selectedOption, setSelectedOption] =
+    useState<string>("carryingCapacity");
   const [displayName, setDisplayName] = useState<string>("");
+  const contextDict = {
+    // Province & Selection
+    selectedProvince,
+    setSelectedProvince,
+    isPanelOpen,
+    setIsPanelOpen,
+    isTopPanelOpen,
+    setTopPanelOpen,
+    searched,
+    setSearched,
 
-  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) => (2002 + index).toString());
+    // Carrying Capacity Related
+    carryingCapacity,
+    setCarryingCapacity,
+    showBelowCells,
+    setShowBelowCells,
+    showAtCapCells,
+    setShowAtCapCells,
+    showAboveCells,
+    setShowAboveCells,
 
+    // Z-Score NDVI Related
+    ndviSelect,
+    setNdviSelect,
+    showPositiveCells,
+    setShowPositiveCells,
+    showZeroCells,
+    setShowZeroCells,
+    showNegativeCells,
+    setShowNegativeCells,
 
-
-  const handleProvinceSelect = (provinceName: string) => {
-    setSelectedProvince(provinceName);
+    // Other
+    selectedYear,
+    setSelectedYear,
+    grazingRange,
+    setGrazingRange,
+    selectedOption,
+    setSelectedOption,
+    displayName,
+    setDisplayName,
   };
-
-  const handleIsPanelOpenChange = (value) => {
-    setIsPanelOpen(value);
-  };
-
-  const handleCarryingCapacityChange = (value) => {
-    setCarryingCapacity(value);
-  };
-
-  const handleShowBelowCellsChange = (value) => {
-    setShowBelowCells(value);
-  };
-
-  const handleShowAtCapCellsChange = (value) => {
-    setShowAtCapCells(value);
-  };
-
-  const handleShowAboveCellsChange = (value) => {
-    setShowAboveCells(value);
-  };
-
-  const handleNdviSelectChange = (value) => {
-    setNdviSelect(value);
-  };
-
-  const handleShowPositiveCellsChange = (value) => {
-    setShowPositiveCells(value);
-  };
-
-  const handleShowZeroCellsChange = (value) => {
-    setShowZeroCells(value);
-  };
-
-  const handleShowNegativeCellsChange = (value) => {
-    setShowNegativeCells(value);
-  };
-
-  const handleSelectedYearChange = (value) => {
-    setSelectedYear(value);
-  };
-
-  const handleGrazingRangeChange = (value) => {
-    setGrazingRange(value);
-  };
-
+  console.log("In the map selecteProvince is" + selectedProvince);
+  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>
+    (2002 + index).toString()
+  );
 
   return (
     <>
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ height: '35px', padding: '30px', zIndex: 1 }}>
-      {/* Top Panel */}
-      <TopPanel 
-        onProvinceSelect={handleProvinceSelect}
-        isPanelOpen={isPanelOpen}
-        setIsPanelOpen={handleIsPanelOpenChange}
-        carryingCapacity={carryingCapacity}
-        showBelowCells={showBelowCells}
-        showAtCapCells={showAtCapCells}
-        showAboveCells={showAboveCells}
-        setCarryingCapacity={handleCarryingCapacityChange}
-        setShowBelowCells={handleShowBelowCellsChange}
-        setShowAtCapCells={handleShowAtCapCellsChange}
-        setShowAboveCells={handleShowAboveCellsChange}
-        ndviSelect={ndviSelect}
-        showPositiveCells={showPositiveCells}
-        showZeroCells={showZeroCells}
-        showNegativeCells={showNegativeCells}
-        setNdviSelect={handleNdviSelectChange}
-        setShowPositiveCells={handleShowPositiveCellsChange}
-        setShowZeroCells={handleShowZeroCellsChange}
-        setShowNegativeCells={handleShowNegativeCellsChange}
-        selectedYear={selectedYear}
-        setSelectedYear={handleSelectedYearChange}
-        grazingRange={grazingRange}
-        setGrazingRange={handleGrazingRangeChange}
-        selectedOption={selectedOption}
-        setSelectedOption={setSelectedOption}
-        yearOptions={yearOptions}
-        setDisplayName={setDisplayName}
-      />
+      <div
+        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      >
+        <div style={{ height: "35px", padding: "30px", zIndex: 1 }}>
+          {/* Top Panel */}
+          <Context.Provider value={contextDict}>
+            <TopPanel yearOptions={yearOptions} />
+          </Context.Provider>
+        </div>
+        <div>
+          <Context.Provider value={contextDict}>
+            <SidePanel yearOptions={yearOptions} />
+          </Context.Provider>
+        </div>
+        <Context.Provider value={contextDict}>
+          <Map />
+        </Context.Provider>
       </div>
-      <div>
-        <SidePanel // fetch for specific info
-          provinceName={selectedProvince}
-          isPanelOpen={isPanelOpen}
-          setIsPanelOpen={handleIsPanelOpenChange}
-          carryingCapacity={carryingCapacity}
-          setCarryingCapacity={handleCarryingCapacityChange}
-          showBelowCells={showBelowCells}
-          setShowBelowCells={handleShowBelowCellsChange}
-          showAtCapCells={showAtCapCells}
-          setShowAtCapCells={handleShowAtCapCellsChange}
-          showAboveCells={showAboveCells}
-          setShowAboveCells={handleShowAboveCellsChange}
-          ndviSelect={ndviSelect}
-          setNdviSelect={handleNdviSelectChange}
-          showPositiveCells={showPositiveCells}
-          setShowPositiveCells={handleShowPositiveCellsChange}
-          showZeroCells={showZeroCells}
-          setShowZeroCells={handleShowZeroCellsChange}
-          showNegativeCells={showNegativeCells}
-          setShowNegativeCells={handleShowNegativeCellsChange}
-          selectedYear={selectedYear}
-          setSelectedYear={handleSelectedYearChange}
-          grazingRange={grazingRange}
-          setGrazingRange={handleGrazingRangeChange}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-          yearOptions={yearOptions}
-          displayName={displayName}
-        />
-      </div>
-        <Map // fetches all coordinates Province/Counties/Cells
-          onProvinceSelect={handleProvinceSelect}
-          showAboveCells={showAboveCells}
-          showAtCapCells={showAtCapCells}
-          showBelowCells={showBelowCells}
-        />
-    </div>
     </>
   );
 };
