@@ -17,7 +17,9 @@ const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 const MapComponent: React.FC = () => {
-  const [hexagons, setHexagons] = useState([]);
+  const [hexagons, setHexagons] = useState<
+    { id: number; vertices: any; count: number }[]
+  >([]);
 
   useEffect(() => {
     const hexagonsForDeckGL = geojsonData.features.map(
