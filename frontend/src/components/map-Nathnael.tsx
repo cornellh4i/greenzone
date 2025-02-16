@@ -23,7 +23,7 @@ const MapComponent: React.FC = () => {
         const hexagonsForDeckGL = geojsonData.features.map(
             (feature: any, index: any) => {
               return {
-                id: index, // Add a unique ID
+                id: index,  // Add a unique ID
                 vertices: feature.geometry.coordinates[0], // Polygon vertices
                 count: 1, // Placeholder count
               };
