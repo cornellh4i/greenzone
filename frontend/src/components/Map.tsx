@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck comment
-import React, { useState, useEffect } from "react";
 import { Map, MapRef, NavigationControl } from "react-map-gl/maplibre";
-import { PolygonLayer } from "deck.gl";
-=======
 import React, { useContext, useState, useEffect } from "react";
-import { Map, MapRef } from "react-map-gl/maplibre";
 import { PolygonLayer, ScatterplotLayer } from "deck.gl";
->>>>>>> origin/main
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";

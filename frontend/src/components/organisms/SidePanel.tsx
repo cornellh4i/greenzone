@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck comment
-import React, { useState, useEffect } from "react";
-=======
 import React, { useContext, useState, useEffect } from "react";
->>>>>>> origin/main
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer, Divider } from "@mui/material";
