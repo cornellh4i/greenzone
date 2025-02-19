@@ -7,7 +7,7 @@ export const createHexagon = async (
   res: Response
 ): Promise<void> => {
   try {
-    const feature = req.body ;
+    const feature = req.body;
 
     // Define the hexagon object based on the new structure
     const hexagonData = {
