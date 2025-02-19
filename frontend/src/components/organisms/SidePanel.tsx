@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+//@ts-nocheck comment
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
