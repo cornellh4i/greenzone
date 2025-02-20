@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { supabase } from "../db/postgresconn";
-
+// minor change
 export const getBMCellsBelow = async (
   req: Request,
   res: Response
