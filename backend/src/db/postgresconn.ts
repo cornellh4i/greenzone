@@ -16,9 +16,10 @@ let supabase: SupabaseClient | null = null;
 //     })
 //     .catch((error) => {
 //       console.error("MongoDB connection error:", error);
-//       callback(error);
+//       callback(error) to take in a livestock_parameter, group the data by the year, and aggregate the livestock for that specific class, for each year, for all Provinces
 //     });
 // };
+//
 
 const connectToServer = () => {
   if (!supabaseUrl && !supabaseKey) {
