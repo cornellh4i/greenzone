@@ -155,9 +155,9 @@ export const getProvinceLivestockByClass = async (
 ): Promise<void> => {
   if (supabase) {
     try {
+      const { type } = req.params;
       const { data, error } = await supabase
-        .from("province_livestock")
-        .select("year, yearly_agg");
+        .rpc('fetch_livestock_by_class', {livestock_type:type})
       // error handling in case the collection doesn't work
       if (error) {
         res.status(500).json({
