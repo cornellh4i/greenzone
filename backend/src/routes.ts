@@ -32,6 +32,11 @@ import {
   getBMCellsBelow,
   getBMCellsAtCap,
   getBMCellsAbove,
+  getGrazingRangeTrue,
+  getGrazingRangeFalse,
+  getZScoreBelow,
+  getZScoreAtCap,
+  getZScoreAbove,
 } from "./controller/Cell";
 
 const router = express.Router();
@@ -102,5 +107,12 @@ router.put("/county/:county_id", updateCounty);
 
 // Route to delete a county
 router.delete("/county/:county_id", deleteCounty);
+
+// Add these new routes
+router.get("/cells/grazing_range_true", getGrazingRangeTrue);
+router.get("/cells/grazing_range_false", getGrazingRangeFalse);
+router.get("/cells/z_score_below", getZScoreBelow);
+router.get("/cells/z_score_at_cap", getZScoreAtCap);
+router.get("/cells/z_score_above", getZScoreAbove);
 
 export default router;

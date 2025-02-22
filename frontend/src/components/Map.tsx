@@ -44,6 +44,13 @@ const MapComponent: React.FC = () => {
   const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
   const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
   const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
+  const [zScoreBelowCells, setZScoreBelowCells] = useState<CellGeometry[]>([]);
+  const [zScoreAtCapCells, setZScoreAtCapCells] = useState<CellGeometry[]>([]);
+  const [zScoreAboveCells, setZScoreAboveCells] = useState<CellGeometry[]>([]);
+  const [grazingTrueCells, setGrazingTrueCells] = useState<CellGeometry[]>([]);
+  const [grazingFalseCells, setGrazingFalseCells] = useState<CellGeometry[]>(
+    []
+  );
   const context = useContext(Context);
 
   if (!context) {
@@ -260,10 +267,84 @@ const MapComponent: React.FC = () => {
   //   handleMapClick(searched);
   // }, [searched]);
 
+  const loadZScoreCells = async () => {
+    try {
+      const below_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_below"
+      );
+      const at_cap_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_at_cap"
+      );
+      const above_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_above"
+      );
+
+      const [json_below, json_at_cap, json_above] = await Promise.all([
+        below_response.json(),
+        at_cap_response.json(),
+        above_response.json(),
+      ]);
+
+      setZScoreBelowCells(
+        json_below.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setZScoreAtCapCells(
+        json_at_cap.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setZScoreAboveCells(
+        json_above.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching z-score data:", error);
+    }
+  };
+
+  const loadGrazingRangeCells = async () => {
+    try {
+      const true_response = await fetch(
+        "http://localhost:8080/api/cells/grazing_range_true"
+      );
+      const false_response = await fetch(
+        "http://localhost:8080/api/cells/grazing_range_false"
+      );
+
+      const [json_true, json_false] = await Promise.all([
+        true_response.json(),
+        false_response.json(),
+      ]);
+
+      setGrazingTrueCells(
+        json_true.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          grazing_range: true,
+        }))
+      );
+      setGrazingFalseCells(
+        json_false.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          grazing_range: false,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching grazing range data:", error);
+    }
+  };
+
   useEffect(() => {
     loadCountiesGeometries();
     loadProvinceGeometries();
     loadCarryingCapacityCells();
+    loadZScoreCells();
+    loadGrazingRangeCells();
   }, []);
 
   const provinceLayer = new PolygonLayer({
@@ -365,8 +446,6 @@ const MapComponent: React.FC = () => {
     const layers = [];
     layers.push(provinceLayer);
     layers.push(soumLayer);
-    // if (showCells) layers.push(cellLayer);
-    // if (showCounties) layers.push(countyLayer);
     if (showBelowCells) layers.push(cellsBelowLayer);
     if (showAtCapCells) layers.push(cellsAtCapLayer);
     if (showAboveCells) layers.push(cellsAboveLayer);
@@ -375,7 +454,7 @@ const MapComponent: React.FC = () => {
     return () => {
       map.removeControl(overlay);
     };
-  }, [map, showBelowCells, showAtCapCells, showAboveCells]);
+  }, [map, showBelowCells, showAtCapCells, showAboveCells, handleMapClick]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;
