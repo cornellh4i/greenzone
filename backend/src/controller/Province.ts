@@ -149,6 +149,31 @@ export const getProvinceByID = async (
   }
 };
 
+export const getProvinceLivestockByClass = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("province_livestock")
+        .select("year, yearly_agg");
+      // error handling in case the collection doesn't work
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
+      res
+        .status(201)
+        .json({ log: "Data was successfully Collected", data: data });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+};
 
 export const getProvinceGeometryByID = async (
   req: Request,

@@ -17,6 +17,7 @@ import {
   getProvinceByID,
   getProvinceGeometry,
   getProvinceGeometryByID,
+  getProvinceLivestockByClass,
   // getProvinceByName,
 } from "./controller/Province";
 import {
@@ -76,6 +77,7 @@ router.post("/province", createProvince);
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
 router.get("/provincegeo/:province_id", getProvinceGeometryByID);
+router.get("/provincebyclass", getProvinceLivestockByClass);
 
 // router.get("/province/:province_name", getProvinceByName);
 
