@@ -15,9 +15,10 @@ const MonitoringPlatform: React.FC = () => {
   const [showAboveCells, setShowAboveCells] = useState(false);
   //Associated with Z-Score NDVI
   const [ndviSelect, setNdviSelect] = useState(false);
-  const [showPositiveCells, setShowPositiveCells] = useState(false);
-  const [showZeroCells, setShowZeroCells] = useState(false);
-  const [showNegativeCells, setShowNegativeCells] = useState(false);
+  const [showZscoreNegativeCells, setShowZscoreNegativeCells] = useState(false);
+  const [showZscorePositiveCells, setShowZscorePositiveCells] = useState(false);
+  const [showZscoreZeroCells, setShowZscoreZeroCells] = useState(false);
+
   const [selectedYear, setSelectedYear] = useState<number>(2014);
   const [grazingRange, setGrazingRange] = useState(false);
   const [selectedOption, setSelectedOption] =
@@ -45,12 +46,12 @@ const MonitoringPlatform: React.FC = () => {
     // Z-Score NDVI Related
     ndviSelect,
     setNdviSelect,
-    showPositiveCells,
-    setShowPositiveCells,
-    showZeroCells,
-    setShowZeroCells,
-    showNegativeCells,
-    setShowNegativeCells,
+    showZscoreNegativeCells,
+    setShowZscoreNegativeCells,
+    showZscorePositiveCells,
+    setShowZscorePositiveCells,
+    showZscoreZeroCells,
+    setShowZscoreZeroCells,
     // Other
     selectedYear,
     setSelectedYear,

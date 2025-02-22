@@ -44,9 +44,9 @@ const MapComponent: React.FC = () => {
   const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
   const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
   const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
-  const [zScoreBelowCells, setZScoreBelowCells] = useState<CellGeometry[]>([]);
-  const [zScoreAtCapCells, setZScoreAtCapCells] = useState<CellGeometry[]>([]);
-  const [zScoreAboveCells, setZScoreAboveCells] = useState<CellGeometry[]>([]);
+  const [zScoreNegativeCells, setZScoreNegativeCells] = useState<CellGeometry[]>([]);
+  const [zScoreZeroCells, setZScoreZeroCells] = useState<CellGeometry[]>([]);
+  const [zScorePositiveCells, setZScorePositiveCells] = useState<CellGeometry[]>([]);
   const [grazingTrueCells, setGrazingTrueCells] = useState<CellGeometry[]>([]);
   const [grazingFalseCells, setGrazingFalseCells] = useState<CellGeometry[]>(
     []
@@ -61,6 +61,10 @@ const MapComponent: React.FC = () => {
     setSelectedProvince,
     showAboveCells,
     showAtCapCells,
+    showZScoreBelowCells,
+    showZScoreAtCapCells,
+    showZScoreAboveCells,
+
     // searched,
   } = context;
 
@@ -285,19 +289,19 @@ const MapComponent: React.FC = () => {
         above_response.json(),
       ]);
 
-      setZScoreBelowCells(
+      setZScoreNegativeCells(
         json_below.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
         }))
       );
-      setZScoreAtCapCells(
+      setZScoreZeroCells(
         json_at_cap.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
         }))
       );
-      setZScoreAboveCells(
+      setZScorePositiveCells(
         json_above.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
@@ -446,15 +450,20 @@ const MapComponent: React.FC = () => {
     const layers = [];
     layers.push(provinceLayer);
     layers.push(soumLayer);
+    // if (showCells) layers.push(cellLayer);
+    // if (showCounties) layers.push(countyLayer);
     if (showBelowCells) layers.push(cellsBelowLayer);
     if (showAtCapCells) layers.push(cellsAtCapLayer);
     if (showAboveCells) layers.push(cellsAboveLayer);
+    if (showZScoreBelowCells) layers.push(zScoreBelowLayer);
+    if (showZScoreAtCapCells) layers.push(zScoreAtCapLayer);
+    if (showZScoreAboveCells) layers.push(zScoreAboveLayer);  
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
     return () => {
       map.removeControl(overlay);
     };
-  }, [map, showBelowCells, showAtCapCells, showAboveCells, handleMapClick]);
+  }, [map, showBelowCells, showAtCapCells, showAboveCells]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;

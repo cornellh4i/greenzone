@@ -34,10 +34,16 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setNdviSelect,
     showPositiveCells,
     setShowPositiveCells,
-    showZeroCells,
-    setShowZeroCells,
-    showNegativeCells,
-    setShowNegativeCells,
+
+
+    showZScoreNegativeCells,
+    setShowZScoreNegativeCells,
+    showZScorePositiveCells,
+    setShowZScorePositiveCells,
+ 
+    showZScoreZeroCells,
+    setShowZScoreZeroCells,
+
     selectedYear,
     setSelectedYear,
     grazingRange,
@@ -133,21 +139,15 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     if (option === "carryingCapacity") {
       setCarryingCapacity(true);
       setNdviSelect(false);
-      setShowPositiveCells(false);
-      setShowZeroCells(false);
-      setShowNegativeCells(false);
       setShowBelowCells(false);
       setShowAtCapCells(false);
       setShowAboveCells(false);
     } else if (option === "zScore") {
       setCarryingCapacity(false);
       setNdviSelect(true);
-      setShowBelowCells(false);
-      setShowAtCapCells(false);
-      setShowAboveCells(false);
-      setShowNegativeCells(false);
-      setShowPositiveCells(false);
-      setShowZeroCells(false);
+      setShowZScoreNegativeCells(false);
+      setShowZScorePositiveCells(false);
+      setShowZScoreZeroCells(false);
     }
   };
 
@@ -181,19 +181,19 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
           <Button
-            onClick={() => setShowPositiveCells(!showPositiveCells)}
+            onClick={() => setShowZScorePositiveCells(!showZScorePositiveCells)}
             label="Positive"
-            sx={{ backgroundColor: showPositiveCells ? "teal" : "grey" }}
+            sx={{ backgroundColor: showZScorePositiveCells ? "teal" : "grey" }}
           />
           <Button
-            onClick={() => setShowZeroCells(!showZeroCells)}
+            onClick={() => setShowZScoreZeroCells(!showZScoreZeroCells)}
             label="Zero"
-            sx={{ backgroundColor: showZeroCells ? "darkblue" : "grey" }}
+            sx={{ backgroundColor: showZScoreZeroCells ? "darkblue" : "grey" }}
           />
           <Button
-            onClick={() => setShowNegativeCells(!showNegativeCells)}
+            onClick={() => setShowZScoreNegativeCells(!showZScoreNegativeCells)}
             label="Negative"
-            sx={{ backgroundColor: showNegativeCells ? "purple" : "grey" }}
+            sx={{ backgroundColor: showZScoreNegativeCells ? "purple" : "grey" }}
           />
         </div>
       ),
