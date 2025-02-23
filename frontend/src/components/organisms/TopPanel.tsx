@@ -10,11 +10,10 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { Context } from "../../utils/global";
 
 interface TopPanelProps {
-  yearOptions: string[]; // ✅ Define expected prop
+  yearOptions: string[];
 }
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
-  console.log(yearOptions);
   const context = useContext(Context);
 
   if (!context) {
@@ -49,6 +48,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     selectedOption,
     setSelectedOption,
     displayName,
+    setSearched,
+    setDisplayName,
   } = context;
   const router = useRouter();
 
@@ -151,23 +152,20 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     return {}; // Default case (should never be reached if above logic is correct)
   };
 
-  const transformString = (name: string): string => {
-    let transformedName = "";
-    console.log(name);
-    for (let char of name) {
-      // Log each character and its transformed value
-      const transformedChar = specialCharsToEnglishMap[char] || char;
-      transformedName += transformedChar;
-    }
+  // const transformString = (name: string): string => {
+  //   let transformedName = "";
+  //   console.log(name);
+  //   for (let char of name) {
+  //     // Log each character and its transformed value
+  //     const transformedChar = specialCharsToEnglishMap[char] || char;
+  //     transformedName += transformedChar;
+  //   }
 
-    return transformedName; // Return the transformed string
-  };
+  //   return transformedName; // Return the transformed string
+  // };
 
-  const handleValueSelect = async (provinceData: { value: string }) => {
-    const transformedName = transformString(provinceData.value);
-    console.log(transformedName);
-    console.log(provinceData);
-    setSearched(transformedName);
+  const handleValueSelect = async (provinceData: { value: number }) => {
+    setSearched(provinceData.value);
     // onProvinceSelect({ name: transformedName });
     setDisplayName(provinceData);
     setTopPanelOpen(true);

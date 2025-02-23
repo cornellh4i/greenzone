@@ -50,50 +50,51 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  // const loadProvinceData = async (
-  //   provinceName: string,
-  //   displayName: string
-  // ) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8080/api/province/21`);
-  //     const json_object = await response.json();
-  //     console.log(json_object);
+  const loadProvinceData = async (
+    provinceID: number,
+    displayName: string,
+  ) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/province/${provinceID}/${selectedYear}`);
+      const json_object = await response.json();
+      console.log(json_object.data[0].yearly_agg.total);
 
-  //     const { province_name, province_land_area, province_herders } =
-  //       json_object;
+      const { province_name, province_land_area, province_herders } =
+        json_object;
 
-  //     const selectedYearData = {
-  //       number_of_livestock:
-  //         json_object.province_number_of_livestock[selectedYear || 2014],
-  //       number_of_cattle:
-  //         json_object.province_number_of_cattle[selectedYear || 2014],
-  //       number_of_goat:
-  //         json_object.province_number_of_goat[selectedYear || 2014],
-  //       number_of_sheep:
-  //         json_object.province_number_of_sheep[selectedYear || 2014],
-  //       number_of_camel:
-  //         json_object.province_number_of_camel[selectedYear || 2014],
-  //       number_of_horse:
-  //         json_object.province_number_of_horse[selectedYear || 2014],
-  //     };
+      const selectedData = {
+        number_of_livestock:
+          json_object.data[0].yearly_agg.total,
+        number_of_cattle:
+          json_object.data[0].yearly_agg.cattle,
+        number_of_goat:
+          json_object.data[0].yearly_agg.goat,
+        number_of_sheep:
+          json_object.data[0].yearly_agg.sheep,
+        number_of_camel:
+          json_object.data[0].yearly_agg.camel,
+        number_of_horse:
+          json_object.data[0].yearly_agg.horse,
+      };
+      console.log(selectedData);
 
-  //     const formattedData = livestockTypes.map((livestockType) => ({
-  //       x: livestockType,
-  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-  //     }));
+      const formattedData = livestockTypes.map((livestockType) => ({
+        x: livestockType,
+        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+      }));
 
-  //     setProvinceData({
-  //       displayName,
-  //       province_name,
-  //       province_land_area,
-  //       province_herders,
-  //       selectedYear,
-  //       formattedData,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching province data:", error);
-  //   }
-  // };
+      setProvinceData({
+        displayName,
+        province_name,
+        province_land_area,
+        province_herders,
+        selectedYear,
+        formattedData,
+      });
+    } catch (error) {
+      console.error("Error fetching province data:", error);
+    }
+  };
 
   useEffect(() => {
     if (provinceData) {
@@ -106,7 +107,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   useEffect(() => {
     if (selectedProvince) {
       setIsPanelOpen(true);
-      //loadProvinceData(selectedProvince, displayName);
+      loadProvinceData(selectedProvince, displayName);
     }
   }, [selectedProvince, selectedYear, setIsPanelOpen]);
 
