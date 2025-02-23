@@ -17,6 +17,7 @@ import {
   getProvinceByID,
   getProvinceGeometry,
   getProvinceGeometryByID,
+  getProvinceCellSummary
   // getProvinceByName,
 } from "./controller/Province";
 import {
@@ -99,6 +100,10 @@ router.get("/countygeo/:county_id", getCountyGeometryByID);
 
 // Route to update a county
 router.put("/county/:county_id", updateCounty);
+
+
+// Updated route structure to include category_type in the URL
+router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
 
 // Route to delete a county
 router.delete("/county/:county_id", deleteCounty);
