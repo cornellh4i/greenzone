@@ -1,5 +1,6 @@
 import React from 'react';
 import NavBar from "../components/molecules/NavBar";
+import LineGraph from "@/components/charts/scatter-line-plot";
 
 const SummaryStats = () => {
   return (

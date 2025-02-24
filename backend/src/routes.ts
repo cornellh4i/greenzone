@@ -77,7 +77,7 @@ router.post("/province", createProvince);
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
 router.get("/provincegeo/:province_id", getProvinceGeometryByID);
-router.get("/provincebyclass", getProvinceLivestockByClass);
+router.get("/provincebyclass/:type", getProvinceLivestockByClass);
 
 // router.get("/province/:province_name", getProvinceByName);
 
