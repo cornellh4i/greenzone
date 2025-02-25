@@ -27,7 +27,32 @@ const Dropdown: React.FC<DropdownProps> = ({
         }
       }}
       renderInput={(params) => (
-        <TextField {...params} label={label} variant="outlined" sx={sx} />
+        <TextField
+          {...params}
+          label={label}
+          variant="outlined"
+          sx={{
+            ...sx,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: sx?.borderRadius || "20px",
+              color: sx?.color || "black",
+              fontWeight: sx?.fontWeight || "bold",
+              fontFamily: sx?.fontFamily || "Arial, sans-serif",
+              textAlign: "center",
+              "& input": {
+                textAlign: "center",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "grey",
+              fontWeight: "bold",
+              fontFamily: sx?.fontFamily || "Arial, sans-serif",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "grey",
+            },
+          }}
+        />
       )}
       freeSolo
       disableClearable

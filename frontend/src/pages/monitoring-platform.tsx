@@ -76,12 +76,11 @@ const MonitoringPlatform: React.FC = () => {
       <div
         style={{ display: "flex", flexDirection: "column", height: "100vh" }}
       >
-        {/* <div style={{ height: "35px", padding: "30px", zIndex: 1 }}>
-         
+        <div>
           <Context.Provider value={contextDict}>
             <TopPanel yearOptions={yearOptions} />
           </Context.Provider>
-        </div> */}
+        </div>
         <div>
           <Context.Provider value={contextDict}>
             <SidePanel yearOptions={yearOptions} />

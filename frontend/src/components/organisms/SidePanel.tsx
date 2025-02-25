@@ -124,7 +124,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
-  console.log("THE YEARSI  " + selectedYear);
+
   const handleBack = () => {
     setProvinceData(null);
   };
@@ -191,9 +191,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   return (
     <div>
-      {/* Toggle SidePanel Button */}
-      {/* <Button onClick={handlePanelToggle} label="Toggle SidePanel" /> */}
-
       <Drawer
         anchor="left"
         open={isPanelOpen ?? false}
