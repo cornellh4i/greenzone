@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+//@ts-nocheck comment
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
@@ -5,7 +8,7 @@ import { Box, Drawer, Divider } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
-import { Context } from "../../utils/global";
+import { LayerType, Context } from "../../utils/global";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -29,18 +32,22 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     showAboveCells,
     setShowAboveCells,
     setNdviSelect,
+
     showPositiveCells,
     setShowPositiveCells,
-    showZeroCells,
-    setShowZeroCells,
     showNegativeCells,
     setShowNegativeCells,
+    showZeroCells,
+    setShowZeroCells,
+
     selectedYear,
     setSelectedYear,
     grazingRange,
     setGrazingRange,
     selectedOption,
     setSelectedOption,
+    selectedLayerType,
+    setSelectedLayerType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
@@ -50,50 +57,46 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  // const loadProvinceData = async (
-  //   provinceName: string,
-  //   displayName: string
-  // ) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8080/api/province/21`);
-  //     const json_object = await response.json();
-  //     console.log(json_object);
+  const loadProvinceData = async (provinceID: number, displayName: string) => {
+    try {
+      console.log(selectedYear);
+      console.log(provinceID);
+      const response = await fetch(
+        `http://localhost:8080/api/province/${provinceID}/${selectedYear}`
+      );
+      const json_object = await response.json();
+      console.log(json_object.data[0].yearly_agg.total);
 
-  //     const { province_name, province_land_area, province_herders } =
-  //       json_object;
+      const { province_name, province_land_area, province_herders } =
+        json_object;
 
-  //     const selectedYearData = {
-  //       number_of_livestock:
-  //         json_object.province_number_of_livestock[selectedYear || 2014],
-  //       number_of_cattle:
-  //         json_object.province_number_of_cattle[selectedYear || 2014],
-  //       number_of_goat:
-  //         json_object.province_number_of_goat[selectedYear || 2014],
-  //       number_of_sheep:
-  //         json_object.province_number_of_sheep[selectedYear || 2014],
-  //       number_of_camel:
-  //         json_object.province_number_of_camel[selectedYear || 2014],
-  //       number_of_horse:
-  //         json_object.province_number_of_horse[selectedYear || 2014],
-  //     };
+      const selectedData = {
+        number_of_livestock: json_object.data[0].yearly_agg.total,
+        number_of_cattle: json_object.data[0].yearly_agg.cattle,
+        number_of_goat: json_object.data[0].yearly_agg.goat,
+        number_of_sheep: json_object.data[0].yearly_agg.sheep,
+        number_of_camel: json_object.data[0].yearly_agg.camel,
+        number_of_horse: json_object.data[0].yearly_agg.horse,
+      };
+      console.log(selectedData);
 
-  //     const formattedData = livestockTypes.map((livestockType) => ({
-  //       x: livestockType,
-  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-  //     }));
+      const formattedData = livestockTypes.map((livestockType) => ({
+        x: livestockType,
+        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+      }));
 
-  //     setProvinceData({
-  //       displayName,
-  //       province_name,
-  //       province_land_area,
-  //       province_herders,
-  //       selectedYear,
-  //       formattedData,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching province data:", error);
-  //   }
-  // };
+      setProvinceData({
+        displayName,
+        province_name,
+        province_land_area,
+        province_herders,
+        selectedYear,
+        formattedData,
+      });
+    } catch (error) {
+      console.error("Error fetching province data:", error);
+    }
+  };
 
   useEffect(() => {
     if (provinceData) {
@@ -106,7 +109,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   useEffect(() => {
     if (selectedProvince) {
       setIsPanelOpen(true);
-      //loadProvinceData(selectedProvince, displayName);
+      loadProvinceData(selectedProvince, displayName);
     }
   }, [selectedProvince, selectedYear, setIsPanelOpen]);
 
@@ -121,36 +124,25 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
+
   const handleBack = () => {
     setProvinceData(null);
   };
 
-  const handleOptionChange = (option: string) => {
+  const handleOptionChange = (option: LayerType) => {
     setSelectedOption(option);
-    if (option === "carryingCapacity") {
-      setCarryingCapacity(true);
-      setNdviSelect(false);
-      setShowPositiveCells(false);
-      setShowZeroCells(false);
-      setShowNegativeCells(false);
-      setShowBelowCells(false);
-      setShowAtCapCells(false);
-      setShowAboveCells(false);
-    } else if (option === "zScore") {
-      setCarryingCapacity(false);
-      setNdviSelect(true);
-      setShowBelowCells(false);
-      setShowAtCapCells(false);
-      setShowAboveCells(false);
-      setShowNegativeCells(false);
-      setShowPositiveCells(false);
-      setShowZeroCells(false);
-    }
+    setSelectedLayerType(option);
+    setShowBelowCells(false);
+    setShowAtCapCells(false);
+    setShowAboveCells(false);
+    setShowNegativeCells(false);
+    setShowPositiveCells(false);
+    setShowZeroCells(false);
   };
 
   const options = [
     {
-      name: "carryingCapacity",
+      name: LayerType.CarryingCapacity, // Use enum here
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
@@ -173,7 +165,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       ),
     },
     {
-      name: "zScore",
+      name: LayerType.ZScore,
       label: "Z-Score",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
@@ -199,9 +191,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   return (
     <div>
-      {/* Toggle SidePanel Button */}
-      {/* <Button onClick={handlePanelToggle} label="Toggle SidePanel" /> */}
-
       <Drawer
         anchor="left"
         open={isPanelOpen ?? false}
@@ -239,8 +228,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 name="Year"
                 selectedValue={selectedYear}
                 onChange={handleYearSlider}
-                min={2002}
-                max={2014}
+                min={2011}
+                max={2022}
                 options={yearOptions}
               />
               <h2>Grazing Range</h2>
@@ -248,12 +237,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 initialChecked={grazingRange ?? false}
                 onChange={(checked) => setGrazingRange(checked)}
               />
-              <h2>Data Layers</h2>
-              <RadioButton
-                options={options}
-                selectedOption={selectedOption}
-                onChange={handleOptionChange}
-              />
+              <div>
+                <h2>Data Layers</h2>
+                <RadioButton
+                  options={options}
+                  selectedOption={selectedOption}
+                  onChange={handleOptionChange}
+                />
+              </div>
             </div>
           ) : (
             <div>

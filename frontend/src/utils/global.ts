@@ -1,39 +1,48 @@
+import { Class } from "leaflet";
 import { SetStateAction, createContext } from "react";
 
 export type SetState<T> = React.Dispatch<SetStateAction<T>>;
+export enum LayerType {
+  CarryingCapacity = "CarryingCapacity",
+  ZScore = "ZScore",
+}
 export type GlobalContext = {
-  selectedProvince: string | null;
-  setSelectedProvince: SetState<string>;
+  selectedProvince: number | null;
+  setSelectedProvince: SetState<number>;
   selectedYear: number;
   setSelectedYear: SetState<number>;
   isPanelOpen: boolean | null;
   setIsPanelOpen: SetState<boolean>;
   isTopPanelOpen: boolean | null;
   setTopPanelOpen: SetState<boolean>;
-  searched: string | null;
-  setSearched: SetState<string>;
+  searched: number | null;
+  setSearched: SetState<number>;
   selectedOption: string | null; //"carryingCapacity"
   setSelectedOption: SetState<string>;
-  displayName: string | null;
+  displayName: string;
   setDisplayName: SetState<string>;
 
   /////////////////////////////////////////
-  carryingCapacity: boolean | null;
-  setCarryingCapacity: SetState<boolean>;
+
+  selectedLayerType: LayerType | null;
+  setSelectedLayerType: SetState<LayerType>;
+
   showBelowCells: boolean | null;
   setShowBelowCells: SetState<boolean>;
   showAtCapCells: boolean | null;
   setShowAtCapCells: SetState<boolean>;
   showAboveCells: boolean | null;
   setShowAboveCells: SetState<boolean>;
-  ndviSelect: boolean | null;
-  setNdviSelect: SetState<boolean>;
-  showPositiveCells: boolean | null;
-  setShowPositiveCells: SetState<boolean>;
-  showZeroCells: boolean | null;
-  setShowZeroCells: SetState<boolean>;
+
+  // Z-Score NDVI Related
+
   showNegativeCells: boolean | null;
   setShowNegativeCells: SetState<boolean>;
+  showZeroCells: boolean | null;
+  setShowZeroCells: SetState<boolean>;
+  showPositiveCells: boolean | null;
+  setShowPositiveCells: SetState<boolean>;
+
   grazingRange: boolean | null;
   setGrazingRange: SetState<boolean>;
 };
