@@ -50,12 +50,13 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
 
   // Fetch data for the selected province
-  const loadProvinceData = async (
-    provinceID: number,
-    displayName: string,
-  ) => {
+  const loadProvinceData = async (provinceID: number, displayName: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/province/${provinceID}/${selectedYear}`);
+      console.log(selectedYear);
+      console.log(provinceID);
+      const response = await fetch(
+        `http://localhost:8080/api/province/${provinceID}/${selectedYear}`
+      );
       const json_object = await response.json();
       console.log(json_object.data[0].yearly_agg.total);
 
@@ -63,18 +64,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         json_object;
 
       const selectedData = {
-        number_of_livestock:
-          json_object.data[0].yearly_agg.total,
-        number_of_cattle:
-          json_object.data[0].yearly_agg.cattle,
-        number_of_goat:
-          json_object.data[0].yearly_agg.goat,
-        number_of_sheep:
-          json_object.data[0].yearly_agg.sheep,
-        number_of_camel:
-          json_object.data[0].yearly_agg.camel,
-        number_of_horse:
-          json_object.data[0].yearly_agg.horse,
+        number_of_livestock: json_object.data[0].yearly_agg.total,
+        number_of_cattle: json_object.data[0].yearly_agg.cattle,
+        number_of_goat: json_object.data[0].yearly_agg.goat,
+        number_of_sheep: json_object.data[0].yearly_agg.sheep,
+        number_of_camel: json_object.data[0].yearly_agg.camel,
+        number_of_horse: json_object.data[0].yearly_agg.horse,
       };
       console.log(selectedData);
 
@@ -122,6 +117,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
+  console.log("THE YEARSI  " + selectedYear);
   const handleBack = () => {
     setProvinceData(null);
   };
@@ -240,8 +236,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 name="Year"
                 selectedValue={selectedYear}
                 onChange={handleYearSlider}
-                min={2002}
-                max={2014}
+                min={2011}
+                max={2022}
                 options={yearOptions}
               />
               <h2>Grazing Range</h2>
