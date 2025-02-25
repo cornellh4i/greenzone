@@ -34,9 +34,9 @@ import {
   getBMCellsAbove,
   getGrazingRangeTrue,
   getGrazingRangeFalse,
-  getZScoreBelow,
-  getZScoreAtCap,
-  getZScoreAbove,
+  getZScoreNegative,
+  getZScoreZero,
+  getZScorePositive,
 } from "./controller/Cell";
 
 const router = express.Router();
@@ -64,6 +64,10 @@ router.get("/cells/bm_pred_at_cap", getBMCellsAtCap);
 
 //Route to get all hexagons with a bm_pred between 0.4 and 0.6
 router.get("/cells/bm_pred_above", getBMCellsAbove);
+
+router.get("/cells/z_score_negative", getZScoreNegative);
+router.get("/cells/z_score_zero", getZScoreZero);
+router.get("/cells/z_score_positive", getZScorePositive);
 
 // Route to update a hexagon
 router.put("/hexagons/:hexagon_id", updateHexagon);
@@ -111,8 +115,5 @@ router.delete("/county/:county_id", deleteCounty);
 // Add these new routes
 router.get("/cells/grazing_range_true", getGrazingRangeTrue);
 router.get("/cells/grazing_range_false", getGrazingRangeFalse);
-router.get("/cells/z_score_below", getZScoreBelow);
-router.get("/cells/z_score_at_cap", getZScoreAtCap);
-router.get("/cells/z_score_above", getZScoreAbove);
 
 export default router;

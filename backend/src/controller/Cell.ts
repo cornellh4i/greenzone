@@ -135,7 +135,7 @@ export const getGrazingRangeFalse = async (
   }
 };
 
-export const getZScoreBelow = async (
+export const getZScoreNegative = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -144,7 +144,7 @@ export const getZScoreBelow = async (
       const { data, error } = await supabase
         .from("circle_grid")
         .select()
-        .lt("z_score", -1);
+        .lt("z_score", 0.4);
 
       if (error) {
         res.status(500).json({
@@ -162,7 +162,7 @@ export const getZScoreBelow = async (
   }
 };
 
-export const getZScoreAtCap = async (
+export const getZScoreZero = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -171,8 +171,8 @@ export const getZScoreAtCap = async (
       const { data, error } = await supabase
         .from("circle_grid")
         .select()
-        .gte("z_score", -1)
-        .lt("z_score", 1);
+        .gte("z_score", 0.4)
+        .lt("z_score", 0.6);
 
       if (error) {
         res.status(500).json({
@@ -190,7 +190,7 @@ export const getZScoreAtCap = async (
   }
 };
 
-export const getZScoreAbove = async (
+export const getZScorePositive = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -199,7 +199,7 @@ export const getZScoreAbove = async (
       const { data, error } = await supabase
         .from("circle_grid")
         .select()
-        .gte("z_score", 1);
+        .gte("z_score", 0.6);
 
       if (error) {
         res.status(500).json({

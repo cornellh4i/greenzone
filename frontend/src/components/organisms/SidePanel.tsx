@@ -8,7 +8,7 @@ import { Box, Drawer, Divider } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
-import { Context } from "../../utils/global";
+import { LayerType, Context } from "../../utils/global";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -32,17 +32,13 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     showAboveCells,
     setShowAboveCells,
     setNdviSelect,
+
     showPositiveCells,
     setShowPositiveCells,
-
-
-    showZScoreNegativeCells,
-    setShowZScoreNegativeCells,
-    showZScorePositiveCells,
-    setShowZScorePositiveCells,
- 
-    showZScoreZeroCells,
-    setShowZScoreZeroCells,
+    showNegativeCells,
+    setShowNegativeCells,
+    showZeroCells,
+    setShowZeroCells,
 
     selectedYear,
     setSelectedYear,
@@ -50,6 +46,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setGrazingRange,
     selectedOption,
     setSelectedOption,
+    selectedLayerType,
+    setSelectedLayerType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
@@ -57,52 +55,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-
-  // Fetch data for the selected province
-  // const loadProvinceData = async (
-  //   provinceName: string,
-  //   displayName: string
-  // ) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8080/api/province/21`);
-  //     const json_object = await response.json();
-  //     console.log(json_object);
-
-  //     const { province_name, province_land_area, province_herders } =
-  //       json_object;
-
-  //     const selectedYearData = {
-  //       number_of_livestock:
-  //         json_object.province_number_of_livestock[selectedYear || 2014],
-  //       number_of_cattle:
-  //         json_object.province_number_of_cattle[selectedYear || 2014],
-  //       number_of_goat:
-  //         json_object.province_number_of_goat[selectedYear || 2014],
-  //       number_of_sheep:
-  //         json_object.province_number_of_sheep[selectedYear || 2014],
-  //       number_of_camel:
-  //         json_object.province_number_of_camel[selectedYear || 2014],
-  //       number_of_horse:
-  //         json_object.province_number_of_horse[selectedYear || 2014],
-  //     };
-
-  //     const formattedData = livestockTypes.map((livestockType) => ({
-  //       x: livestockType,
-  //       y: selectedYearData[`number_of_${livestockType.toLowerCase()}`] || 0,
-  //     }));
-
-  //     setProvinceData({
-  //       displayName,
-  //       province_name,
-  //       province_land_area,
-  //       province_herders,
-  //       selectedYear,
-  //       formattedData,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching province data:", error);
-  //   }
-  // };
 
   useEffect(() => {
     if (provinceData) {
@@ -134,26 +86,20 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setProvinceData(null);
   };
 
-  const handleOptionChange = (option: string) => {
+  const handleOptionChange = (option: LayerType) => {
     setSelectedOption(option);
-    if (option === "carryingCapacity") {
-      setCarryingCapacity(true);
-      setNdviSelect(false);
-      setShowBelowCells(false);
-      setShowAtCapCells(false);
-      setShowAboveCells(false);
-    } else if (option === "zScore") {
-      setCarryingCapacity(false);
-      setNdviSelect(true);
-      setShowZScoreNegativeCells(false);
-      setShowZScorePositiveCells(false);
-      setShowZScoreZeroCells(false);
-    }
+    setSelectedLayerType(option);
+    setShowBelowCells(false);
+    setShowAtCapCells(false);
+    setShowAboveCells(false);
+    setShowNegativeCells(false);
+    setShowPositiveCells(false);
+    setShowZeroCells(false);
   };
 
   const options = [
     {
-      name: "carryingCapacity",
+      name: LayerType.CarryingCapacity, // Use enum here
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
@@ -176,24 +122,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       ),
     },
     {
-      name: "zScore",
+      name: LayerType.ZScore,
       label: "Z-Score",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
           <Button
-            onClick={() => setShowZScorePositiveCells(!showZScorePositiveCells)}
+            onClick={() => setShowPositiveCells(!showPositiveCells)}
             label="Positive"
-            sx={{ backgroundColor: showZScorePositiveCells ? "teal" : "grey" }}
+            sx={{ backgroundColor: showPositiveCells ? "teal" : "grey" }}
           />
           <Button
-            onClick={() => setShowZScoreZeroCells(!showZScoreZeroCells)}
+            onClick={() => setShowZeroCells(!showZeroCells)}
             label="Zero"
-            sx={{ backgroundColor: showZScoreZeroCells ? "darkblue" : "grey" }}
+            sx={{ backgroundColor: showZeroCells ? "darkblue" : "grey" }}
           />
           <Button
-            onClick={() => setShowZScoreNegativeCells(!showZScoreNegativeCells)}
+            onClick={() => setShowNegativeCells(!showNegativeCells)}
             label="Negative"
-            sx={{ backgroundColor: showZScoreNegativeCells ? "purple" : "grey" }}
+            sx={{ backgroundColor: showNegativeCells ? "purple" : "grey" }}
           />
         </div>
       ),
@@ -251,12 +197,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 initialChecked={grazingRange ?? false}
                 onChange={(checked) => setGrazingRange(checked)}
               />
-              <h2>Data Layers</h2>
-              <RadioButton
-                options={options}
-                selectedOption={selectedOption}
-                onChange={handleOptionChange}
-              />
+              <div>
+                <h2>Data Layers</h2>
+                <RadioButton
+                  options={options}
+                  selectedOption={selectedOption}
+                  onChange={handleOptionChange}
+                />
+              </div>
             </div>
           ) : (
             <div>

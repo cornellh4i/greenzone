@@ -7,7 +7,7 @@ import { PolygonLayer, ScatterplotLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Context } from "../utils/global";
+import { Context, LayerType } from "../utils/global";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -44,9 +44,9 @@ const MapComponent: React.FC = () => {
   const [belowCells, setBelowCells] = useState<CellGeometry[]>([]);
   const [atCapCells, setAtCapCells] = useState<CellGeometry[]>([]);
   const [aboveCells, setAboveCells] = useState<CellGeometry[]>([]);
-  const [zScoreNegativeCells, setZScoreNegativeCells] = useState<CellGeometry[]>([]);
-  const [zScoreZeroCells, setZScoreZeroCells] = useState<CellGeometry[]>([]);
-  const [zScorePositiveCells, setZScorePositiveCells] = useState<CellGeometry[]>([]);
+  const [negativeCells, setNegativeCells] = useState<CellGeometry[]>([]);
+  const [zeroCells, setZeroCells] = useState<CellGeometry[]>([]);
+  const [positiveCells, setPositiveCells] = useState<CellGeometry[]>([]);
   const [grazingTrueCells, setGrazingTrueCells] = useState<CellGeometry[]>([]);
   const [grazingFalseCells, setGrazingFalseCells] = useState<CellGeometry[]>(
     []
@@ -57,18 +57,24 @@ const MapComponent: React.FC = () => {
     throw new Error("Context must be used within a ContextProvider");
   }
   const {
-    showBelowCells,
     setSelectedProvince,
-    showAboveCells,
-    showAtCapCells,
-    showZScoreBelowCells,
-    showZScoreAtCapCells,
-    showZScoreAboveCells,
 
-    // searched,
+    setShowBelowCells,
+    setShowAtCapCells,
+    setShowAboveCells,
+    showAboveCells,
+    showBelowCells,
+    showAtCapCells,
+    setShowPositiveCells,
+    setShowNegativeCells,
+    setShowZeroCells,
+    showPositiveCells,
+    showNegativeCells,
+    showZeroCells,
+    selectedLayerType,
+    setSelectedLayerType,
   } = context;
 
-  // This is for the circular elements
   const loadCarryingCapacityCells = async () => {
     try {
       const below_response = await fetch(
@@ -81,99 +87,77 @@ const MapComponent: React.FC = () => {
         "http://localhost:8080/api//cells/bm_pred_above"
       );
 
-      const json_object_below = await below_response.json();
-      const geojsonDataBelow = json_object_below;
-      console.log(geojsonDataBelow);
-
-      const json_object_at_cap = await at_cap_response.json();
-      const geojsonDataAtCap = json_object_at_cap;
-
-      const json_object_above = await above_response.json();
-      const geojsonDataAbove = json_object_above;
-
-      const deckCellProjBelow = geojsonDataBelow.data.map((feature: any) => {
-        return {
-          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
-          bm_pred: feature.bm_pred,
-        };
-      });
-      const deckCellProjAtCap = geojsonDataAtCap.data.map((feature: any) => {
-        return {
-          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
-          bm_pred: feature.bm_pred,
-        };
-      });
-      const deckCellProjAbove = geojsonDataAbove.data.map((feature: any) => {
-        return {
-          vertices: feature.wkb_geometry.coordinates, // Polygon vertices
-          bm_pred: feature.bm_pred,
-        };
-      });
-      setBelowCells(deckCellProjBelow);
-      setAtCapCells(deckCellProjAtCap);
-      setAboveCells(deckCellProjAbove);
+      const [json_below_response, json_at_cap_response, json_above_response] =
+        await Promise.all([
+          below_response.json(),
+          at_cap_response.json(),
+          above_response.json(),
+        ]);
+      setBelowCells(
+        json_below_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setAtCapCells(
+        json_at_cap_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setAboveCells(
+        json_above_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
     } catch (error) {
       console.error("Error fetching data from Express:", error);
     }
   };
+  const loadZScoreCells = async () => {
+    try {
+      const negative_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_negative"
+      );
+      const zero_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_zero"
+      );
+      const positive_response = await fetch(
+        "http://localhost:8080/api/cells/z_score_positive"
+      );
 
-  // const loadCarryingCapacityCells = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:8080/api/hexagons");
-  //     const below_response = await fetch(
-  //       "http://localhost:8080/api//hexagons/bm_pred_below"
-  //     );
-  //     const at_cap_response = await fetch(
-  //       "http://localhost:8080/api//hexagons/bm_pred_at_cap"
-  //     );
-  //     const above_response = await fetch(
-  //       "http://localhost:8080/api//hexagons/bm_pred_above"
-  //     );
-  //     const json_object = await response.json();
-  //     const geojsonData = json_object;
-
-  //     const json_object_below = await below_response.json();
-  //     const geojsonDataBelow = json_object_below;
-
-  //     const json_object_at_cap = await at_cap_response.json();
-  //     const geojsonDataAtCap = json_object_at_cap;
-
-  //     const json_object_above = await above_response.json();
-  //     const geojsonDataAbove = json_object_above;
-
-  //     // THIS BLOCK IS REQUIRED TO CONVERT HEX COORDINATES - no need to understand it
-  //     const deckHexProj = geojsonData.map((feature: any) => {
-  //       return {
-  //         vertices: feature.geometry.coordinates[0], // Polygon vertices
-  //         bm_pred: feature.bm_pred,
-  //       };
-  //     });
-  //     const deckHexProjBelow = geojsonDataBelow.map((feature: any) => {
-  //       return {
-  //         vertices: feature.geometry.coordinates[0], // Polygon vertices
-  //         bm_pred: feature.bm_pred,
-  //       };
-  //     });
-  //     const deckHexProjAtCap = geojsonDataAtCap.map((feature: any) => {
-  //       return {
-  //         vertices: feature.geometry.coordinates[0], // Polygon vertices
-  //         bm_pred: feature.bm_pred,
-  //       };
-  //     });
-  //     const deckHexProjAbove = geojsonDataAbove.map((feature: any) => {
-  //       return {
-  //         vertices: feature.geometry.coordinates[0], // Polygon vertices
-  //         bm_pred: feature.bm_pred,
-  //       };
-  //     });
-  //     setCells(deckHexProj);
-  //     setBelowCells(deckHexProjBelow);
-  //     setAtCapCells(deckHexProjAtCap);
-  //     setAboveCells(deckHexProjAbove);
-  //   } catch (error) {
-  //     console.error("Error fetching data from Express:", error);
-  //   }
-  // };
+      const [
+        json_negative_response,
+        json_zero_response,
+        json_positive_response,
+      ] = await Promise.all([
+        negative_response.json(),
+        zero_response.json(),
+        positive_response.json(),
+      ]);
+      setNegativeCells(
+        json_negative_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setZeroCells(
+        json_zero_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+      setPositiveCells(
+        json_positive_response.data.map((feature: any) => ({
+          vertices: feature.wkb_geometry.coordinates,
+          z_score: feature.z_score,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching z-score data:", error);
+    }
+  };
 
   const loadProvinceGeometries = async () => {
     try {
@@ -256,7 +240,6 @@ const MapComponent: React.FC = () => {
     if (!coordinates && !view) {
       // find province
       const province = provinces.filter((p) => p.name === provinceName)[0];
-      console.log(province);
       coordinates = province.coordinates;
       view = province.view;
     }
@@ -267,88 +250,12 @@ const MapComponent: React.FC = () => {
     }
   };
 
-  // useEffect(() => {
-  //   handleMapClick(searched);
-  // }, [searched]);
-
-  const loadZScoreCells = async () => {
-    try {
-      const below_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_below"
-      );
-      const at_cap_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_at_cap"
-      );
-      const above_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_above"
-      );
-
-      const [json_below, json_at_cap, json_above] = await Promise.all([
-        below_response.json(),
-        at_cap_response.json(),
-        above_response.json(),
-      ]);
-
-      setZScoreNegativeCells(
-        json_below.data.map((feature: any) => ({
-          vertices: feature.wkb_geometry.coordinates,
-          z_score: feature.z_score,
-        }))
-      );
-      setZScoreZeroCells(
-        json_at_cap.data.map((feature: any) => ({
-          vertices: feature.wkb_geometry.coordinates,
-          z_score: feature.z_score,
-        }))
-      );
-      setZScorePositiveCells(
-        json_above.data.map((feature: any) => ({
-          vertices: feature.wkb_geometry.coordinates,
-          z_score: feature.z_score,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching z-score data:", error);
-    }
-  };
-
-  const loadGrazingRangeCells = async () => {
-    try {
-      const true_response = await fetch(
-        "http://localhost:8080/api/cells/grazing_range_true"
-      );
-      const false_response = await fetch(
-        "http://localhost:8080/api/cells/grazing_range_false"
-      );
-
-      const [json_true, json_false] = await Promise.all([
-        true_response.json(),
-        false_response.json(),
-      ]);
-
-      setGrazingTrueCells(
-        json_true.data.map((feature: any) => ({
-          vertices: feature.wkb_geometry.coordinates,
-          grazing_range: true,
-        }))
-      );
-      setGrazingFalseCells(
-        json_false.data.map((feature: any) => ({
-          vertices: feature.wkb_geometry.coordinates,
-          grazing_range: false,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching grazing range data:", error);
-    }
-  };
-
   useEffect(() => {
     loadCountiesGeometries();
     loadProvinceGeometries();
     loadCarryingCapacityCells();
     loadZScoreCells();
-    loadGrazingRangeCells();
+    // loadGrazingRangeCells();
   }, []);
 
   const provinceLayer = new PolygonLayer({
@@ -402,44 +309,45 @@ const MapComponent: React.FC = () => {
   const cellsAboveLayer = new ScatterplotLayer({
     id: "point-layer",
     data: aboveCells, // Point Data
-    getPosition: (d) => d.vertices,
+    getPosition: (d) => {
+      return d.vertices;
+    },
     getRadius: 5000, // Adjust size
     getFillColor: [214, 15, 2, 150], // Red color for visibility
     pickable: true,
   });
 
-  // const cellsBelowLayer = new PolygonLayer({
-  //   id: "hexagonBelow-layer",
-  //   data: belowCells,
-  //   getPolygon: (d) => d.vertices,
-  //   stroked: true,
-  //   filled: true,
-  //   getLineColor: [0, 0, 0],
-  //   getFillColor: [0, 170, 60, 200],
-  //   lineWidthMinPixels: 1,
-  // });
+  const cellsNegativeLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: negativeCells, // Point Data
+    getPosition: (d) => {
+      return d.vertices;
+    },
+    getRadius: 5000, // Adjust size
+    getFillColor: [128, 0, 128, 200], // Purple color for visibility
 
-  // const cellsAtCapLayer = new PolygonLayer({
-  //   id: "hexagonAtCap-layer",
-  //   data: atCapCells,
-  //   getPolygon: (d) => d.vertices,
-  //   stroked: true,
-  //   filled: true,
-  //   getLineColor: [0, 0, 0],
-  //   getFillColor: [255, 255, 20, 150],
-  //   lineWidthMinPixels: 1,
-  // });
+    pickable: true,
+  });
+  const cellsZeroLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: zeroCells, // Point Data
+    getPosition: (d) => {
+      return d.vertices;
+    },
+    getRadius: 5000, // Adjust size
+    getFillColor: [0, 0, 139, 200], // Blue color for visibility
 
-  // const cellsAboveLayer = new PolygonLayer({
-  //   id: "hexagon-above-layer",
-  //   data: aboveCells,
-  //   getPolygon: (d) => d.vertices,
-  //   stroked: true,
-  //   filled: true,
-  //   getLineColor: [0, 0, 0],
-  //   getFillColor: [214, 15, 2, 150],
-  //   lineWidthMinPixels: 1,
-  // });
+    pickable: true,
+  });
+  const cellsPositiveLayer = new ScatterplotLayer({
+    id: "point-layer",
+    data: positiveCells, // Point Data
+    getPosition: (d) => d.vertices,
+    getRadius: 5000, // Adjust size
+    getFillColor: [0, 128, 128, 200], // Teal color
+
+    pickable: true,
+  });
 
   const handleMapLoad = (event: maplibregl.MapLibreEvent) => {
     setMap(event.target as unknown as MapRef);
@@ -450,20 +358,31 @@ const MapComponent: React.FC = () => {
     const layers = [];
     layers.push(provinceLayer);
     layers.push(soumLayer);
-    // if (showCells) layers.push(cellLayer);
-    // if (showCounties) layers.push(countyLayer);
-    if (showBelowCells) layers.push(cellsBelowLayer);
-    if (showAtCapCells) layers.push(cellsAtCapLayer);
-    if (showAboveCells) layers.push(cellsAboveLayer);
-    if (showZScoreBelowCells) layers.push(zScoreBelowLayer);
-    if (showZScoreAtCapCells) layers.push(zScoreAtCapLayer);
-    if (showZScoreAboveCells) layers.push(zScoreAboveLayer);  
+    if (selectedLayerType == LayerType.ZScore) {
+      if (showNegativeCells) layers.push(cellsNegativeLayer);
+      if (showZeroCells) layers.push(cellsZeroLayer);
+      if (showPositiveCells) layers.push(cellsPositiveLayer);
+    }
+    if (selectedLayerType == LayerType.CarryingCapacity) {
+      if (showBelowCells) layers.push(cellsBelowLayer);
+      if (showAtCapCells) layers.push(cellsAtCapLayer);
+      if (showAboveCells) layers.push(cellsAboveLayer);
+    }
+
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
     return () => {
       map.removeControl(overlay);
     };
-  }, [map, showBelowCells, showAtCapCells, showAboveCells]);
+  }, [
+    map,
+    showBelowCells,
+    showAtCapCells,
+    showAboveCells,
+    showNegativeCells,
+    showZeroCells,
+    showPositiveCells,
+  ]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;

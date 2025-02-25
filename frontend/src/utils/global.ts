@@ -1,6 +1,11 @@
+import { Class } from "leaflet";
 import { SetStateAction, createContext } from "react";
 
 export type SetState<T> = React.Dispatch<SetStateAction<T>>;
+export enum LayerType {
+  CarryingCapacity = "CarryingCapacity",
+  ZScore = "ZScore",
+}
 export type GlobalContext = {
   selectedProvince: string | null;
   setSelectedProvince: SetState<string>;
@@ -18,8 +23,10 @@ export type GlobalContext = {
   setDisplayName: SetState<string>;
 
   /////////////////////////////////////////
-  carryingCapacity: boolean | null;
-  setCarryingCapacity: SetState<boolean>;
+
+  selectedLayerType: LayerType | null;
+  setSelectedLayerType: SetState<LayerType>;
+
   showBelowCells: boolean | null;
   setShowBelowCells: SetState<boolean>;
   showAtCapCells: boolean | null;
@@ -28,14 +35,11 @@ export type GlobalContext = {
   setShowAboveCells: SetState<boolean>;
 
   // Z-Score NDVI Related
-  showZScoreNegativeCells: boolean | null;
-  setShowZScoreNegativeCells: SetState<boolean>;
-  showZScoreZeroCells: boolean | null;
-  setShowZScoreZeroCells: SetState<boolean>;
-  ShowZScorePositiveCells: boolean | null;
-  setShowZcorePositiveCells: SetState<boolean>;
-  ndviSelect: boolean | null;
-  setNdviSelect: SetState<boolean>;
+
+  showNegativeCells: boolean | null;
+  setShowNegativeCells: SetState<boolean>;
+  showZeroCells: boolean | null;
+  setShowZeroCells: SetState<boolean>;
   showPositiveCells: boolean | null;
   setShowPositiveCells: SetState<boolean>;
 
