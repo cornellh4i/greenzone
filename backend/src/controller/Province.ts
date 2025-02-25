@@ -178,6 +178,35 @@ export const getProvinceGeometryByID = async (
   }
 };
 
+export const getProvinceLivestockByID = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      const { province_id, year } = req.params;
+      const { data, error } = await supabase
+        .from("province_livestock")
+        .select("yearly_agg")
+        .eq("asid_prefix", province_id)
+        .eq("year", year);
+      // error handling in case the insertion doesn't work
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
+      res
+        .status(201)
+        .json({ log: "Data was successfully Collected", data: data });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+};
+
 // // Get a province by name
 // export const getProvinceByName = async (
 //   req: Request,

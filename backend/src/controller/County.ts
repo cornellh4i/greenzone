@@ -147,6 +147,35 @@ export const getCountyGeometryByID = async (
   }
 };
 
+export const getCountyLivestockByID = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      const { county_id, year } = req.params;
+      const { data, error } = await supabase
+        .from("county_livestock")
+        .select("yearly_agg")
+        .eq("asid", county_id)
+        .eq("year", year);
+      // error handling in case the insertion doesn't work
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
+      res
+        .status(201)
+        .json({ log: "Data was successfully Collected", data: data });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+};
+
 // export const getCounties = async (
 //   req: Request,
 //   res: Response

@@ -67,7 +67,7 @@ const MonitoringPlatform: React.FC = () => {
     displayName,
     setDisplayName,
   };
-  console.log("In the map selecteProvince is" + selectedProvince);
+  console.log("In the map selecteProvince is " + selectedProvince);
   const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>
     (2002 + index).toString()
   );

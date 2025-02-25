@@ -7,19 +7,19 @@ export enum LayerType {
   ZScore = "ZScore",
 }
 export type GlobalContext = {
-  selectedProvince: string | null;
-  setSelectedProvince: SetState<string>;
+  selectedProvince: number | null;
+  setSelectedProvince: SetState<number>;
   selectedYear: number;
   setSelectedYear: SetState<number>;
   isPanelOpen: boolean | null;
   setIsPanelOpen: SetState<boolean>;
   isTopPanelOpen: boolean | null;
   setTopPanelOpen: SetState<boolean>;
-  searched: string | null;
-  setSearched: SetState<string>;
+  searched: number | null;
+  setSearched: SetState<number>;
   selectedOption: string | null; //"carryingCapacity"
   setSelectedOption: SetState<string>;
-  displayName: string | null;
+  displayName: string;
   setDisplayName: SetState<string>;
 
   /////////////////////////////////////////

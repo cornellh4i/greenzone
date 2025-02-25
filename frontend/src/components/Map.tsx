@@ -189,11 +189,13 @@ const MapComponent: React.FC = () => {
         );
 
         const provinceName = feature.province_name;
+        const provinceID = feature.province_id;
         return {
           type: "Polygon",
-          name: provinceName,
+          province: provinceName,
           coordinates: feature.province_geometry.coordinates[0],
           view: bounds,
+          provinceID: provinceID,
         };
       });
       setProvinces(deckProvinceProj);
@@ -234,11 +236,13 @@ const MapComponent: React.FC = () => {
   const handleMapClick = (
     provinceName: string | null,
     coordinates: number[] | null,
-    view: [number, number, number, number] | null
+    view: [number, number, number, number] | null,
+    provinceID: number
   ) => {
     if (!map) return;
     if (!coordinates && !view) {
       // find province
+      console.log(provinces);
       const province = provinces.filter((p) => p.name === provinceName)[0];
       coordinates = province.coordinates;
       view = province.view;
@@ -246,7 +250,7 @@ const MapComponent: React.FC = () => {
     if (provinceName && coordinates) {
       handleZoomToProvince(view);
       // Trigger the onProvinceSelect callback
-      setSelectedProvince(provinceName);
+      setSelectedProvince(provinceID);
     }
   };
 
@@ -271,9 +275,9 @@ const MapComponent: React.FC = () => {
     highlightColor: [1000, 20, 20, 20],
     onClick: ({ object }) => {
       if (object) {
-        handleMapClick(object.name, null, null);
+        handleMapClick(object.province, object.coordinates, object.view, object.provinceID);
       } else {
-        handleMapClick(null, null, null); // Click outside the polygons
+        handleMapClick(null, null, null, null); // Click outside the polygons
       }
     },
   });

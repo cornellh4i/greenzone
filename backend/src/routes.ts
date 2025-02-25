@@ -17,6 +17,7 @@ import {
   getProvinceByID,
   getProvinceGeometry,
   getProvinceGeometryByID,
+  getProvinceLivestockByID,
   // getProvinceByName,
 } from "./controller/Province";
 import {
@@ -27,6 +28,7 @@ import {
   updateCounty,
   getCountyGeometry,
   getCountyGeometryByID,
+  getCountyLivestockByID,
 } from "./controller/County";
 import {
   getBMCellsBelow,
@@ -90,6 +92,8 @@ router.get("/provincegeo/:province_id", getProvinceGeometryByID);
 
 // Route to get a specific province by ID
 router.get("/province/:province_id", getProvinceByID);
+router.get("/province/:province_id/:year", getProvinceLivestockByID);
+
 
 // Route to update a province
 // router.put("/province/:province_id", updateProvince);
@@ -105,6 +109,8 @@ router.get("/county", getCounties);
 router.get("/countygeo", getCountyGeometry);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
+router.get("/county/:county_id/:year", getCountyLivestockByID);
+
 
 // Route to update a county
 router.put("/county/:county_id", updateCounty);
