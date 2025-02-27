@@ -23,7 +23,6 @@ interface TopPanelProps {
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   console.log("component is leoading");
-  const [count, setCount] = useState(0);
   // const context = useContext(Context);
 
   // if (!context) {
@@ -115,25 +114,21 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       if (!response.ok) throw new Error("Failed to fetch county data");
 
       const json_object = await response.json();
-      console.log("County Data Received:", json_object);
 
-      //   if (!json_object.data || !Array.isArray(json_object.data)) {
-      //     throw new Error("Invalid data format from API");
-      //   }
+      if (!json_object.data || !Array.isArray(json_object.data)) {
+        throw new Error("Invalid data format from API");
+      }
 
-      //   const countyDictionary: { [key: string]: number } = {};
-      //   json_object.data.forEach(
-      //     (county: {
-      //       county_data: { county_name: string };
-      //       county_id: number;
-      //     }) => {
-      //       const name = county.county_data.county_name;
-      //       if (name) countyDictionary[name] = county.county_id;
-      //     }
-      //   );
+      const countyDictionary: { [key: string]: number } = {};
+      json_object.data.forEach(
+        (county: { county_data: { soum_name: string }; county_id: number }) => {
+          const name = county.county_data.soum_name;
+          if (name) countyDictionary[name] = county.county_id;
+        }
+      );
 
-      //   console.log("Formatted County Map:", countyDictionary);
-      //   setCountyMap(countyDictionary);
+      console.log("Formatted County Map:", countyDictionary);
+      setCountyMap(countyDictionary);
     } catch (error) {
       console.error("Error fetching county data:", error);
     }
