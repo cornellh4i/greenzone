@@ -1,6 +1,7 @@
 import React from "react";
 import MapComponent from "@/components/Map";
-import SimpleMap from "@/components/MapWrapper";
+import TopPanel from "@/components/organisms/TopPanel";
+// import SimpleMap from "@/components/MapWrapper";
 /** An About page */
 /*const About = () => {
   return <>Hello there</>;
@@ -16,9 +17,12 @@ export default About;*/
 const About = () => {
   console.log("about!");
   return (
-    <>
-      <MapComponent />
-    </>
+    <div>
+      <TopPanel yearOptions={[]}></TopPanel>
+      {/* <>
+        <MapComponent />
+      </> */}
+    </div>
   );
 };
 
