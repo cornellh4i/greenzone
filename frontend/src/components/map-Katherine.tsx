@@ -3,7 +3,7 @@ import { Map, NavigationControl } from "react-map-gl/maplibre";
 import { PolygonLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import "maplibre-gl/dist/maplibre-gl.css";
-import geojsonData from "../components/charts/data/converted_to_wgs84_geojson.geojson";
+import geojsonData from "../components/charts/data/converted_to_wgs84_geojson.json";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
