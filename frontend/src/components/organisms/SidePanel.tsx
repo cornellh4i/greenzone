@@ -7,6 +7,8 @@ import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 import { Context } from "../../utils/global";
 
+import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
+
 interface SidePanelProps {
   yearOptions: string[];
 }
@@ -48,6 +50,20 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
+  //local state for controlling the new Percentage Modal
+  const [isPercentageModalOpen, setIsPercentageModalOpen] = useState(false);
+
+  // New state to hold cell summary percentages for the modal
+  const [cellSummary, setCellSummary] = useState<number[]>([]);
+
+  // Define color schemes & labels separately for clarity
+  const carryingCapacityLabels = ["Below Capacity", "At Capacity", "Over Capacity"];
+  const zScoreLabels = ["Positive", "Zero", "Negative"];
+
+  // You can adjust or refine these colors as needed
+  const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
+  const zScoreColors = ["#3F7F7F", "#00008B", "#800080"];
+
 
   // Fetch data for the selected province
   // const loadProvinceData = async (
@@ -94,6 +110,42 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   //     console.error("Error fetching province data:", error);
   //   }
   // };
+ // Example: Fetch cell summary data for the selected province and category type
+ const loadProvinceCellSummary = async (provinceId: number, categoryType: string) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/67/${categoryType}/cell-summary`
+    );
+    console.log(provinceId)
+    const json = await response.json();
+    console.log(response)
+    const percentages = [
+      json.data[0].cat1_percentage,
+      json.data[0].cat2_percentage,
+      json.data[0].cat3_percentage
+    ];
+    console.log("Cell summary data:", json);
+
+    //console.log("Cell summary data:", json.data);
+    // Assuming the backend returns an object with a "data" array containing the percentages:
+    if (json.data) {
+      setCellSummary(percentages);
+    } else {
+      setCellSummary([]);
+    }
+  } catch (error) {
+    console.error("Error fetching cell summary data:", error);
+  }
+};
+
+// Whenever the selected province or option changes, fetch cell summary data
+useEffect(() => {
+  if (selectedProvince) {
+    // Determine the category type string required by the backend
+    const categoryType = selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score";
+    loadProvinceCellSummary(Number(selectedProvince), categoryType);
+  }
+}, [selectedProvince, selectedOption]);
 
   useEffect(() => {
     if (provinceData) {
@@ -254,6 +306,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 selectedOption={selectedOption}
                 onChange={handleOptionChange}
               />
+              {/* Button to open the new Percentage Modal */}
+              <div className="mt-4">
+                <Button
+                  onClick={() => setIsPercentageModalOpen(true)}
+                  label="Show Percentage Modal"
+                  sx={{ backgroundColor: "#6C757D" }}
+                />
+              </div>
             </div>
           ) : (
             <div>
@@ -285,6 +345,26 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           )}
         </Box>
       </Drawer>
+{  /* Render the Percentage Modal at the bottom of SidePanel */}
+  <SidePanelPercentageModal
+        isOpen={isPercentageModalOpen}
+        onClose={() => setIsPercentageModalOpen(false)}
+        // If selectedOption is "carryingCapacity", classificationType is true
+        classificationType={selectedOption === "carryingCapacity"}
+        classificationValues={
+          cellSummary
+        }
+        classificationLabels={
+          selectedOption === "carryingCapacity"
+            ? carryingCapacityLabels
+            : zScoreLabels
+        }
+        classificationColourScheme={
+          selectedOption === "carryingCapacity"
+            ? carryingCapacityColors
+            : zScoreColors
+        }
+      />
     </div>
   );
 };
