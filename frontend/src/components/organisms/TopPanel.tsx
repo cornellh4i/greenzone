@@ -23,45 +23,48 @@ interface TopPanelProps {
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   console.log("component is leoading");
-  // const context = useContext(Context);
+  const context = useContext(Context);
 
-  // if (!context) {
-  //   throw new Error("Context must be used within a ContextProvider");
-  // }
-  // const {
-  //   selectedProvince,
-  //   isPanelOpen,
-  //   setIsPanelOpen,
-  //   isTopPanelOpen,
-  //   setTopPanelOpen,
-  //   carryingCapacity,
-  //   setCarryingCapacity,
-  //   showBelowCells,
-  //   setShowBelowCells,
-  //   showAtCapCells,
-  //   setShowAtCapCells,
-  //   showAboveCells,
-  //   setShowAboveCells,
-  //   ndviSelect,
-  //   setNdviSelect,
-  //   showPositiveCells,
-  //   setShowPositiveCells,
-  //   showZeroCells,
-  //   setShowZeroCells,
-  //   showNegativeCells,
-  //   setShowNegativeCells,
-  //   selectedYear,
-  //   setSelectedYear,
-  //   grazingRange,
-  //   setGrazingRange,
-  //   selectedOption,
-  //   setSelectedOption,
-  //   displayName,
-  //   setSearched,
-  //   setDisplayName,
-  //   selectedLayerType,
-  //   setSelectedLayerType,
-  // } = context;
+  if (!context) {
+    throw new Error("Context must be used within a ContextProvider");
+  }
+  const {
+    setSearched,
+    setDisplayName,
+    setTopPanelOpen
+    //   selectedProvince,
+    //   isPanelOpen,
+    //   setIsPanelOpen,
+    //   isTopPanelOpen,
+    //   setTopPanelOpen,
+    //   carryingCapacity,
+    //   setCarryingCapacity,
+    //   showBelowCells,
+    //   setShowBelowCells,
+    //   showAtCapCells,
+    //   setShowAtCapCells,
+    //   showAboveCells,
+    //   setShowAboveCells,
+    //   ndviSelect,
+    //   setNdviSelect,
+    //   showPositiveCells,
+    //   setShowPositiveCells,
+    //   showZeroCells,
+    //   setShowZeroCells,
+    //   showNegativeCells,
+    //   setShowNegativeCells,
+    //   selectedYear,
+    //   setSelectedYear,
+    //   grazingRange,
+    //   setGrazingRange,
+    //   selectedOption,
+    //   setSelectedOption,
+    //   displayName,
+    //   setSearched,
+    //   setDisplayName,
+    //   selectedLayerType,
+    //   setSelectedLayerType,
+  } = context;
   const router = useRouter();
 
   const navigateTo = (path: string) => {
@@ -134,19 +137,51 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     }
   };
 
-  loadCountyData();
+  useEffect(() => {
+    loadCountyData();
+  }, []);
 
-  const handleValueSelect = async (provinceData: { value: number }) => {
+
+  /*const handleValueSelect = async (provinceData: { value: number }) => {
     setSearched(provinceData.value);
     setDisplayName(provinceData);
     setTopPanelOpen(true);
+  };*/
+
+  const handleValueSelect = async (countyData: { value: string }) => {
+    // Retrieve the county ID from the countyMap using the selected county name
+    const countyId = countyMap[countyData.value];
+
+    if (countyId) {
+      // Update the searched value with the county ID
+      setSearched(countyId);
+
+      // Update the display name with the selected county name
+      setDisplayName({ value: countyData.value });
+
+      // Open the top panel (if needed)
+      setTopPanelOpen(true);
+
+      console.log("Selected County:", countyData.value, "County ID:", countyId);
+    } else {
+      console.error("County ID not found for:", countyData.value);
+    }
   };
 
   return (
     <div>
       <h2>County Map</h2>
       <pre>{JSON.stringify(countyMap, null, 2)}</pre>
+
+      <div style={{ flex: 1 }}>
+        <SearchBar
+          countyMap={countyMap}
+          onValueSelect={handleValueSelect}
+        />
+      </div>
     </div>
+
+
   );
   //   <div
   //     style={{

@@ -5,21 +5,27 @@ import { Box } from "@mui/material";
 import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
 
-interface SearchBarParams {
+/*interface SearchBarParams {
   uniqueData: string[];
   onValueSelect: (searchValue: { value: string }) => void;
+}*/
+
+interface SearchBarParams {
+  countyMap: { [key: string]: number };
+  onValueSelect: (countyData: { value: string }) => void;
 }
 
 const SearchBar: React.FC<SearchBarParams> = ({
-  uniqueData,
+  countyMap,
   onValueSelect,
 }) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
-  const fuse = new Fuse(uniqueData, { threshold: 0.3 });
+  const countyNames = Object.keys(countyMap);
+  const fuse = new Fuse(countyNames, { threshold: 0.3 });
 
   const filteredOptions = selectedValue
     ? fuse.search(selectedValue).map((result) => result.item)
-    : uniqueData;
+    : countyNames;
 
   const handleOptionClick = () => {
     if (selectedValue) {
@@ -43,7 +49,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
           options={filteredOptions}
           value={selectedValue}
           onChange={setSelectedValue}
-          label="Select Aimag"
+          label="Select County"
           sx={{ width: "100%" }}
         />
       </Box>
