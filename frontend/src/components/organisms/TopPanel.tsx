@@ -171,7 +171,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   return (
     <div>
       <h2>County Map</h2>
-      <pre>{JSON.stringify(countyMap, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(countyMap, null, 2)}</pre> */}
 
       <div style={{ flex: 1 }}>
         <SearchBar
