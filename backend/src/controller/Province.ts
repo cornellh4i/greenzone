@@ -207,6 +207,33 @@ export const getProvinceLivestockByID = async (
   }
 };
 
+export const getProvinceLivestockByClass = async (
+  req: Request,
+  res: Response
+ ): Promise<void> => {
+  if (supabase) {
+    try {
+      const { type } = req.params;
+      const { data, error } = await supabase
+        .rpc('fetch_livestock_by_class', {livestock_type:type})
+      // error handling in case the collection doesn't work
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
+      res
+        .status(201)
+        .json({ log: "Data was successfully Collected", data: data });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+ };
+ 
+
 // // Get a province by name
 // export const getProvinceByName = async (
 //   req: Request,
