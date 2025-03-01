@@ -114,7 +114,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
  const loadProvinceCellSummary = async (provinceId: number, categoryType: string) => {
   try {
     const response = await fetch(
-      `http://localhost:8080/api/67/${categoryType}/cell-summary`
+      `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
     );
     console.log(provinceId)
     const json = await response.json();
@@ -138,12 +138,38 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   }
 };
 
+//get provinvce by ID
+const getProvinceIdByName = (jsonData: any, provinceName: string)=> {
+  const province = jsonData.data.find(
+    (item: any) => item.province_data.province_name === provinceName
+  );
+  return province ? province.province_id : null;
+}
+
+// Extracted async function that fetches province data and then loads the cell summary
+const fetchProvinceDataAndLoadSummary  = async (
+  selectedProvince: string,
+  selectedOption: string
+) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/province`);
+    const jsonData = await response.json();
+    const prov_id = getProvinceIdByName(jsonData, selectedProvince);
+    if (prov_id) {
+      await loadProvinceCellSummary(prov_id, selectedOption);
+    } else {
+      console.error(`Province with name ${selectedProvince} not found.`);
+    }
+  } catch (error) {
+    console.error("Error fetching province data:", error);
+  }
+}
 // Whenever the selected province or option changes, fetch cell summary data
 useEffect(() => {
   if (selectedProvince) {
     // Determine the category type string required by the backend
     const categoryType = selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score";
-    loadProvinceCellSummary(Number(selectedProvince), categoryType);
+    fetchProvinceDataAndLoadSummary(selectedProvince, categoryType);
   }
 }, [selectedProvince, selectedOption]);
 
