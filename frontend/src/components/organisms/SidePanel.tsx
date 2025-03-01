@@ -50,9 +50,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  //local state for controlling the new Percentage Modal
-  const [isPercentageModalOpen, setIsPercentageModalOpen] = useState(false);
-
   // New state to hold cell summary percentages for the modal
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -122,18 +119,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       const response = await fetch(
         `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
       );
-      console.log(provinceId);
       const json = await response.json();
-      console.log(response);
       const percentages = [
         json.data[0].cat1_percentage,
         json.data[0].cat2_percentage,
         json.data[0].cat3_percentage,
       ];
-      console.log("Cell summary data:", json);
-
-      //console.log("Cell summary data:", json.data);
-      // Assuming the backend returns an object with a "data" array containing the percentages:
       if (json.data) {
         setCellSummary(percentages);
       } else {
@@ -144,7 +135,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   };
 
-  //get provinvce by ID
+  // Get province by ID
   const getProvinceIdByName = (jsonData: any, provinceName: string) => {
     const province = jsonData.data.find(
       (item: any) => item.province_data.province_name === provinceName
@@ -152,7 +143,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     return province ? province.province_id : null;
   };
 
-  // Extracted async function that fetches province data and then loads the cell summary
+  // Fetch province data and then load the cell summary
   const fetchProvinceDataAndLoadSummary = async (
     selectedProvince: string,
     selectedOption: string
@@ -188,17 +179,13 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   }, [provinceData, setTopPanelOpen]);
 
+  // Minimal change: Only adjust panel visibility based on percentage section status
   useEffect(() => {
     if (selectedProvince) {
-      if(!isPercentageModalOpen){
-        setIsPanelOpen(true);
-      }
-      else{
-        setIsPanelOpen(false)
-      }
-      //loadProvinceData(selectedProvince, displayName);
+      setIsPanelOpen(true)
     }
-  }, [selectedProvince, selectedYear,isPercentageModalOpen, setIsPanelOpen]);
+  }, [selectedProvince, setIsPanelOpen]);
+
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setTopPanelOpen(true);
@@ -343,14 +330,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 selectedOption={selectedOption}
                 onChange={handleOptionChange}
               />
-              {/* Button to open the new Percentage Modal */}
-              <div className="mt-4">
-                <Button
-                  onClick={() => setIsPercentageModalOpen(true)}
-                  label="Show Percentage Modal"
-                  sx={{ backgroundColor: "#6C757D" }}
-                />
-              </div>
+              
             </div>
           ) : (
             <div>
@@ -381,25 +361,23 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           )}
         </Box>
+        {/* Render the Percentage Modal as an embedded section at the bottom */}
+        <SidePanelPercentageModal
+          isOpen={true}
+          classificationType={selectedOption === "carryingCapacity"}
+          classificationValues={cellSummary}
+          classificationLabels={
+            selectedOption === "carryingCapacity"
+              ? carryingCapacityLabels
+              : zScoreLabels
+          }
+          classificationColourScheme={
+            selectedOption === "carryingCapacity"
+              ? carryingCapacityColors
+              : zScoreColors
+          }
+        />
       </Drawer>
-      {/* Render the Percentage Modal at the bottom of SidePanel */}
-      <SidePanelPercentageModal
-        isOpen={isPercentageModalOpen}
-        onClose={() => setIsPercentageModalOpen(false)}
-        // If selectedOption is "carryingCapacity", classificationType is true
-        classificationType={selectedOption === "carryingCapacity"}
-        classificationValues={cellSummary}
-        classificationLabels={
-          selectedOption === "carryingCapacity"
-            ? carryingCapacityLabels
-            : zScoreLabels
-        }
-        classificationColourScheme={
-          selectedOption === "carryingCapacity"
-            ? carryingCapacityColors
-            : zScoreColors
-        }
-      />
     </div>
   );
 };
