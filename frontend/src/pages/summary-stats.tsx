@@ -9,6 +9,8 @@ interface LivestockData {
 const SummaryStatistics: React.FC = () => {
   const [livestockData, setLivestockData] = useState<{[key: string]: LivestockData[]}>({});
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
+  const dzudYears = [2017, 2016, 2020, 2021]; 
+  const privatizationPeriods = [2012, 2015, 2018, 2013];
 
   useEffect(() => {
     const fetchAllLivestockData = async () => {
@@ -55,6 +57,8 @@ const SummaryStatistics: React.FC = () => {
         <LineGraph
           datasets={Object.values(livestockData).flat()}
           livestock="all"
+          dzudYears={dzudYears} 
+          privatizationPeriods={privatizationPeriods} 
         />
       )}
     </div>

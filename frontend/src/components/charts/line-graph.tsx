@@ -5,9 +5,10 @@ export interface Prop {
   datasets: { aimag: string; data: { x: number; y: number }[] }[];
   livestock: string;
   dzudYears?: number[];
+  privatizationPeriods?: number[];
 }
 
-const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears = [] }) => {
+const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizationPeriods  = [] }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -45,10 +46,6 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears = [] }) => {
     const colorScale = d3
       .scaleOrdinal(d3.schemeCategory10)
       .domain(datasets.map(d => d.aimag));
-
-   
-const dzudYears = [2017, 2016, 2020, 2021]; 
-const privatizationPeriods = [2012, 2015, 2018, 2013];
 
 // === DZUD YEARS HIGHLIGHT ===
 d3svg.selectAll(".dzud-rect")
