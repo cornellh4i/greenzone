@@ -57,13 +57,16 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
   // Define color schemes & labels separately for clarity
-  const carryingCapacityLabels = ["Below Capacity", "At Capacity", "Over Capacity"];
+  const carryingCapacityLabels = [
+    "Below Capacity",
+    "At Capacity",
+    "Over Capacity",
+  ];
   const zScoreLabels = ["Positive", "Zero", "Negative"];
 
   // You can adjust or refine these colors as needed
   const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
   const zScoreColors = ["#3F7F7F", "#00008B", "#800080"];
-
 
   // Fetch data for the selected province
   // const loadProvinceData = async (
@@ -110,68 +113,72 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   //     console.error("Error fetching province data:", error);
   //   }
   // };
- // Example: Fetch cell summary data for the selected province and category type
- const loadProvinceCellSummary = async (provinceId: number, categoryType: string) => {
-  try {
-    const response = await fetch(
-      `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+  // Example: Fetch cell summary data for the selected province and category type
+  const loadProvinceCellSummary = async (
+    provinceId: number,
+    categoryType: string
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+      );
+      console.log(provinceId);
+      const json = await response.json();
+      console.log(response);
+      const percentages = [
+        json.data[0].cat1_percentage,
+        json.data[0].cat2_percentage,
+        json.data[0].cat3_percentage,
+      ];
+      console.log("Cell summary data:", json);
+
+      //console.log("Cell summary data:", json.data);
+      // Assuming the backend returns an object with a "data" array containing the percentages:
+      if (json.data) {
+        setCellSummary(percentages);
+      } else {
+        setCellSummary([]);
+      }
+    } catch (error) {
+      console.error("Error fetching cell summary data:", error);
+    }
+  };
+
+  //get provinvce by ID
+  const getProvinceIdByName = (jsonData: any, provinceName: string) => {
+    const province = jsonData.data.find(
+      (item: any) => item.province_data.province_name === provinceName
     );
-    console.log(provinceId)
-    const json = await response.json();
-    console.log(response)
-    const percentages = [
-      json.data[0].cat1_percentage,
-      json.data[0].cat2_percentage,
-      json.data[0].cat3_percentage
-    ];
-    console.log("Cell summary data:", json);
+    return province ? province.province_id : null;
+  };
 
-    //console.log("Cell summary data:", json.data);
-    // Assuming the backend returns an object with a "data" array containing the percentages:
-    if (json.data) {
-      setCellSummary(percentages);
-    } else {
-      setCellSummary([]);
+  // Extracted async function that fetches province data and then loads the cell summary
+  const fetchProvinceDataAndLoadSummary = async (
+    selectedProvince: string,
+    selectedOption: string
+  ) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/province`);
+      const jsonData = await response.json();
+      const prov_id = getProvinceIdByName(jsonData, selectedProvince);
+      if (prov_id) {
+        await loadProvinceCellSummary(prov_id, selectedOption);
+      } else {
+        console.error(`Province with name ${selectedProvince} not found.`);
+      }
+    } catch (error) {
+      console.error("Error fetching province data:", error);
     }
-  } catch (error) {
-    console.error("Error fetching cell summary data:", error);
-  }
-};
-
-//get provinvce by ID
-const getProvinceIdByName = (jsonData: any, provinceName: string)=> {
-  const province = jsonData.data.find(
-    (item: any) => item.province_data.province_name === provinceName
-  );
-  return province ? province.province_id : null;
-}
-
-// Extracted async function that fetches province data and then loads the cell summary
-const fetchProvinceDataAndLoadSummary  = async (
-  selectedProvince: string,
-  selectedOption: string
-) => {
-  try {
-    const response = await fetch(`http://localhost:8080/api/province`);
-    const jsonData = await response.json();
-    const prov_id = getProvinceIdByName(jsonData, selectedProvince);
-    if (prov_id) {
-      await loadProvinceCellSummary(prov_id, selectedOption);
-    } else {
-      console.error(`Province with name ${selectedProvince} not found.`);
+  };
+  // Whenever the selected province or option changes, fetch cell summary data
+  useEffect(() => {
+    if (selectedProvince) {
+      // Determine the category type string required by the backend
+      const categoryType =
+        selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score";
+      fetchProvinceDataAndLoadSummary(selectedProvince, categoryType);
     }
-  } catch (error) {
-    console.error("Error fetching province data:", error);
-  }
-}
-// Whenever the selected province or option changes, fetch cell summary data
-useEffect(() => {
-  if (selectedProvince) {
-    // Determine the category type string required by the backend
-    const categoryType = selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score";
-    fetchProvinceDataAndLoadSummary(selectedProvince, categoryType);
-  }
-}, [selectedProvince, selectedOption]);
+  }, [selectedProvince, selectedOption]);
 
   useEffect(() => {
     if (provinceData) {
@@ -183,11 +190,15 @@ useEffect(() => {
 
   useEffect(() => {
     if (selectedProvince) {
-      setIsPanelOpen(true);
+      if(!isPercentageModalOpen){
+        setIsPanelOpen(true);
+      }
+      else{
+        setIsPanelOpen(false)
+      }
       //loadProvinceData(selectedProvince, displayName);
     }
-  }, [selectedProvince, selectedYear, setIsPanelOpen]);
-
+  }, [selectedProvince, selectedYear,isPercentageModalOpen, setIsPanelOpen]);
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setTopPanelOpen(true);
@@ -371,15 +382,13 @@ useEffect(() => {
           )}
         </Box>
       </Drawer>
-{  /* Render the Percentage Modal at the bottom of SidePanel */}
-  <SidePanelPercentageModal
+      {/* Render the Percentage Modal at the bottom of SidePanel */}
+      <SidePanelPercentageModal
         isOpen={isPercentageModalOpen}
         onClose={() => setIsPercentageModalOpen(false)}
         // If selectedOption is "carryingCapacity", classificationType is true
         classificationType={selectedOption === "carryingCapacity"}
-        classificationValues={
-          cellSummary
-        }
+        classificationValues={cellSummary}
         classificationLabels={
           selectedOption === "carryingCapacity"
             ? carryingCapacityLabels
