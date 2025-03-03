@@ -117,16 +117,27 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       if (!response.ok) throw new Error("Failed to fetch county data");
 
       const json_object = await response.json();
+      console.log("Heyyy" + json_object);
 
       if (!json_object.data || !Array.isArray(json_object.data)) {
         throw new Error("Invalid data format from API");
       }
 
-      const countyDictionary: { [key: string]: number } = {};
+      const countyDictionary: {
+        [key: string]: { countyid: number; province_name: string };
+      } = {};
+
       json_object.data.forEach(
-        (county: { county_data: { soum_name: string }; county_id: number }) => {
+        (county:
+          { county_data: { soum_name: string; province_name: string }; county_id: number }) => {
           const name = county.county_data.soum_name;
-          if (name) countyDictionary[name] = county.county_id;
+          const provinceName = county.county_data.province_name;
+          if (name && provinceName) {
+            countyDictionary[name] = {
+              county_id: county.county_id,
+              province_name: provinceName,
+            }
+          }
         }
       );
 
