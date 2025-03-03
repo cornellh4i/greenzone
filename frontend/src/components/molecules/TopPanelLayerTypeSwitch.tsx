@@ -50,21 +50,27 @@ const TopPanelLayerTypeSwitch = () => {
     backgroundColor: isActive ? color : "grey",
     borderRadius: "50px",
     padding: "10px 20px",
-    width: "120px",
-    height: "45px",
+    width: "100px",
+    height: "40px",
     textAlign: "center",
-    fontSize: "14px",
+    fontSize: "12px",
     fontWeight: "bold",
+    flex: "1 1 auto",
+    minWidth: "100px",
+    maxWidth: "200px",
   });
 
   return (
     <div
       style={{
-        padding: "15px",
+        padding: "10px",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        flexWrap: "wrap",
+        flexWrap: "nowrap",
+        overflowX: "auto",
+        width: "100%",
+        maxWidth: "100vw",
         gap: "10px",
       }}
     >
@@ -74,11 +80,11 @@ const TopPanelLayerTypeSwitch = () => {
         value={selectedYear.toString()}
         onChange={(val) => setSelectedYear(val)}
         sx={{
-          width: "140px",
-          height: "50px",
-          borderRadius: "60px",
+          width: "120px",
+          height: "40px",
+          borderRadius: "30px",
           backgroundColor: "white", // Match button color
-          fontSize: "20px",
+          fontSize: "14px",
           color: "black",
           fontWeight: "bold",
           textAlign: "center",
@@ -98,7 +104,6 @@ const TopPanelLayerTypeSwitch = () => {
         sx={buttonStyle(grazingRange, "green")}
       />
 
-      {/* Main Button Group */}
       <div
         style={{
           backgroundColor: "#e6e6e6",
@@ -106,9 +111,10 @@ const TopPanelLayerTypeSwitch = () => {
           borderRadius: "20px",
           display: "flex",
           justifyContent: "center",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
+          overflowX: "auto",
+          width: "60%",
           gap: "10px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
       >
         {selectedLayerType == LayerType.CarryingCapacity && (
@@ -181,6 +187,7 @@ const TopPanelLayerTypeSwitch = () => {
             padding: "10px 20px",
             width: "140px",
             height: "50px",
+            fontSize: "10px",
             fontWeight: "bold",
           }}
         />

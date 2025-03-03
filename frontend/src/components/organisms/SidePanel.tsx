@@ -9,6 +9,7 @@ import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 import { LayerType, Context } from "../../utils/global";
+import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -53,8 +54,45 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   } = context;
 
   const [provinceData, setProvinceData] = useState<any | null>(null);
+  // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
+  const [cellSummary, setCellSummary] = useState<number[]>([]);
+
+  // Define color schemes & labels separately for clarity
+  const carryingCapacityLabels = [
+    "Below Capacity",
+    "At Capacity",
+    "Over Capacity",
+  ];
+  const zScoreLabels = ["Positive", "Zero", "Negative"];
+
+  // You can adjust or refine these colors as needed
+  const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
+  const zScoreColors = ["#3F7F7F", "#00008B", "#800080"];
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
+  const loadProvinceCellSummary = async (
+    provinceId: number,
+    categoryType: string
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+      );
+      const json = await response.json();
+      const percentages = [
+        json.data[0].cat1_percentage,
+        json.data[0].cat2_percentage,
+        json.data[0].cat3_percentage,
+      ];
+      if (json.data) {
+        setCellSummary(percentages);
+      } else {
+        setCellSummary([]);
+      }
+    } catch (error) {
+      console.error("Error fetching cell summary data:", error);
+    }
+  };
 
   // Fetch data for the selected province
   const loadProvinceData = async (provinceID: number, displayName: string) => {
@@ -109,9 +147,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   useEffect(() => {
     if (selectedProvince) {
       setIsPanelOpen(true);
+      const categoryType =
+        selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score"; //NEEDS TO BE ADDRESSED - VARIABLE FIXING
+      loadProvinceCellSummary(selectedProvince, categoryType);
       loadProvinceData(selectedProvince, displayName);
     }
-  }, [selectedProvince, selectedYear, setIsPanelOpen]);
+  }, [selectedProvince, selectedYear, setIsPanelOpen, selectedOption]);
 
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -260,6 +301,21 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 <strong>Number of Herders:</strong>{" "}
                 {provinceData.province_herders}
               </p>
+              <SidePanelPercentageModal
+                isOpen={true}
+                classificationType={selectedOption === "carryingCapacity"}
+                classificationValues={cellSummary}
+                classificationLabels={
+                  selectedOption === "carryingCapacity"
+                    ? carryingCapacityLabels
+                    : zScoreLabels
+                }
+                classificationColourScheme={
+                  selectedOption === "carryingCapacity"
+                    ? carryingCapacityColors
+                    : zScoreColors
+                }
+              />
               <h2>Livestock Data for {selectedYear}</h2>
               {provinceData.formattedData.length > 0 && (
                 <BarChart

@@ -180,10 +180,18 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   };
 
   return (
-    <div>
-      <h2>County Map</h2>
-      {/* <pre>{JSON.stringify(countyMap, null, 2)}</pre> */}
-
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between", // Adjusts layout distribution
+        gap: "10px",
+        padding: "10px",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        borderRadius: "15px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+      }}
+    >
       <div style={{ flex: 1 }}>
         <SearchBar
           countyMap={countyMap}
