@@ -27,6 +27,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       onChange={(event, newValue) => {
         if (typeof newValue === "string" || newValue === null) {
           onChange(newValue);
+          console.log("user typed " + newValue);
         }
       }}
       renderOption={(props, option) => (

@@ -27,7 +27,17 @@ const SearchBar: React.FC<SearchBarParams> = ({
 }) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const countyNames = Object.keys(countyMap);
-  const fuse = new Fuse(countyNames, { threshold: 0.3 });
+  //const fuse = new Fuse(countyNames, { threshold: 0.3 });
+  const fuse = new Fuse(countyNames, {
+    threshold: 0.3,
+    includeScore: true,
+    minMatchCharLength: 2,
+    findAllMatches: true,
+  });
+
+  console.log("Search Query:", selectedValue);
+  console.log("Fuzzy Search Results:", fuse.search(selectedValue || ""));
+
 
   const filteredOptions = selectedValue
     ? fuse.search(selectedValue).map((result) => result.item)
