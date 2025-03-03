@@ -1,9 +1,11 @@
 import React from "react";
 import { Autocomplete, TextField } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 interface DropdownProps {
   options: string[];
-  value: string | null;
+  countyMap: { [key: string]: { county_id: number; province_name: string } };
+  value?: string | null;
   onChange: (value: string | null) => void;
   label: string;
   sx?: React.CSSProperties;
@@ -11,6 +13,7 @@ interface DropdownProps {
 
 const Dropdown: React.FC<DropdownProps> = ({
   options,
+  countyMap,
   value,
   onChange,
   label,
@@ -20,12 +23,23 @@ const Dropdown: React.FC<DropdownProps> = ({
     <Autocomplete
       options={options}
       getOptionLabel={(option) => option.toString()}
-      value={value}
+      // value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string" || newValue === null) {
           onChange(newValue);
+          console.log("user typed " + newValue);
         }
       }}
+      renderOption={(props, option) => (
+        <Box component="li" {...props} sx={{ display: "flex", flexDirection: "column", padding: "10px" }}>
+          <Typography sx={{ fontWeight: "bold", color: "black" }}>
+            {option} {/* County Name */}
+          </Typography>
+          <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
+            {countyMap[option]?.province_name || ""}
+          </Typography>
+        </Box>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}

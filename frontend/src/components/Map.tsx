@@ -302,6 +302,7 @@ const MapComponent: React.FC = () => {
     getFillColor: [0, 170, 60, 200], // Red color for visibility
     pickable: true,
   });
+  
   const cellsAtCapLayer = new ScatterplotLayer({
     id: "point-layer",
     data: atCapCells, // Point Data
