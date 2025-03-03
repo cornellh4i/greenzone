@@ -112,7 +112,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between", // Adjusts layout distribution
-        gap: "15px",
+        gap: "10px",
         padding: "10px",
         backgroundColor: "rgba(255, 255, 255, 0.8)",
         borderRadius: "15px",
