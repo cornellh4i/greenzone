@@ -5,7 +5,7 @@ import { Box, Typography } from "@mui/material";
 interface DropdownProps {
   options: string[];
   countyMap: { [key: string]: { county_id: number; province_name: string } };
-  value: string | null;
+  value?: string | null;
   onChange: (value: string | null) => void;
   label: string;
   sx?: React.CSSProperties;
@@ -23,7 +23,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <Autocomplete
       options={options}
       getOptionLabel={(option) => option.toString()}
-      value={value}
+      // value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string" || newValue === null) {
           onChange(newValue);

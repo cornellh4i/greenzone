@@ -10,6 +10,7 @@ import { Box } from "@mui/material";
 
 import Dropdown from "../atoms/DropDown";
 import Button from "../atoms/Button";
+import { on } from "events";
 
 /*interface SearchBarParams {
   uniqueData: string[];
@@ -25,23 +26,29 @@ const SearchBar: React.FC<SearchBarParams> = ({
   countyMap,
   onValueSelect,
 }) => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [selectedValue, setSelectedValue] = useState<string>("");
   const countyNames = Object.keys(countyMap);
+  const [searchData, setSearchData] = useState<string[]>(countyNames);
   //const fuse = new Fuse(countyNames, { threshold: 0.3 });
-  const fuse = new Fuse(countyNames, {
-    threshold: 0.3,
-    includeScore: true,
-    minMatchCharLength: 2,
-    findAllMatches: true,
-  });
 
-  console.log("Search Query:", selectedValue);
-  console.log("Fuzzy Search Results:", fuse.search(selectedValue || ""));
+  const searchItem = () => {
+    const fuse = new Fuse(countyNames, {
+      threshold: 0.5,
+      includeScore: true,
+      minMatchCharLength: 2,
+      findAllMatches: true,
+    });
+
+    // console.log("Search Query:", selectedValue);
+    // console.log("Fuzzy Search Results:", fuse.search(selectedValue || ""));
 
 
-  const filteredOptions = selectedValue
-    ? fuse.search(selectedValue).map((result) => result.item)
-    : countyNames;
+    const filteredOptions = selectedValue
+      ? fuse.search(selectedValue).map((result) => result.item)
+      : countyNames;
+    
+    setSearchData(filteredOptions);
+}
 
   const handleOptionClick = () => {
     if (selectedValue && countyMap[selectedValue]) {
@@ -53,6 +60,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
     }
   };
 
+
   return (
     <Box
       sx={{
@@ -61,16 +69,15 @@ const SearchBar: React.FC<SearchBarParams> = ({
         width: "100%",
       }}
     >
-      {" "}
+      {/* {" "} */}
       <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
         <Dropdown
-          options={filteredOptions}
+          options={countyNames}
           countyMap={countyMap}
-          value={selectedValue}
-          onChange={setSelectedValue}
+          // value={selectedValue}
+          onChange={searchItem}
           label="Select County"
           sx={{ width: "100%" }}
-
         />
       </Box>
       <Button
