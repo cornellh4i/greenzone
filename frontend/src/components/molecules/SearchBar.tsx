@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import Fuse from "fuse.js";
 import { Box } from "@mui/material";
 
-import Dropdown from "../atoms/DropDown";
+import SearchBarDropdown from "../atoms/SearchBarDropDown";
 import Button from "../atoms/Button";
 import { on } from "events";
 
@@ -71,7 +71,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
     >
       {/* {" "} */}
       <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
-        <Dropdown
+        <SearchBarDropdown
           options={countyNames}
           countyMap={countyMap}
           // value={selectedValue}
