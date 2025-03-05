@@ -35,13 +35,14 @@ const SearchBar: React.FC<SearchBarParams> = ({
     findAllMatches: true,
   });
 
-  console.log("Search Query:", selectedValue);
-  console.log("Fuzzy Search Results:", fuse.search(selectedValue || ""));
 
+  console.log("these are the county names " + countyNames)
 
   const filteredOptions = selectedValue
     ? fuse.search(selectedValue).map((result) => result.item)
     : countyNames;
+
+  console.log("Filtered Options After Search:", filteredOptions);
 
   const handleOptionClick = () => {
     if (selectedValue && countyMap[selectedValue]) {

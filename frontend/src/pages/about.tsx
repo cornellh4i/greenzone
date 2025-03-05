@@ -18,7 +18,7 @@ const About = () => {
   console.log("about!");
   return (
     <div>
-      <TopPanel yearOptions={[]}></TopPanel>
+      <h1>Hello, World!</h1>
       {/* <>
         <MapComponent />
       </> */}
