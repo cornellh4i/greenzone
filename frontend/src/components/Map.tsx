@@ -30,6 +30,7 @@ interface CellGeometry {
   name: string;
   coordinates: number[];
   vertices: [number, number][];
+  grazing: boolean; // Add grazing boolean value
 }
 
 const MAP_STYLE =
@@ -97,18 +98,23 @@ const MapComponent: React.FC = () => {
         json_below_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
         }))
       );
       setAtCapCells(
         json_at_cap_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
+
         }))
       );
       setAboveCells(
         json_above_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
+
         }))
       );
     } catch (error) {
@@ -140,18 +146,24 @@ const MapComponent: React.FC = () => {
         json_negative_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
+
         }))
       );
       setZeroCells(
         json_zero_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
+
         }))
       );
       setPositiveCells(
         json_positive_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing: feature.grazing, // Include grazing boolean value
+
         }))
       );
     } catch (error) {
