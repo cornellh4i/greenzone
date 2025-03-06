@@ -45,8 +45,5 @@ export type GlobalContext = {
 
   grazingRange: boolean | null;
   setGrazingRange: SetState<boolean>;
-
-  isGrazingRangeSelected: boolean | null; // Add isGrazingRangeSelected
-  setIsGrazingRangeSelected: SetState<boolean>;
 };
 export const Context = createContext<GlobalContext | undefined>(undefined);

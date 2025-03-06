@@ -68,9 +68,6 @@ const MonitoringPlatform: React.FC = () => {
     setSelectedOption,
     displayName,
     setDisplayName,
-
-    isGrazingRangeSelected, // Pass to context
-    setIsGrazingRangeSelected,
   };
   console.log("In the map selecteProvince is " + selectedProvince);
   const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>

@@ -4,12 +4,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
-import { Box, Drawer, Divider } from "@mui/material";
+import { Box, Drawer, Divider , Typography, Switch} from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
+import AgricultureIcon from '@mui/icons-material/Agriculture'; 
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -271,20 +272,13 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 onChange={handleYearSlider}
                 min={2011}
                 max={2022}
-                options={yearOptions}
-              />
-              <h2>Grazing Range</h2>
-              <Toggle
-                initialChecked={grazingRange ?? false}
-                onChange={(checked) => setGrazingRange(checked)}
-              />
-              <div>
+                options={yearOptions} />
+            <div>
                 <h2>Data Layers</h2>
                 <RadioButton
                   options={options}
                   selectedOption={selectedOption}
-                  onChange={handleOptionChange}
-                />
+                  onChange={handleOptionChange} />
               </div>
             </div>
           ) : (
@@ -331,7 +325,49 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           )}
         </Box>
+        <Divider sx={{ my: 2 }} />
+        {/* Row with icon, heading, and switch */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mb: 0.5 // small margin bottom before the text below
+          }}
+        >
+          <AgricultureIcon sx={{ mr: 1 }} />
+          <Typography
+            variant="h6"
+            component="h2"
+            sx={{ mr: 'auto' }} // pushes the switch to the right
+          >
+            Grazing Range
+          </Typography>
+          <Switch
+            checked={grazingRange ?? false}
+            onChange={(e) => setGrazingRange(e.target.checked)}
+            sx={{
+              // Override track color when on
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#2E7D32', // dark green
+              },
+              // Override the thumb color when on
+              '& .MuiSwitch-switchBase.Mui-checked': {
+                color: '#ffffff', // white thumb
+              },
+            }}
+      
+             />
+        </Box>
+
+        {/* Descriptive text below */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+        >
+          View data only in land categorized as a grazing range.
+        </Typography>
       </Drawer>
+      
     </div>
   );
 };

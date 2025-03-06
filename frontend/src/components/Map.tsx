@@ -30,7 +30,7 @@ interface CellGeometry {
   name: string;
   coordinates: number[];
   vertices: [number, number][];
-  grazing: boolean; // Add grazing boolean value
+  grazing_range: boolean; // Add grazing boolean value
 }
 
 const MAP_STYLE =
@@ -74,6 +74,7 @@ const MapComponent: React.FC = () => {
     showZeroCells,
     selectedLayerType,
     setSelectedLayerType,
+    grazingRange
   } = context;
 
   const loadCarryingCapacityCells = async () => {
@@ -98,23 +99,21 @@ const MapComponent: React.FC = () => {
         json_below_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
+          grazing_range: feature.grazing_range, // Include grazing boolean value
         }))
       );
       setAtCapCells(
         json_at_cap_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
-
+          grazing_range: feature.grazing_range,// Include grazing boolean value
         }))
       );
       setAboveCells(
         json_above_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
-
+          grazing_range: feature.grazing_range, // Include grazing boolean value
         }))
       );
     } catch (error) {
@@ -146,15 +145,14 @@ const MapComponent: React.FC = () => {
         json_negative_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
-
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
         }))
       );
       setZeroCells(
         json_zero_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
 
         }))
       );
@@ -162,8 +160,7 @@ const MapComponent: React.FC = () => {
         json_positive_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
-          grazing: feature.grazing, // Include grazing boolean value
-
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
         }))
       );
     } catch (error) {
@@ -308,7 +305,9 @@ const MapComponent: React.FC = () => {
 
   const cellsBelowLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: belowCells, // Point Data
+    data: !grazingRange
+    ? belowCells
+    : belowCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 170, 60, 200], // Red color for visibility
@@ -317,7 +316,9 @@ const MapComponent: React.FC = () => {
   
   const cellsAtCapLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: atCapCells, // Point Data
+    data: !grazingRange
+    ? atCapCells
+    : atCapCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [255, 140, 90, 200], // Red color for visibility
@@ -325,8 +326,9 @@ const MapComponent: React.FC = () => {
   });
   const cellsAboveLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: aboveCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? aboveCells
+    : aboveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -336,8 +338,9 @@ const MapComponent: React.FC = () => {
 
   const cellsNegativeLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: negativeCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? negativeCells
+    : negativeCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -347,8 +350,9 @@ const MapComponent: React.FC = () => {
   });
   const cellsZeroLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: zeroCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? zeroCells
+    : zeroCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -358,8 +362,9 @@ const MapComponent: React.FC = () => {
   });
   const cellsPositiveLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: positiveCells, // Point Data
-    getPosition: (d) => d.vertices,
+    data: !grazingRange
+    ? positiveCells
+    : positiveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 128, 128, 200], // Teal color
 
@@ -399,6 +404,7 @@ const MapComponent: React.FC = () => {
     showNegativeCells,
     showZeroCells,
     showPositiveCells,
+    grazingRange
   ]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
