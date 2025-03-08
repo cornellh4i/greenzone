@@ -31,7 +31,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   const {
     setSearched,
     setDisplayName,
-    setTopPanelOpen
+    setTopPanelOpen,
     //   selectedProvince,
     //   isPanelOpen,
     //   setIsPanelOpen,
@@ -128,15 +128,17 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       } = {};
 
       json_object.data.forEach(
-        (county:
-          { county_data: { soum_name: string; province_name: string }; county_id: number }) => {
+        (county: {
+          county_data: { soum_name: string; province_name: string };
+          county_id: number;
+        }) => {
           const name = county.county_data.soum_name;
           const provinceName = county.county_data.province_name;
           if (name && provinceName) {
             countyDictionary[name] = {
               county_id: county.county_id,
               province_name: provinceName,
-            }
+            };
           }
         }
       );
@@ -151,7 +153,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   useEffect(() => {
     loadCountyData();
   }, []);
-
 
   /*const handleValueSelect = async (provinceData: { value: number }) => {
     setSearched(provinceData.value);
@@ -193,14 +194,44 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       }}
     >
       <div style={{ flex: 1 }}>
-        <SearchBar
-          countyMap={countyMap}
-          onValueSelect={handleValueSelect}
-        />
+        <SearchBar countyMap={countyMap} onValueSelect={handleValueSelect} />
       </div>
+
+      <Context.Provider value={context}>
+        <TopPanelLayerTypeSwitch />
+      </Context.Provider>
+
+      <Button
+        onClick={() => navigateTo("/landing")}
+        sx={{
+          backgroundColor: "grey",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "12px",
+        }}
+        startIcon={<HomeIcon />}
+      />
+
+      <Button
+        onClick={() => {}} // Placeholder for future routing
+        sx={{
+          backgroundColor: "transparent",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        startIcon={
+          <Avatar sx={{ width: "40px", height: "40px" }}>
+            <PersonIcon />
+          </Avatar>
+        }
+      />
     </div>
-
-
   );
   //   <div
   //     style={{
