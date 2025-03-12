@@ -74,19 +74,19 @@ const MapComponent: React.FC = () => {
     showZeroCells,
     selectedLayerType,
     setSelectedLayerType,
-    grazingRange
+    grazingRange,
+    selectedYear
   } = context;
-
   const loadCarryingCapacityCells = async () => {
     try {
       const below_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_below"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0/0.4`
       );
       const at_cap_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_at_cap"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.4/0.6`
       );
       const above_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_above"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.6/1`
       );
 
       const [json_below_response, json_at_cap_response, json_above_response] =
@@ -123,15 +123,15 @@ const MapComponent: React.FC = () => {
   const loadZScoreCells = async () => {
     try {
       const negative_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_negative"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0/0.4`
       );
       const zero_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_zero"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.4/0.6`
       );
       const positive_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_positive"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.6/1`
       );
-
+      console.log(negative_response)
       const [
         json_negative_response,
         json_zero_response,
@@ -269,7 +269,7 @@ const MapComponent: React.FC = () => {
     loadCarryingCapacityCells();
     loadZScoreCells();
     // loadGrazingRangeCells();
-  }, []);
+  }, [selectedYear]);
 
   const provinceLayer = new PolygonLayer({
     id: "province-layer",
@@ -404,7 +404,8 @@ const MapComponent: React.FC = () => {
     showNegativeCells,
     showZeroCells,
     showPositiveCells,
-    grazingRange
+    grazingRange,
+    selectedYear
   ]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {

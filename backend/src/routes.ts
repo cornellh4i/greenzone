@@ -41,6 +41,7 @@ import {
   getZScoreNegative,
   getZScoreZero,
   getZScorePositive,
+  getCellValuesbyYearandCtype,
 } from "./controller/Cell";
 
 const router = express.Router();
@@ -74,6 +75,8 @@ router.get("/cells/z_score_zero", getZScoreZero);
 router.get("/cells/z_score_positive", getZScorePositive);
 router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
 
+//
+router.get("/cells/:year/:classificationType/:lowerBound/:upperBound",getCellValuesbyYearandCtype)
 // Route to update a hexagon
 router.put("/hexagons/:hexagon_id", updateHexagon);
 
