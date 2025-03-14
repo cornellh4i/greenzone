@@ -6,7 +6,6 @@ import InsightsDesc from "../components/summary-stats/InsightsDesc";
 const SummaryPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavBar />
       <div className="flex flex-col">
         <InsightsDesc />
         <InsightsPanel />

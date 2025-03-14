@@ -151,7 +151,7 @@ const InsightsPanel: React.FC = () => {
             Key conclusions
           </Typography>
 
-          <Box sx={{ backgroundColor: 'white', p: 4, borderRadius: 2 }}>
+          <Box sx={{p: 4, borderRadius: 2 }}>
             <Typography 
               variant="h6" 
               sx={{ 
@@ -199,7 +199,7 @@ const InsightsPanel: React.FC = () => {
             />
           </Box>
 
-          <Box sx={{ backgroundColor: 'white', p: 4, borderRadius: 2 }}>
+          <Box sx={{p: 4, borderRadius: 2 }}>
             <Typography 
               variant="h6" 
               sx={{ 
@@ -217,8 +217,8 @@ const InsightsPanel: React.FC = () => {
                 mx: -4,
                 px: 4,
                 '& > div': {
-                  minWidth: '1500px',  // Minimum width to ensure scrolling
-                  width: '100%',       // Take full width of container
+                  minWidth: '1500px',
+                  width: '100%',
                   height: '600px',
                 }
               }}

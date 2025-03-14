@@ -7,12 +7,10 @@ const InsightsDesc: React.FC = () => {
       <Container maxWidth="xl">
         <Box
           sx={{
-            backgroundColor: 'white',
             borderRadius: 2,
             p: { xs: 3, md: 6 },
           }}
         >
-          {/* Mobile Layout */}
           <Box
             sx={{
               display: { xs: 'flex', md: 'none' },
@@ -20,7 +18,6 @@ const InsightsDesc: React.FC = () => {
               gap: 3,
             }}
           >
-            {/* Title Section */}
             <Box>
               <Typography
                 variant="subtitle1"
@@ -44,7 +41,6 @@ const InsightsDesc: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Image */}
             <Box
               sx={{
                 width: '100%',
@@ -71,7 +67,6 @@ const InsightsDesc: React.FC = () => {
               />
             </Box>
 
-            {/* Description */}
             <Box>
               <Typography
                 variant="h5"
@@ -96,7 +91,6 @@ const InsightsDesc: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Desktop Layout */}
           <Box
             sx={{
               display: { xs: 'none', md: 'flex' },
@@ -105,7 +99,6 @@ const InsightsDesc: React.FC = () => {
               alignItems: 'center',
             }}
           >
-            {/* Text Content */}
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="subtitle1"
@@ -149,7 +142,6 @@ const InsightsDesc: React.FC = () => {
               </Typography>
             </Box>
 
-            {/* Image */}
             <Box
               sx={{
                 flex: 1,
