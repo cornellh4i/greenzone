@@ -12,21 +12,25 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
 
-    const w = 500;
-    const h = 500;
-    const m = { top: 40, right: 30, bottom: 50, left: 60 };
+    // Adjust dimensions for better mobile display
+    const w = 1000; // Fixed width
+    const h = 500;  // Fixed height
+    const m = { 
+      top: 40, 
+      right: 120, // Increased right margin for legend
+      bottom: 50, 
+      left: 80  // Increased left margin for y-axis labels
+    };
 
     const allData = datasets.flatMap(d => d.data);
 
-        
     const d3svg = d3
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", `0 0 ${w + 100} ${h}`)
+      .attr("viewBox", `0 0 ${w + m.right} ${h + m.top + m.bottom}`)
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .style("background-color", "#ffffff")
-
+      .style("background-color", "#ffffff");
 
     //setting the scales of the graph
     const xScale = d3
@@ -153,7 +157,12 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
 
 
   return (
-    <div className="line-graph" style={{ width: "100%", height: "100vh", maxHeight: "500px", maxWidth: "600px" }}>
+    <div className="line-graph" style={{ 
+      width: "100%", 
+      height: "auto",
+      minHeight: "300px",
+      maxHeight: "600px"
+    }}>
       <svg ref={svgRef}></svg>
     </div>
   );
