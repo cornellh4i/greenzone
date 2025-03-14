@@ -1,14 +1,16 @@
 import React from "react";
+import NavBar from "../components/molecules/NavBar";
 import InsightsPanel from "../components/summary-stats/InsightsPanel";
 import InsightsDesc from "../components/summary-stats/InsightsDesc";
 
 const SummaryPage: React.FC = () => {
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto mt-12">
+    <div className="min-h-screen bg-gray-50">
+      <NavBar />
+      <div className="flex flex-col">
         <InsightsDesc />
+        <InsightsPanel />
       </div>
-      <InsightsPanel />
     </div>
   );
 };

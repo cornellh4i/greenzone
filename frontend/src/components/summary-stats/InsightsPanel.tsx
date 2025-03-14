@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
 
@@ -15,15 +16,20 @@ interface ProvinceSummary {
   aboveCapacity: number;
 }
 
-const SummaryStatistics: React.FC = () => {
+const InsightsPanel: React.FC = () => {
   const [livestockData, setLivestockData] = useState<{ [key: string]: LivestockData[] }>({});
   const [provinceSummaries, setProvinceSummaries] = useState<ProvinceSummary[]>([]);
   const [provinceIds, setProvinceIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tabValue, setTabValue] = useState(0);
   
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
   const dzudYears = [2017, 2016, 2020, 2021];
   const privatizationPeriods = [2012, 2015, 2018, 2013];
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const tableColumns = [
     { field: 'ranking', headerName: 'Ranking', width: 100, format: (value: number) => value.toString() },
@@ -124,26 +130,113 @@ const SummaryStatistics: React.FC = () => {
   }, []);
 
   return (
-    <div className="summary-statistics">
+    <Box sx={{ backgroundColor: '#F3F4F6', py: 8 }}>
+      <Container maxWidth="xl">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            padding: { xs: 2, md: 4 },
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 700,
+              color: '#111827',
+              mb: 4
+            }}
+          >
+            Key conclusions
+          </Typography>
 
-      {/* Graph and Table Components Below */}
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-4">Livestock Population Over Time</h1>
+          <Box sx={{ backgroundColor: 'white', p: 4, borderRadius: 2 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 600,
+                color: '#111827',
+                mb: 3
+              }}
+            >
+              Regions by Carrying Capacity & Breakdown
+            </Typography>
+            <Box sx={{ 
+              borderBottom: 1, 
+              borderColor: 'divider', 
+              mb: 3,
+              '& .MuiTabs-root': {
+                minHeight: '48px',
+              },
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                minHeight: '48px',
+              }
+            }}>
+              <Tabs 
+                value={tabValue} 
+                onChange={handleTabChange}
+                sx={{
+                  '& .Mui-selected': {
+                    color: '#2563EB',
+                  },
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: '#2563EB',
+                  }
+                }}
+              >
+                <Tab label="Aimags" />
+                <Tab label="Soums" />
+              </Tabs>
+            </Box>
+            <Table
+              columns={tableColumns}
+              rows={provinceSummaries}
+              loading={loading}
+            />
+          </Box>
 
-        {Object.keys(livestockData).length > 0 && (
-          <LineGraph
-            datasets={Object.values(livestockData).flat()}
-            livestock="all"
-            dzudYears={dzudYears}
-            privatizationPeriods={privatizationPeriods}
-          />
-        )}
-
-        <h2 className="text-2xl font-bold mt-8 mb-4">Province Capacity Summary</h2>
-        <Table columns={tableColumns} rows={provinceSummaries} loading={loading} />
-      </div>
-    </div>
+          <Box sx={{ backgroundColor: 'white', p: 4, borderRadius: 2 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 600,
+                color: '#111827',
+                mb: 3
+              }}
+            >
+              Livestock Population by Type and Year
+            </Typography>
+            <Box
+              sx={{
+                width: '100%',
+                overflowX: 'auto',
+                mx: -4,
+                px: 4,
+                '& > div': {
+                  minWidth: '1500px',  // Minimum width to ensure scrolling
+                  width: '100%',       // Take full width of container
+                  height: '600px',
+                }
+              }}
+            >
+              {Object.keys(livestockData).length > 0 && (
+                <LineGraph
+                  datasets={Object.values(livestockData).flat()}
+                  livestock="all"
+                  dzudYears={dzudYears}
+                  privatizationPeriods={privatizationPeriods}
+                />
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
-export default SummaryStatistics;
+export default InsightsPanel;

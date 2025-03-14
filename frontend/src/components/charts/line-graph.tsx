@@ -14,9 +14,14 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
 
-    const w = window.innerWidth * 0.9;
-    const h = window.innerHeight * 0.8;
-    const m = { top: 80, right: 80, bottom: 60, left: 120 };
+    const w = 1500;  // Match container width
+    const h = 600;   // Fixed height
+    const m = { 
+      top: 80, 
+      right: 120,
+      bottom: 60, 
+      left: 120 
+    };
 
     const allData = datasets.flatMap(d => d.data);
 
@@ -24,7 +29,7 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", `0 0 ${w} ${h}`)
+      .attr("viewBox", `0 0 ${w + m.right} ${h + m.top}`)
       .attr("preserveAspectRatio", "xMinYMin meet")
       .style("background-color", "#ffffff");
 
