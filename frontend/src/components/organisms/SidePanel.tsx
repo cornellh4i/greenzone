@@ -149,10 +149,11 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   useEffect(() => {
     if (selectedProvince) {
       setIsPanelOpen(true);
-      const categoryType =
-        selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score"; //NEEDS TO BE ADDRESSED - VARIABLE FIXING
+      const categoryType = selectedLayerType
+        // selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score"; //NEEDS TO BE ADDRESSED - VARIABLE FIXING
       loadProvinceCellSummary(selectedProvince, categoryType);
       loadProvinceData(selectedProvince, displayName);
+      console.log(categoryType)
     }
   }, [selectedProvince, selectedYear, setIsPanelOpen, selectedOption]);
 
@@ -342,7 +343,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 <h2>Data Layers</h2>
                 <RadioButton
                   options={options}
-                  selectedOption={selectedOption}
+                  selectedOption={selectedLayerType}
                   onChange={handleOptionChange} />
               </div>
             </div>
@@ -362,15 +363,15 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               </p>
               <SidePanelPercentageModal
                 isOpen={true}
-                classificationType={selectedOption === "carryingCapacity"}
+                classificationType={selectedLayerType}
                 classificationValues={cellSummary}
                 classificationLabels={
-                  selectedOption === "carryingCapacity"
+                  selectedLayerType === LayerType.CarryingCapacity
                     ? carryingCapacityLabels
                     : zScoreLabels
                 }
                 classificationColourScheme={
-                  selectedOption === "carryingCapacity"
+                  selectedLayerType === LayerType.CarryingCapacity
                     ? carryingCapacityColors
                     : zScoreColors
                 }

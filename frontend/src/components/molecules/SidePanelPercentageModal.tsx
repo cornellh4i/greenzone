@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { Layer } from "deck.gl";
+import { LayerType } from "../../utils/global";
 
 /**
  * Props for the SidePanelPercentageModal
@@ -8,7 +10,7 @@ interface SidePanelPercentageModalProps {
   /** Controls whether the section is visible or not */
   isOpen: boolean;
   /** True => Carrying Capacity; False => Z-Score */
-  classificationType: boolean;
+  classificationType: LayerType;
   /** Numerical values (e.g., percentages) to display */
   classificationValues: number[];
   /** Labels for each classification category (e.g., "Below Capacity", "At Capacity", "Over Capacity") */
@@ -32,7 +34,7 @@ const SidePanelPercentageModal: React.FC<SidePanelPercentageModalProps> = ({
   if (!isOpen) return null;
 
   // Simple logic to decide the section title
-  const modalTitle = classificationType ? "Carrying Capacity" : "Z-Score";
+  const modalTitle = classificationType === LayerType.CarryingCapacity ? "Carrying Capacity" : "Z-Score";
 
   return (
     <Box
