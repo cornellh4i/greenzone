@@ -18,7 +18,8 @@ import Button from "../atoms/Button";
 
 interface SearchBarParams {
   countyMap: { [key: string]: { county_id: number; province_name: string } };
-  onValueSelect: (countyData: { value: string }) => void;
+  onValueSelect: (countyData: { value: number, name: string }) => void;
+  map: any;
 }
 
 const SearchBar: React.FC<SearchBarParams> = ({
@@ -26,6 +27,8 @@ const SearchBar: React.FC<SearchBarParams> = ({
   onValueSelect,
 }) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+
+  console.log("here is the county map " + countyMap)
   const countyNames = Object.keys(countyMap);
   //const fuse = new Fuse(countyNames, { threshold: 0.3 });
   const fuse = new Fuse(countyNames, {
@@ -49,7 +52,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
       // Ensure selectedValue is not null before calling onValueSelect
       const countyId = countyMap[selectedValue].county_id;
       //onValueSelect({ value: selectedValue });
-      onValueSelect({ value: countyId.toString() });
+      onValueSelect({ value: countyId, name: selectedValue });
       setSelectedValue("");
     }
   };

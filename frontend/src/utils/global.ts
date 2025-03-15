@@ -22,6 +22,9 @@ export type GlobalContext = {
   displayName: string;
   setDisplayName: SetState<string>;
 
+  ////////////////////////////////////////
+  /*zoomToCounty: ((countyId: number) => void) | null;
+  setZoomToCounty: SetState<((countyId: number) => void) | null>;*/
   /////////////////////////////////////////
 
   selectedLayerType: LayerType | null;

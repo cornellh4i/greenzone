@@ -17,11 +17,12 @@ import { GetCounties } from "../../../../../backend/src/controller/County.ts";
 
 interface TopPanelProps {
   yearOptions: string[];
+  onZoomToCounty: (countyId: number) => void;
   //provinceOptions
   //CountyOptions
 }
 
-const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
+const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
   console.log("component is leoading");
   const context = useContext(Context);
 
@@ -123,8 +124,11 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
         throw new Error("Invalid data format from API");
       }
 
-      const countyDictionary: {
+      /*const countyDictionary: {
         [key: string]: { countyid: number; province_name: string };
+      } = {};*/
+      const countyDictionary: {
+        [key: number]: { soum_name: string; province_name: string };
       } = {};
 
       json_object.data.forEach(
@@ -140,6 +144,19 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           }
         }
       );
+      /*json_object.data.forEach((county: { county_data: { soum_name: string; province_name: string }; county_id: number }) => {
+        const countyId = county.county_id;
+        const countyName = county.county_data.soum_name;
+        const provinceName = county.county_data.province_name;
+
+        if (countyId && countyName && provinceName) {
+          countyDictionary[countyId] = {
+            soum_name: countyName,
+            province_name: provinceName,
+          };
+        }
+      });*/
+
 
       console.log("Formatted County Map:", countyDictionary);
       setCountyMap(countyDictionary);
@@ -159,23 +176,30 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
   };*/
 
-  const handleValueSelect = async (countyData: { value: string }) => {
+  console.log("hey there deliliah!")
+  const handleValueSelect = async (countyData: { value: number, name: string }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyMap[countyData.value];
-
+    const countyId = countyData.value;
+    const countyName = countyData.name;
+    console.log("whats it like in nyc")
     if (countyId) {
       // Update the searched value with the county ID
       setSearched(countyId);
 
       // Update the display name with the selected county name
-      setDisplayName({ value: countyData.value });
+      setDisplayName({ value: countyName });
 
       // Open the top panel (if needed)
       setTopPanelOpen(true);
 
-      console.log("Selected County:", countyData.value, "County ID:", countyId);
+      if (onZoomToCounty) {
+        onZoomToCounty(countyId);
+      }
+
+      console.log("im a thousan miles away")
+      console.log("Selected County:", countyName, "County ID:", countyId);
     } else {
-      console.error("County ID not found for:", countyData.value);
+      console.error("County ID not found for:", countyId);
     }
   };
 

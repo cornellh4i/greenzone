@@ -35,7 +35,7 @@ interface CellGeometry {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const MapComponent: React.FC = () => {
+const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
   // const [showCells, setShowCells] = useState(false);
@@ -204,7 +204,7 @@ const MapComponent: React.FC = () => {
     }
   };
 
-  const loadCountiesGeometries = async () => {
+  /*const loadCountiesGeometries = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/countygeo");
       const json_object = await response.json();
@@ -219,7 +219,48 @@ const MapComponent: React.FC = () => {
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
+  };*/
+  const loadCountiesGeometries = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/countygeo");
+      const json_object = await response.json();
+      const geojsonData = json_object.data;
+      const deckSoumProj = geojsonData.map((feature: any) => {
+        // Calculate bounds from coordinates for zooming
+        const flattenedArray = feature.county_geometry.coordinates[0].reduce(
+          (acc, current) => acc.concat(current),
+          []
+        );
+
+        const bounds = flattenedArray.reduce(
+          (bbox, coord) => {
+            if (!Array.isArray(coord) || coord.length !== 2) {
+              return bbox;
+            }
+            const [lng, lat] = coord;
+            return [
+              Math.min(bbox[0], lng), // Min longitude
+              Math.min(bbox[1], lat), // Min latitude
+              Math.max(bbox[2], lng), // Max longitude
+              Math.max(bbox[3], lat), // Max latitude
+            ];
+          },
+          [Infinity, Infinity, -Infinity, -Infinity]
+        );
+
+        return {
+          type: "Polygon",
+          coordinates: feature.county_geometry.coordinates[0],
+          countyId: feature.county_id,
+          view: bounds
+        };
+      });
+      setSoums(deckSoumProj);
+    } catch (error) {
+      console.error("Error fetching county data:", error);
+    }
   };
+
 
   const handleZoomToProvince = (
     bounds: [number, number, number, number] | null
@@ -233,11 +274,45 @@ const MapComponent: React.FC = () => {
     }
   };
 
+  /*const handleZoomToCounty = (countyName: string) => {
+    if (!map) return;
+
+    const county = soums.find((soum) => soum.name === countyName);
+
+    if (county && county.view) {
+      map.fitBounds(county.view, {
+        padding: 50,
+        maxZoom: 10,
+        duration: 1500,
+      });
+    }
+  };
+*/
+  const handleZoomToCounty = (countyId: number) => {
+    if (!map) return;
+    console.log("Attempting to zoom to county ID:", countyId);
+
+    const county = soums.find((soum) => soum.countyId === countyId);
+    console.log("Found county:", county);
+
+    if (county && county.view) {
+      console.log("Zooming to bounds:", county.view);
+      map.fitBounds(county.view as [number, number, number, number], {
+        padding: 50,
+        maxZoom: 10,
+        duration: 1500,
+      });
+    } else {
+      console.error("County not found or missing view data. County ID:", countyId);
+    }
+  };
+
   const handleMapClick = (
     provinceName: string | null,
     coordinates: number[] | null,
     view: [number, number, number, number] | null,
-    provinceID: number
+    provinceID: number,
+    type: "province" | "county"
   ) => {
     if (!map) return;
     if (!coordinates && !view) {
@@ -378,15 +453,22 @@ const MapComponent: React.FC = () => {
     return () => {
       map.removeControl(overlay);
     };
-  }, [
-    map,
-    showBelowCells,
-    showAtCapCells,
-    showAboveCells,
-    showNegativeCells,
-    showZeroCells,
-    showPositiveCells,
-  ]);
+  },
+    [
+      map,
+      showBelowCells,
+      showAtCapCells,
+      showAboveCells,
+      showNegativeCells,
+      showZeroCells,
+      showPositiveCells,
+    ]);
+  useEffect(() => {
+    if (map && onMapReady) {
+      console.log("Map is ready, exposing zoom function");
+      onMapReady(handleZoomToCounty);
+    }
+  }, [map, onMapReady, soums]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;
@@ -401,7 +483,7 @@ const MapComponent: React.FC = () => {
         mapStyle={MAP_STYLE}
         // style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
-        // onMove={(evt) => setViewState(evt.viewState)}
+      // onMove={(evt) => setViewState(evt.viewState)}
       >
         {/* <NavigationControl position="top-left" /> */}
       </Map>
