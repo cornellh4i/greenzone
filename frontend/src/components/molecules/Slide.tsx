@@ -17,20 +17,30 @@ const Slide: React.FC<SlideProps> = ({
   onChange,
   min,
   max,
-  options,
+  options = [],
 }) => {
-  const [value, setValue] = useState<number>(selectedValue || max);
+  const [sliderVal, setSliderVal] = useState<number>(selectedValue || max);
 
-  const handleSlideChange = (_: Event, newValue: number | number[]) => {
+  const handleSliderChange = (_: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
-      setValue(newValue); // Update local state
-      onChange(newValue); // Call the onChange handler passed from parent
+      setSliderVal(newValue); // Update local state
+    }
+  };
+
+  // Handles when releasing the slider
+  const handleSliderCommit = (
+    _: React.SyntheticEvent | Event,
+    newValue: number | number[]
+  ) => {
+    if (typeof newValue === "number") {
+      setSliderVal(newValue); // Update local state
+      onChange(newValue); // Also notify parent component
     }
   };
 
   const handleDropdownChange = (newValue: number | null) => {
     if (newValue !== null) {
-      setValue(newValue);
+      setSliderVal(newValue);
       onChange(newValue);
     }
   };
@@ -75,21 +85,25 @@ const Slide: React.FC<SlideProps> = ({
               textAlign: "left",
               textDecoration: "none",
             }}
-          >
-            {<Dropdown
-        options={options}
-        value={value.toString()}
-        onChange={handleDropdownChange}
-        sx={{ width: "64px", alignItems: 'center' }}
-        disableClearable={true}/>}
-          </span>
+          ></span>{" "}
+          {
+            <Dropdown
+              options={options}
+              value={sliderVal.toString()}
+              onChange={(newVal) => handleDropdownChange(Number(newVal))}
+              sx={{ width: "64px", alignItems: "center" }}
+              label={""}
+            />
+          }
         </Box>
       </Box>
       <Slider
-        value={value}
+        id="myRange"
+        value={sliderVal}
         min={min}
         max={max}
-        onChange={handleSlideChange}
+        onChange={handleSliderChange} // Call when dragging slider
+        onChangeCommitted={handleSliderCommit} //Call once finished dragging slider
         valueLabelDisplay="auto"
       />
       <Box display="flex" width="100%" justifyContent="space-between" mt={2}>
