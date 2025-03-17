@@ -1,27 +1,21 @@
 import React from "react";
-import MapComponent from "@/components/Map";
-import TopPanel from "@/components/organisms/TopPanel";
-// import SimpleMap from "@/components/MapWrapper";
-/** An About page */
-/*const About = () => {
-  return <>Hello there</>;
-};
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
-export default About;*/
+const About: React.FC = () => {
+  const { t } = useTranslation();
 
-// // Uncomment for Button Onboarding
-// import React from "react";
-// import Button from "@/components/Button";
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
+  };
 
-/** An About page */
-const About = () => {
-  console.log("about!");
   return (
-    <div>
-      <TopPanel yearOptions={[]}></TopPanel>
-      {/* <>
-        <MapComponent />
-      </> */}
+    <div style={{ textAlign: "center", padding: "20px" }}>
+      <h1>{t("title")}</h1>
+      <p style={{ fontSize: "1.3rem", padding: "15px" }}>{t("description")}</p>
+      <button onClick={toggleLanguage}>
+        {i18n.language === "en" ? "Translate to Mongolian" : "Англи хэл рүү хөрвүүлэх"}
+      </button>
     </div>
   );
 };

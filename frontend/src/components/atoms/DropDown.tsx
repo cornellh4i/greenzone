@@ -16,6 +16,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   label,
   sx,
 }) => {
+  console.log("Dropdown received options:", options);
   return (
     <Autocomplete
       options={options}
@@ -25,6 +26,29 @@ const Dropdown: React.FC<DropdownProps> = ({
         if (typeof newValue === "string" || newValue === null) {
           onChange(newValue);
         }
+      }}
+      /*renderOption={(props, option) => (
+        <Box component="li" {...props} sx={{ display: "flex", flexDirection: "column", padding: "10px" }}>
+          <Typography sx={{ fontWeight: "bold", color: "black" }}>
+            {option} 
+          </Typography>
+          <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
+            {countyMap[option]?.province_name || ""}
+          </Typography>
+        </Box>
+      )}*/
+      renderOption={(props, option) => {
+        const { key, ...restProps } = props;
+        return (
+          <Box component="li" key={key} {...restProps} sx={{ display: "flex", flexDirection: "column", padding: "10px" }}>
+            <Typography sx={{ fontWeight: "bold", color: "black" }}>
+              {option}
+            </Typography>
+            <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
+              {countyMap[option]?.province_name || ""}
+            </Typography>
+          </Box>
+        );
       }}
       renderInput={(params) => (
         <TextField

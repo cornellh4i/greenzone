@@ -22,7 +22,6 @@ interface TopPanelProps {
 }
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
-  console.log("component is leoading");
   const context = useContext(Context);
 
   if (!context) {
@@ -32,6 +31,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setSearched,
     setDisplayName,
     setTopPanelOpen,
+    setSelectedCounty,
+    setSelectedProvince,
     //   selectedProvince,
     //   isPanelOpen,
     //   setIsPanelOpen,
@@ -117,14 +118,16 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       if (!response.ok) throw new Error("Failed to fetch county data");
 
       const json_object = await response.json();
-      console.log("Heyyy" + json_object);
 
       if (!json_object.data || !Array.isArray(json_object.data)) {
         throw new Error("Invalid data format from API");
       }
 
-      const countyDictionary: {
+      /*const countyDictionary: {
         [key: string]: { countyid: number; province_name: string };
+      } = {};*/
+      const countyDictionary: {
+        [key: number]: { soum_name: string; province_name: string };
       } = {};
 
       json_object.data.forEach(
@@ -142,6 +145,19 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           }
         }
       );
+      /*json_object.data.forEach((county: { county_data: { soum_name: string; province_name: string }; county_id: number }) => {
+        const countyId = county.county_id;
+        const countyName = county.county_data.soum_name;
+        const provinceName = county.county_data.province_name;
+
+        if (countyId && countyName && provinceName) {
+          countyDictionary[countyId] = {
+            soum_name: countyName,
+            province_name: provinceName,
+          };
+        }
+      });*/
+
 
       console.log("Formatted County Map:", countyDictionary);
       setCountyMap(countyDictionary);
@@ -160,23 +176,22 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
   };*/
 
-  const handleValueSelect = async (countyData: { value: string }) => {
+  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyMap[countyData.value];
-
+    const countyId = countyData.ID;
+    const countyName = countyData.name;
     if (countyId) {
       // Update the searched value with the county ID
       setSearched(countyId);
 
       // Update the display name with the selected county name
-      setDisplayName({ value: countyData.value });
+      setDisplayName({ value: countyName });
 
       // Open the top panel (if needed)
       setTopPanelOpen(true);
-
-      console.log("Selected County:", countyData.value, "County ID:", countyId);
+      setSelectedCounty(countyId);
     } else {
-      console.error("County ID not found for:", countyData.value);
+      console.error("County ID not found for:", countyId);
     }
   };
 
