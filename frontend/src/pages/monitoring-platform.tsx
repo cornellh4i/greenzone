@@ -5,6 +5,7 @@ import SidePanel from "../components/organisms/SidePanel";
 import { LayerType, Context } from "../utils/global";
 const MonitoringPlatform: React.FC = () => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedCounty, setSelectedCounty] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isTopPanelOpen, setTopPanelOpen] = useState(false);
   const [searched, setSearched] = useState<string | null>(null);
@@ -32,6 +33,8 @@ const MonitoringPlatform: React.FC = () => {
     // Province & Selection
     selectedProvince,
     setSelectedProvince,
+    selectedCounty,
+    setSelectedCounty,
     isPanelOpen,
     setIsPanelOpen,
     isTopPanelOpen,
@@ -67,7 +70,6 @@ const MonitoringPlatform: React.FC = () => {
     displayName,
     setDisplayName,
   };
-  console.log("In the map selecteProvince is " + selectedProvince);
   const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>
     (2002 + index).toString()
   );

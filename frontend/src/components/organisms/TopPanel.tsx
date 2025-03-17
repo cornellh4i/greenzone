@@ -17,13 +17,11 @@ import { GetCounties } from "../../../../../backend/src/controller/County.ts";
 
 interface TopPanelProps {
   yearOptions: string[];
-  onZoomToCounty: (countyId: number) => void;
   //provinceOptions
   //CountyOptions
 }
 
-const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
-  console.log("component is leoading");
+const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   const context = useContext(Context);
 
   if (!context) {
@@ -32,7 +30,9 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
   const {
     setSearched,
     setDisplayName,
-    setTopPanelOpen
+    setTopPanelOpen,
+    setSelectedCounty,
+    setSelectedProvince,
     //   selectedProvince,
     //   isPanelOpen,
     //   setIsPanelOpen,
@@ -118,7 +118,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
       if (!response.ok) throw new Error("Failed to fetch county data");
 
       const json_object = await response.json();
-      console.log("Heyyy" + json_object);
 
       if (!json_object.data || !Array.isArray(json_object.data)) {
         throw new Error("Invalid data format from API");
@@ -176,12 +175,10 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
     setTopPanelOpen(true);
   };*/
 
-  console.log("hey there deliliah!")
-  const handleValueSelect = async (countyData: { value: number, name: string }) => {
+  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyData.value;
+    const countyId = countyData.ID;
     const countyName = countyData.name;
-    console.log("whats it like in nyc")
     if (countyId) {
       // Update the searched value with the county ID
       setSearched(countyId);
@@ -191,13 +188,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions, onZoomToCounty }) => {
 
       // Open the top panel (if needed)
       setTopPanelOpen(true);
-
-      if (onZoomToCounty) {
-        onZoomToCounty(countyId);
-      }
-
-      console.log("im a thousan miles away")
-      console.log("Selected County:", countyName, "County ID:", countyId);
+      setSelectedCounty(countyId);
     } else {
       console.error("County ID not found for:", countyId);
     }
