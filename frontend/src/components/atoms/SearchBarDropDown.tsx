@@ -3,47 +3,70 @@ import { Autocomplete, TextField } from "@mui/material";
 import { Box, Typography } from "@mui/material";
 
 interface DropdownProps {
-  options: string[];
-  countyMap: { [key: string]: { county_id: number; province_name: string } };
-  value?: string | null;
-  onChange: (value: string | null) => void;
-  label: string;
+  options: {
+    county_id: number;
+    county_name: string;
+    province_name: string;
+  }[];
+  value:
+    | {
+        county_id: number;
+        county_name: string;
+        province_name: string;
+      }
+    | undefined;
+
+  onChange: (selectedItem: {
+    county_id: number;
+    county_name: string;
+    province_name: string;
+  }) => void;
+  onInputChange: (inputValue: string) => void;
   sx?: React.CSSProperties;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
   options,
-  countyMap,
   value,
   onChange,
-  label,
+  onInputChange,
   sx,
 }) => {
+  console.log(options);
   return (
     <Autocomplete
       options={options}
-      getOptionLabel={(option) => option.toString()}
-      // value={value}
+      getOptionLabel={(option) =>
+        typeof option === "string" ? option : option.county_name
+      }
+      value={value || null}
       onChange={(event, newValue) => {
-        if (typeof newValue === "string" || newValue === null) {
-          onChange(newValue);
-          console.log("user typed " + newValue);
-        }
+        console.log("User selected:", newValue.county_name);
+        onChange({
+          county_id: newValue.county_id,
+          county_name: newValue.county_name,
+          province_name: newValue.province_name,
+        });
       }}
       renderOption={(props, option) => (
-        <Box component="li" {...props} sx={{ display: "flex", flexDirection: "column", padding: "10px" }}>
+        <Box
+          component="li"
+          {...props}
+          key={option.county_id}
+          sx={{ display: "flex", flexDirection: "column", padding: "10px" }}
+        >
           <Typography sx={{ fontWeight: "bold", color: "black" }}>
-            {option} {/* County Name */}
+            {option.county_name} {/* County Name */}
           </Typography>
           <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
-            {countyMap[option]?.province_name || ""}
+            {option.province_name}
           </Typography>
         </Box>
       )}
       renderInput={(params) => (
         <TextField
           {...params}
-          label={label}
+          label={"HAHH"}
           variant="outlined"
           sx={{
             ...sx,

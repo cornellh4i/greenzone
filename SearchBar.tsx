@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState } from "react";
 import Fuse from "fuse.js";
-import { Box, debounce } from "@mui/material";
+import { Box } from "@mui/material";
 import SearchBarDropdown from "../atoms/SearchBarDropDown";
 import Button from "../atoms/Button";
 
@@ -20,6 +20,7 @@ interface SearchBarParams {
 }
 
 const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
+  console.log("HJURBUWOORKKJKJKJKRNI");
   const [selectedValue, setSelectedValue] = useState<
     | {
         county_id: number;
@@ -28,38 +29,27 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
       }
     | undefined
   >(undefined);
-
-  const countyOptions = useMemo(
-    () =>
-      Object.values(countyMap).map((county) => ({
-        ...county,
-      })),
-    [countyMap]
-  );
+  console.log(countyMap);
 
   const [searchData, setSearchData] = useState(countyOptions);
-  const fuse = useMemo(
-    () =>
-      new Fuse(countyOptions, {
-        keys: ["county_name"],
-        threshold: 0.8, // Reduce threshold for better matches
-        minMatchCharLength: 2,
-        includeScore: false, // Remove score to reduce computation overhead
-        findAllMatches: true,
-      }),
-    [countyOptions]
-  );
+  const fuse = new Fuse(countyOptions, {
+    keys: ["county_name"],
+    threshold: 0.5,
+    includeScore: true,
+    minMatchCharLength: 2,
+    findAllMatches: true,
+  });
 
-  const handleSearch = useCallback(
-    debounce((inputValue: string) => {
-      if (!inputValue) {
-        setSearchData(countyOptions);
-        return;
-      }
-      setSearchData(fuse.search(inputValue).map((result) => result.item));
-    }, 200), // Adjust debounce delay to 200ms for smoother search
-    [fuse, countyOptions]
-  );
+  const handleSearch = (inputValue: string) => {
+    if (!inputValue) {
+      setSearchData(countyOptions);
+      return;
+    }
+    const filteredOptions = fuse
+      .search(inputValue)
+      .map((result) => result.item);
+    setSearchData(filteredOptions);
+  };
 
   // Handle user selection from dropdown
   const handleSelection = (selectedItem: {
@@ -86,6 +76,7 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
         width: "100%",
       }}
     >
+      {/* {" "} */}
       <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
         <SearchBarDropdown
           options={searchData}

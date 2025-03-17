@@ -4,14 +4,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
-import { Box, Drawer, Divider , Typography, Switch, Chip} from "@mui/material";
+import { Box, Drawer, Divider, Typography, Switch, Chip } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import Toggle from "@/components/atoms/Toggle";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
-import AgricultureIcon from '@mui/icons-material/Agriculture'; 
-import CloseIcon from '@mui/icons-material/Close';
+import AgricultureIcon from "@mui/icons-material/Agriculture";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -24,17 +24,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   }
   const {
     selectedProvince,
+    setSelectedProvince,
+    selectedYear,
+    setSelectedYear,
+    grazingRange,
+    setGrazingRange,
+    selectedLayerType,
+    setSelectedLayerType,
+
     isPanelOpen,
     setIsPanelOpen,
     setTopPanelOpen,
-    setCarryingCapacity,
+
     showBelowCells,
     setShowBelowCells,
     showAtCapCells,
     setShowAtCapCells,
     showAboveCells,
     setShowAboveCells,
-    setNdviSelect,
 
     showPositiveCells,
     setShowPositiveCells,
@@ -43,14 +50,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     showZeroCells,
     setShowZeroCells,
 
-    selectedYear,
-    setSelectedYear,
-    grazingRange,
-    setGrazingRange,
-    selectedOption,
-    setSelectedOption,
-    selectedLayerType,
-    setSelectedLayerType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
@@ -138,6 +137,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   };
 
+  // Controls the Top Panel
   useEffect(() => {
     if (provinceData) {
       setTopPanelOpen(true);
@@ -146,34 +146,39 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   }, [provinceData, setTopPanelOpen]);
 
+  // Controls whether to open up the SidePanel Or NOT
   useEffect(() => {
     if (selectedProvince) {
       setIsPanelOpen(true);
-      const categoryType = selectedLayerType
-        // selectedOption === "carryingCapacity" ? "carrying_capacity" : "z_score"; //NEEDS TO BE ADDRESSED - VARIABLE FIXING
-      loadProvinceCellSummary(selectedProvince, categoryType);
-      loadProvinceData(selectedProvince, displayName);
-      console.log(categoryType)
     }
-  }, [selectedProvince, selectedYear, setIsPanelOpen, selectedOption]);
+  }, [selectedProvince, setIsPanelOpen]);
 
+  // Controls when to fetch province/county specific summary data
+  useEffect(() => {
+    if (selectedYear && selectedProvince) {
+      loadProvinceCellSummary(selectedProvince, selectedLayerType);
+      loadProvinceData(selectedProvince, displayName);
+    }
+  }, [selectedProvince, selectedYear]);
+
+  // Controls when to Exit Province/County Summary Mode
+  const handleBack = () => {
+    setProvinceData(null);
+    setSelectedProvince(null);
+  };
+  // Controls when to close the SidePanel
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setTopPanelOpen(true);
     if (!isPanelOpen) {
-      setProvinceData(null); // Clear province data when closing the panel
+      setProvinceData(null);
+      setSelectedProvince(null);
     }
   };
-
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
-
-  const handleBack = () => {
-    setProvinceData(null);
-  };
   const handleOptionChange = (option: LayerType) => {
-    setSelectedOption(option);
     setSelectedLayerType(option);
     setShowBelowCells(false);
     setShowAtCapCells(false);
@@ -189,52 +194,58 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Chip
               label="Below"
-              onClick={() => setShowBelowCells((prev) => !prev)}  
-              onDelete={showBelowCells ? () => setShowBelowCells(false) : undefined}  
+              onClick={() => setShowBelowCells((prev) => !prev)}
+              onDelete={
+                showBelowCells ? () => setShowBelowCells(false) : undefined
+              }
               deleteIcon={showBelowCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showBelowCells ? 'green' : 'grey',
-                color: '#fff',
-                borderRadius: '16px',
-                fontWeight: 'bold',
+                backgroundColor: showBelowCells ? "green" : "grey",
+                color: "#fff",
+                borderRadius: "16px",
+                fontWeight: "bold",
                 // Make the close (delete) icon white
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
             <Chip
               label="At Capacity"
               onClick={() => setShowAtCapCells((prev) => !prev)}
-              onDelete={showAtCapCells ? () => setShowAtCapCells(false) : undefined}
+              onDelete={
+                showAtCapCells ? () => setShowAtCapCells(false) : undefined
+              }
               deleteIcon={showAtCapCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showAtCapCells ? '#C6BF31' : 'grey',
-                color: '#fff',
-                borderRadius: '16px',
-                fontWeight: 'bold',
+                backgroundColor: showAtCapCells ? "#C6BF31" : "grey",
+                color: "#fff",
+                borderRadius: "16px",
+                fontWeight: "bold",
                 // Make the close (delete) icon white
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
             <Chip
               label="Above"
               onClick={() => setShowAboveCells((prev) => !prev)}
-              onDelete={showAboveCells ? () => setShowAboveCells(false) : undefined}
+              onDelete={
+                showAboveCells ? () => setShowAboveCells(false) : undefined
+              }
               deleteIcon={showAboveCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showAboveCells ? 'red' : 'grey',
-                color: '#fff',
-                borderRadius: '16px',
-                fontWeight: 'bold',
+                backgroundColor: showAboveCells ? "red" : "grey",
+                color: "#fff",
+                borderRadius: "16px",
+                fontWeight: "bold",
                 // Make the close (delete) icon white
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
@@ -247,46 +258,56 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       label: "Z-Score",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Chip
               label="Positive"
-              onClick={() => setShowPositiveCells(prev => !prev)}
-              onDelete={showPositiveCells ? () => setShowPositiveCells(false) : undefined}
+              onClick={() => setShowPositiveCells((prev) => !prev)}
+              onDelete={
+                showPositiveCells
+                  ? () => setShowPositiveCells(false)
+                  : undefined
+              }
               deleteIcon={showPositiveCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showPositiveCells ? 'teal' : 'grey',
-                color: '#fff',
-                fontWeight: 'bold',
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                backgroundColor: showPositiveCells ? "teal" : "grey",
+                color: "#fff",
+                fontWeight: "bold",
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
             <Chip
               label="Zero"
-              onClick={() => setShowZeroCells(prev => !prev)}
-              onDelete={showZeroCells ? () => setShowZeroCells(false) : undefined}
+              onClick={() => setShowZeroCells((prev) => !prev)}
+              onDelete={
+                showZeroCells ? () => setShowZeroCells(false) : undefined
+              }
               deleteIcon={showZeroCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showZeroCells ? 'darkblue' : 'grey',
-                color: '#fff',
-                fontWeight: 'bold',
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                backgroundColor: showZeroCells ? "darkblue" : "grey",
+                color: "#fff",
+                fontWeight: "bold",
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
             <Chip
               label="Negative"
-              onClick={() => setShowNegativeCells(prev => !prev)}
-              onDelete={showNegativeCells ? () => setShowNegativeCells(false) : undefined}
+              onClick={() => setShowNegativeCells((prev) => !prev)}
+              onDelete={
+                showNegativeCells
+                  ? () => setShowNegativeCells(false)
+                  : undefined
+              }
               deleteIcon={showNegativeCells ? <CloseIcon /> : undefined}
               sx={{
-                backgroundColor: showNegativeCells ? 'purple' : 'grey',
-                color: '#fff',
-                fontWeight: 'bold',
-                '.MuiChip-deleteIcon': {
-                  color: '#fff',
+                backgroundColor: showNegativeCells ? "purple" : "grey",
+                color: "#fff",
+                fontWeight: "bold",
+                ".MuiChip-deleteIcon": {
+                  color: "#fff",
                 },
               }}
             />
@@ -337,13 +358,17 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 onChange={handleYearSlider}
                 min={2011}
                 max={2022}
-                options={yearOptions} />
-            <div>
+                options={yearOptions}
+              />
+              <div>
                 <h2>Data Layers</h2>
                 <RadioButton
                   options={options}
-                  selectedOption={selectedLayerType ?? LayerType.CarryingCapacity}
-                  onChange={handleOptionChange} />
+                  selectedOption={
+                    selectedLayerType ?? LayerType.CarryingCapacity
+                  }
+                  onChange={handleOptionChange}
+                />
               </div>
             </div>
           ) : (
@@ -394,16 +419,16 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         {/* Row with icon, heading, and switch */}
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            mb: 0.5 // small margin bottom before the text below
+            display: "flex",
+            alignItems: "center",
+            mb: 0.5, // small margin bottom before the text below
           }}
         >
           <AgricultureIcon sx={{ mr: 1 }} />
           <Typography
             variant="h6"
             component="h2"
-            sx={{ mr: 'auto' }} // pushes the switch to the right
+            sx={{ mr: "auto" }} // pushes the switch to the right
           >
             Grazing Range
           </Typography>
@@ -412,27 +437,22 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             onChange={(e) => setGrazingRange(e.target.checked)}
             sx={{
               // Override track color when on
-              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: '#2E7D32', // dark green
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#2E7D32", // dark green
               },
               // Override the thumb color when on
-              '& .MuiSwitch-switchBase.Mui-checked': {
-                color: '#ffffff', // white thumb
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "#ffffff", // white thumb
               },
             }}
-      
-             />
+          />
         </Box>
 
         {/* Descriptive text below */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
+        <Typography variant="body2" color="text.secondary">
           View data only in land categorized as a grazing range.
         </Typography>
       </Drawer>
-      
     </div>
   );
 };
