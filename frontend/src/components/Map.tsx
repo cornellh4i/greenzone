@@ -7,7 +7,7 @@ import { PolygonLayer, ScatterplotLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Context, LayerType, SelectedType } from "../utils/global";
+import { Context, LayerType } from "../utils/global";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -21,9 +21,8 @@ const INITIAL_VIEW_STATE = {
 interface Geometry {
   view: [number, number, number, number] | null;
   type: string;
-  ID: number;
+  name: string;
   coordinates: number[];
-  areaType: SelectedType | null;
 }
 // For the Geometrical Shapes on the Maps like Province And Counties
 interface CellGeometry {
@@ -37,7 +36,7 @@ interface CellGeometry {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
+const MapComponent: React.FC = () => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
   // const [showCells, setShowCells] = useState(false);
@@ -60,7 +59,7 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   }
   const {
     setSelectedProvince,
-    setSelectedCounty,
+
     setShowBelowCells,
     setShowAtCapCells,
     setShowAboveCells,
@@ -176,22 +175,36 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
       const json_object = await response.json();
       const geojsonData = json_object.data;
       const deckProvinceProj = geojsonData.map((feature: any) => {
-        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+        const flattenedArray: number[] =
+          feature.province_geometry.coordinates[0].reduce(
+            (acc: string | any[], current: any) => acc.concat(current),
+            []
+          );
+        const bounds = flattenedArray.reduce(
+          (bbox, coord) => {
+            if (!Array.isArray(coord) || coord.length !== 2) {
+              console.error("Unexpected coordinate format:", coord);
+              return bbox; // Return previous bbox if coord is not valid
+            }
+            const [lng, lat] = coord;
+            return [
+              Math.min(bbox[0], lng), // Min longitude
+              Math.min(bbox[1], lat), // Min latitude
+              Math.max(bbox[2], lng), // Max longitude
+              Math.max(bbox[3], lat), // Max latitude
+            ];
+          },
+          [Infinity, Infinity, -Infinity, -Infinity]
+        );
 
-        feature.province_geometry.coordinates[0][0].forEach((
-          [lng, lat]: [number, number]) => {
-            console.log("Coordinates:", lng, lat);
-            bounds[0] = Math.min(bounds[0], lng); // Min longitude
-            bounds[1] = Math.min(bounds[1], lat); // Min latitude
-            bounds[2] = Math.max(bounds[2], lng); // Max longitude
-            bounds[3] = Math.max(bounds[3], lat); // Max latitude
-      });
+        const provinceName = feature.province_name;
+        const provinceID = feature.province_id;
         return {
           type: "Polygon",
+          province: provinceName,
           coordinates: feature.province_geometry.coordinates[0],
-          provinceID: feature.province_id,
           view: bounds,
-          areaType: SelectedType.Province,
+          provinceID: provinceID,
         };
       });
       setProvinces(deckProvinceProj);
@@ -200,7 +213,7 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     }
   };
 
-  /*const loadCountiesGeometries = async () => {
+  const loadCountiesGeometries = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/countygeo");
       const json_object = await response.json();
@@ -215,45 +228,9 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
-  };*/
-  const loadCountiesGeometries = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/countygeo");
-      const json_object = await response.json();
-      const geojsonData = json_object.data;
-      const deckSoumProj = geojsonData.map((feature: any) => {
-        // Calculate bounds from coordinates for zooming
-        // const flattenedArray = reduce(
-        //   (acc, current) => acc.concat(current),
-        //   []
-        // );
-        // console.log(feature.county_geometry.coordinates[0])
-        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
-
-        feature.county_geometry.coordinates[0].forEach((
-          [lng, lat]: [number, number]) => {
-            bounds[0] = Math.min(bounds[0], lng); // Min longitude
-            bounds[1] = Math.min(bounds[1], lat); // Min latitude
-            bounds[2] = Math.max(bounds[2], lng); // Max longitude
-            bounds[3] = Math.max(bounds[3], lat); // Max latitude
-      });
-
-        return {
-          type: "Polygon",
-          coordinates: feature.county_geometry.coordinates[0],
-          countyID: feature.county_id,
-          view: bounds,
-          areaType: SelectedType.County,
-        };
-      });
-      setSoums(deckSoumProj);
-    } catch (error) {
-      console.error("Error fetching county data:", error);
-    }
   };
 
-
-  const handleZoom = (
+  const handleZoomToProvince = (
     bounds: [number, number, number, number] | null
   ) => {
     if (map && bounds) {
@@ -266,20 +243,25 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   };
 
   const handleMapClick = (
+    provinceName: string | null,
+    coordinates: number[] | null,
     view: [number, number, number, number] | null,
-    ID: number,
-    areaType: SelectedType | null,
+    provinceID: number
   ) => {
-    console.log(view)
-    if (areaType === "province") {
-      setSelectedProvince(ID);
-  } if (areaType == "county") {
-      setSelectedCounty(ID);
+    if (!map) return;
+    if (!coordinates && !view) {
+      // find province
+      console.log(provinces);
+      const province = provinces.filter((p) => p.name === provinceName)[0];
+      coordinates = province.coordinates;
+      view = province.view;
     }
-    if (view) {
-      console.log(view)
-      handleZoom(view);
-  }};
+    if (provinceName && coordinates) {
+      handleZoomToProvince(view);
+      // Trigger the onProvinceSelect callback
+      setSelectedProvince(provinceID);
+    }
+  };
 
   useEffect(() => {
     loadCountiesGeometries();
@@ -297,12 +279,12 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     getLineColor: [0, 0, 0],
     getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 1,
-    pickable: false,
-    autoHighlight: false,
+    pickable: true,
+    autoHighlight: true,
     highlightColor: [1000, 20, 20, 20],
     onClick: ({ object }) => {
       if (object) {
-        handleMapClick(object.view, object.provinceID, object.areaType);
+        handleMapClick(object.province, object.coordinates, object.view, object.provinceID);
       } else {
         handleMapClick(null, null, null, null); // Click outside the polygons
       }
@@ -316,16 +298,6 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     getLineColor: [0, 0, 0, 70],
     getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 0.8,
-    pickable: true,
-    autoHighlight: true,
-    onClick: ({ object }) => {
-      if (object) {
-        handleMapClick(object.view, object.countyID, object.areaType);
-      } else {
-        handleMapClick(null, null, null, null); // Click outside the polygons
-      }
-    },
-    
 
     // pickable: true,
     // autoHighlight: true,
@@ -424,23 +396,17 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     return () => {
       map.removeControl(overlay);
     };
-  },
-    [
-      map,
-      showBelowCells,
-      showAtCapCells,
-      showAboveCells,
-      showNegativeCells,
-      showZeroCells,
-      showPositiveCells,
-      grazingRange,
-      selectedYear
-    ]);
-  useEffect(() => {
-    if (map && onMapReady) {
-      onMapReady(handleZoom);
-    }
-  }, [map, onMapReady, soums]);
+  }, [
+    map,
+    showBelowCells,
+    showAtCapCells,
+    showAboveCells,
+    showNegativeCells,
+    showZeroCells,
+    showPositiveCells,
+    grazingRange,
+    selectedYear
+  ]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;
@@ -455,7 +421,7 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
         mapStyle={MAP_STYLE}
         // style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
-      // onMove={(evt) => setViewState(evt.viewState)}
+        // onMove={(evt) => setViewState(evt.viewState)}
       >
         {/* <NavigationControl position="top-left" /> */}
       </Map>

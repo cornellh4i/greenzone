@@ -19,15 +19,14 @@ import { on } from "events";
 
 interface SearchBarParams {
   countyMap: { [key: string]: { county_id: number; province_name: string } };
-  onValueSelect: (countyData: { value: number, name: string }) => void;
-  map: any;
+  onValueSelect: (countyData: { value: string }) => void;
 }
 
 const SearchBar: React.FC<SearchBarParams> = ({
   countyMap,
   onValueSelect,
 }) => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [selectedValue, setSelectedValue] = useState<string>("");
   const countyNames = Object.keys(countyMap);
   const [searchData, setSearchData] = useState<string[]>(countyNames);
   //const fuse = new Fuse(countyNames, { threshold: 0.3 });
@@ -43,6 +42,7 @@ const SearchBar: React.FC<SearchBarParams> = ({
     // console.log("Search Query:", selectedValue);
     // console.log("Fuzzy Search Results:", fuse.search(selectedValue || ""));
 
+
     const filteredOptions = selectedValue
       ? fuse.search(selectedValue).map((result) => result.item)
       : countyNames;
@@ -50,14 +50,12 @@ const SearchBar: React.FC<SearchBarParams> = ({
     setSearchData(filteredOptions);
 }
 
-  console.log("Filtered Options After Search:", filteredOptions);
-
   const handleOptionClick = () => {
     if (selectedValue && countyMap[selectedValue]) {
       // Ensure selectedValue is not null before calling onValueSelect
       const countyId = countyMap[selectedValue].county_id;
       //onValueSelect({ value: selectedValue });
-      onValueSelect({ value: countyId, name: selectedValue });
+      onValueSelect({ value: countyId.toString() });
       setSelectedValue("");
     }
   };
