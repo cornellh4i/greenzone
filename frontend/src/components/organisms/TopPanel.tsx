@@ -31,6 +31,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setSearched,
     setDisplayName,
     setTopPanelOpen,
+    setSelectedCounty,
+    setSelectedProvince,
     //   selectedProvince,
     //   isPanelOpen,
     //   setIsPanelOpen,
@@ -123,7 +125,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       if (!response.ok) throw new Error("Failed to fetch county data");
 
       const json_object = await response.json();
-      console.log("Heyyy" + json_object);
 
       if (!json_object.data || !Array.isArray(json_object.data)) {
         throw new Error("Invalid data format from API");
@@ -171,13 +172,9 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
   };*/
 
-  const handleValueSelect = async (countyData: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }) => {
+  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyData.county_id;
+    const countyId = countyData.ID;
 
     if (countyId) {
       // Update the searched value with the county ID
@@ -189,12 +186,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       // Open the top panel (if needed)
       setTopPanelOpen(true);
 
-      console.log(
-        "Selected County:",
-        countyData.county_name,
-        "County ID:",
-        countyId
-      );
+      setSelectedCounty(countyId);
     } else {
       console.error("County ID not found for:", countyData.county_name);
     }

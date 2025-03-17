@@ -6,9 +6,17 @@ export enum LayerType {
   CarryingCapacity = "carrying_capacity",
   ZScore = "z_score",
 }
+
+export enum SelectedType {
+  Province = "province",
+  County = "county"
+}
+
 export type GlobalContext = {
   selectedProvince: number | null;
   setSelectedProvince: SetState<number>;
+  selectedCounty: number | null;
+  setSelectedCounty: SetState<number>;
   selectedYear: number;
   setSelectedYear: SetState<number>;
   isPanelOpen: boolean | null;

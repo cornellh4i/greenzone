@@ -7,7 +7,7 @@ import { PolygonLayer, ScatterplotLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Context, LayerType } from "../utils/global";
+import { Context, LayerType, SelectedType } from "../utils/global";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -21,8 +21,9 @@ const INITIAL_VIEW_STATE = {
 interface Geometry {
   view: [number, number, number, number] | null;
   type: string;
-  name: string;
+  ID: number;
   coordinates: number[];
+  areaType: SelectedType | null;
 }
 // For the Geometrical Shapes on the Maps like Province And Counties
 interface CellGeometry {
@@ -36,8 +37,8 @@ interface CellGeometry {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const MapComponent: React.FC = () => {
-  const [provinces, setProvinces] = useState<Geometry[]>([]);
+  const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
+    const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
   // const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
@@ -59,7 +60,7 @@ const MapComponent: React.FC = () => {
   }
   const {
     setSelectedProvince,
-
+    setSelectedCounty,
     setShowBelowCells,
     setShowAtCapCells,
     setShowAboveCells,
@@ -175,36 +176,22 @@ const MapComponent: React.FC = () => {
       const json_object = await response.json();
       const geojsonData = json_object.data;
       const deckProvinceProj = geojsonData.map((feature: any) => {
-        const flattenedArray: number[] =
-          feature.province_geometry.coordinates[0].reduce(
-            (acc: string | any[], current: any) => acc.concat(current),
-            []
-          );
-        const bounds = flattenedArray.reduce(
-          (bbox, coord) => {
-            if (!Array.isArray(coord) || coord.length !== 2) {
-              console.error("Unexpected coordinate format:", coord);
-              return bbox; // Return previous bbox if coord is not valid
-            }
-            const [lng, lat] = coord;
-            return [
-              Math.min(bbox[0], lng), // Min longitude
-              Math.min(bbox[1], lat), // Min latitude
-              Math.max(bbox[2], lng), // Max longitude
-              Math.max(bbox[3], lat), // Max latitude
-            ];
-          },
-          [Infinity, Infinity, -Infinity, -Infinity]
-        );
+        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
-        const provinceName = feature.province_name;
-        const provinceID = feature.province_id;
+        feature.province_geometry.coordinates[0][0].forEach((
+          [lng, lat]: [number, number]) => {
+            console.log("Coordinates:", lng, lat);
+            bounds[0] = Math.min(bounds[0], lng); // Min longitude
+            bounds[1] = Math.min(bounds[1], lat); // Min latitude
+            bounds[2] = Math.max(bounds[2], lng); // Max longitude
+            bounds[3] = Math.max(bounds[3], lat); // Max latitude
+      });
         return {
           type: "Polygon",
-          province: provinceName,
           coordinates: feature.province_geometry.coordinates[0],
+          ID: feature.province_id,
           view: bounds,
-          provinceID: provinceID,
+          areaType: SelectedType.Province,
         };
       });
       setProvinces(deckProvinceProj);
@@ -219,9 +206,21 @@ const MapComponent: React.FC = () => {
       const json_object = await response.json();
       const geojsonData = json_object.data;
       const deckSoumProj = geojsonData.map((feature: any) => {
+        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+
+        feature.county_geometry.coordinates[0].forEach((
+          [lng, lat]: [number, number]) => {
+            bounds[0] = Math.min(bounds[0], lng); // Min longitude
+            bounds[1] = Math.min(bounds[1], lat); // Min latitude
+            bounds[2] = Math.max(bounds[2], lng); // Max longitude
+            bounds[3] = Math.max(bounds[3], lat); // Max latitude
+      });
         return {
           type: "Polygon",
           coordinates: feature.county_geometry.coordinates[0],
+          ID: feature.county_id,
+          view: bounds,
+          areaType: SelectedType.County,
         };
       });
       setSoums(deckSoumProj);
@@ -230,7 +229,7 @@ const MapComponent: React.FC = () => {
     }
   };
 
-  const handleZoomToProvince = (
+  const handleZoom = (
     bounds: [number, number, number, number] | null
   ) => {
     if (map && bounds) {
@@ -243,25 +242,17 @@ const MapComponent: React.FC = () => {
   };
 
   const handleMapClick = (
-    provinceName: string | null,
-    coordinates: number[] | null,
     view: [number, number, number, number] | null,
-    provinceID: number
-  ) => {
-    if (!map) return;
-    if (!coordinates && !view) {
-      // find province
-      console.log(provinces);
-      const province = provinces.filter((p) => p.name === provinceName)[0];
-      coordinates = province.coordinates;
-      view = province.view;
-    }
-    if (provinceName && coordinates) {
-      handleZoomToProvince(view);
-      // Trigger the onProvinceSelect callback
-      setSelectedProvince(provinceID);
-    }
-  };
+    ID: number,
+    areaType: SelectedType | null
+    ) => {
+      if (areaType === "province") {
+        setSelectedProvince(ID);
+    } if (areaType == "county") {
+        setSelectedCounty(ID);
+    } if (view) {
+    handleZoom(view);
+}};
 
   useEffect(() => {
     loadCountiesGeometries();
@@ -284,7 +275,7 @@ const MapComponent: React.FC = () => {
     highlightColor: [1000, 20, 20, 20],
     onClick: ({ object }) => {
       if (object) {
-        handleMapClick(object.province, object.coordinates, object.view, object.provinceID);
+        handleMapClick(object.view, object.ID, object.areaType);
       } else {
         handleMapClick(null, null, null, null); // Click outside the polygons
       }
@@ -298,9 +289,15 @@ const MapComponent: React.FC = () => {
     getLineColor: [0, 0, 0, 70],
     getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 0.8,
-
-    // pickable: true,
-    // autoHighlight: true,
+    pickable: false,
+    autoHighlight: false,
+    onClick: ({ object }) => {
+      if (object) {
+        handleMapClick(object.view, object.ID, object.areaType);
+      } else {
+        handleMapClick(null, null, null, null); // Click outside the polygons
+      }
+    },
   });
 
   const cellsBelowLayer = new ScatterplotLayer({
@@ -407,6 +404,11 @@ const MapComponent: React.FC = () => {
     grazingRange,
     selectedYear
   ]);
+  useEffect(() => {
+    if (map && onMapReady) {
+      onMapReady(handleZoom);
+    }
+  }, [map, onMapReady, soums]);
 
   if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
     return <div>Loading...</div>;

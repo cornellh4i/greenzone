@@ -66,7 +66,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       renderInput={(params) => (
         <TextField
           {...params}
-          label={"HAHH"}
+          label={"Select Option"}
           variant="outlined"
           sx={{
             ...sx,
