@@ -172,7 +172,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const handleBack = () => {
     setProvinceData(null);
   };
-
   const handleOptionChange = (option: LayerType) => {
     setSelectedOption(option);
     setSelectedLayerType(option);
