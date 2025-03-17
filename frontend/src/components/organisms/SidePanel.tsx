@@ -343,7 +343,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 <h2>Data Layers</h2>
                 <RadioButton
                   options={options}
-                  selectedOption={selectedLayerType}
+                  selectedOption={selectedLayerType ?? LayerType.CarryingCapacity}
                   onChange={handleOptionChange} />
               </div>
             </div>
