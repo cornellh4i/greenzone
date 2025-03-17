@@ -31,6 +31,7 @@ interface CellGeometry {
   name: string;
   coordinates: number[];
   vertices: [number, number][];
+  grazing_range: boolean; // Add grazing boolean value
 }
 
 const MAP_STYLE =
@@ -74,18 +75,19 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     showZeroCells,
     selectedLayerType,
     setSelectedLayerType,
+    grazingRange,
+    selectedYear
   } = context;
-
   const loadCarryingCapacityCells = async () => {
     try {
       const below_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_below"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0/0.4`
       );
       const at_cap_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_at_cap"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.4/0.6`
       );
       const above_response = await fetch(
-        "http://localhost:8080/api//cells/bm_pred_above"
+        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.6/1`
       );
 
       const [json_below_response, json_at_cap_response, json_above_response] =
@@ -98,18 +100,21 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
         json_below_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range, // Include grazing boolean value
         }))
       );
       setAtCapCells(
         json_at_cap_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range,// Include grazing boolean value
         }))
       );
       setAboveCells(
         json_above_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range, // Include grazing boolean value
         }))
       );
     } catch (error) {
@@ -119,15 +124,15 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   const loadZScoreCells = async () => {
     try {
       const negative_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_negative"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0/0.4`
       );
       const zero_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_zero"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.4/0.6`
       );
       const positive_response = await fetch(
-        "http://localhost:8080/api/cells/z_score_positive"
+        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.6/1`
       );
-
+      console.log(negative_response)
       const [
         json_negative_response,
         json_zero_response,
@@ -141,18 +146,22 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
         json_negative_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
         }))
       );
       setZeroCells(
         json_zero_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
+
         }))
       );
       setPositiveCells(
         json_positive_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
+          grazing_range: feature.grazing_range,  // Include grazing boolean value
         }))
       );
     } catch (error) {
@@ -278,7 +287,7 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     loadCarryingCapacityCells();
     loadZScoreCells();
     // loadGrazingRangeCells();
-  }, []);
+  }, [selectedYear]);
 
   const provinceLayer = new PolygonLayer({
     id: "province-layer",
@@ -324,15 +333,20 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
 
   const cellsBelowLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: belowCells, // Point Data
+    data: !grazingRange
+    ? belowCells
+    : belowCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 170, 60, 200], // Red color for visibility
     pickable: true,
   });
+  
   const cellsAtCapLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: atCapCells, // Point Data
+    data: !grazingRange
+    ? atCapCells
+    : atCapCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [255, 140, 90, 200], // Red color for visibility
@@ -340,8 +354,9 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   });
   const cellsAboveLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: aboveCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? aboveCells
+    : aboveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -351,8 +366,9 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
 
   const cellsNegativeLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: negativeCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? negativeCells
+    : negativeCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -362,8 +378,9 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   });
   const cellsZeroLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: zeroCells, // Point Data
-    getPosition: (d) => {
+    data: !grazingRange
+    ? zeroCells
+    : zeroCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
       return d.vertices;
     },
     getRadius: 5000, // Adjust size
@@ -373,8 +390,9 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
   });
   const cellsPositiveLayer = new ScatterplotLayer({
     id: "point-layer",
-    data: positiveCells, // Point Data
-    getPosition: (d) => d.vertices,
+    data: !grazingRange
+    ? positiveCells
+    : positiveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 128, 128, 200], // Teal color
 
@@ -415,6 +433,8 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
       showNegativeCells,
       showZeroCells,
       showPositiveCells,
+      grazingRange,
+      selectedYear
     ]);
   useEffect(() => {
     if (map && onMapReady) {

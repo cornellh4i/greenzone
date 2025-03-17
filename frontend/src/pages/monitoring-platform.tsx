@@ -29,6 +29,8 @@ const MonitoringPlatform: React.FC = () => {
   const [selectedOption, setSelectedOption] =
     useState<string>("carryingCapacity");
   const [displayName, setDisplayName] = useState<string>("");
+  const [isGrazingRangeSelected, setIsGrazingRangeSelected] = useState(false); // Define the variable
+
   const contextDict = {
     // Province & Selection
     selectedProvince,

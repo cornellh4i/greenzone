@@ -3,8 +3,8 @@ import { SetStateAction, createContext } from "react";
 
 export type SetState<T> = React.Dispatch<SetStateAction<T>>;
 export enum LayerType {
-  CarryingCapacity = "CarryingCapacity",
-  ZScore = "ZScore",
+  CarryingCapacity = "carrying_capacity",
+  ZScore = "z_score",
 }
 
 export enum SelectedType {

@@ -131,15 +131,17 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       } = {};
 
       json_object.data.forEach(
-        (county:
-          { county_data: { soum_name: string; province_name: string }; county_id: number }) => {
+        (county: {
+          county_data: { soum_name: string; province_name: string };
+          county_id: number;
+        }) => {
           const name = county.county_data.soum_name;
           const provinceName = county.county_data.province_name;
           if (name && provinceName) {
             countyDictionary[name] = {
               county_id: county.county_id,
               province_name: provinceName,
-            }
+            };
           }
         }
       );
@@ -168,7 +170,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     loadCountyData();
   }, []);
 
-
   /*const handleValueSelect = async (provinceData: { value: number }) => {
     setSearched(provinceData.value);
     setDisplayName(provinceData);
@@ -195,19 +196,57 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   };
 
   return (
-    <div>
-      <h2>County Map</h2>
-      {/* <pre>{JSON.stringify(countyMap, null, 2)}</pre> */}
-
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between", // Adjusts layout distribution
+        gap: "10px",
+        padding: "10px",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        borderRadius: "15px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+      }}
+    >
       <div style={{ flex: 1 }}>
-        <SearchBar
-          countyMap={countyMap}
-          onValueSelect={handleValueSelect}
-        />
+        <SearchBar countyMap={countyMap} onValueSelect={handleValueSelect} />
       </div>
+
+      <Context.Provider value={context}>
+        <TopPanelLayerTypeSwitch />
+      </Context.Provider>
+
+      <Button
+        onClick={() => navigateTo("/landing")}
+        sx={{
+          backgroundColor: "grey",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "12px",
+        }}
+        startIcon={<HomeIcon />}
+      />
+
+      <Button
+        onClick={() => {}} // Placeholder for future routing
+        sx={{
+          backgroundColor: "transparent",
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        startIcon={
+          <Avatar sx={{ width: "40px", height: "40px" }}>
+            <PersonIcon />
+          </Avatar>
+        }
+      />
     </div>
-
-
   );
   //   <div
   //     style={{

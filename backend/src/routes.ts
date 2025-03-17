@@ -18,6 +18,8 @@ import {
   getProvinceGeometry,
   getProvinceGeometryByID,
   getProvinceLivestockByID,
+  getProvinceLivestockByClass,
+  getProvinceCellSummary,
   // getProvinceByName,
 } from "./controller/Province";
 import {
@@ -39,6 +41,7 @@ import {
   getZScoreNegative,
   getZScoreZero,
   getZScorePositive,
+  getCellValuesbyYearandCtype,
 } from "./controller/Cell";
 
 const router = express.Router();
@@ -70,7 +73,10 @@ router.get("/cells/bm_pred_above", getBMCellsAbove);
 router.get("/cells/z_score_negative", getZScoreNegative);
 router.get("/cells/z_score_zero", getZScoreZero);
 router.get("/cells/z_score_positive", getZScorePositive);
+router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
 
+//
+router.get("/cells/:year/:classificationType/:lowerBound/:upperBound",getCellValuesbyYearandCtype)
 // Route to update a hexagon
 router.put("/hexagons/:hexagon_id", updateHexagon);
 
@@ -87,13 +93,13 @@ router.post("/province", createProvince);
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
 router.get("/provincegeo/:province_id", getProvinceGeometryByID);
+router.get("/provincebyclass/:type", getProvinceLivestockByClass);
 
 // router.get("/province/:province_name", getProvinceByName);
 
 // Route to get a specific province by ID
 router.get("/province/:province_id", getProvinceByID);
 router.get("/province/:province_id/:year", getProvinceLivestockByID);
-
 
 // Route to update a province
 // router.put("/province/:province_id", updateProvince);
@@ -110,7 +116,6 @@ router.get("/countygeo", getCountyGeometry);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
 router.get("/county/:county_id/:year", getCountyLivestockByID);
-
 
 // Route to update a county
 router.put("/county/:county_id", updateCounty);
