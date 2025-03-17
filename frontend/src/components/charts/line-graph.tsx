@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { Box, Typography, Container } from '@mui/material';
+
 
 export interface Prop {
   datasets: { aimag: string; data: { x: number; y: number }[] }[];
@@ -14,9 +16,14 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
   useEffect(() => {
     d3.select(svgRef.current).selectAll("*").remove();
 
-    const w = window.innerWidth * 0.9;
-    const h = window.innerHeight * 0.8;
-    const m = { top: 80, right: 80, bottom: 60, left: 120 };
+    const w = 1500;  // Match container width
+    const h = 600;   // Fixed height
+    const m = { 
+      top: 80, 
+      right: 120,
+      bottom: 60, 
+      left: 120 
+    };
 
     const allData = datasets.flatMap(d => d.data);
 
@@ -24,7 +31,7 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", `0 0 ${w} ${h}`)
+      .attr("viewBox", `0 0 ${w + m.right} ${h + m.top}`)
       .attr("preserveAspectRatio", "xMinYMin meet")
       .style("background-color", "#ffffff");
 
@@ -58,6 +65,7 @@ d3svg.selectAll(".dzud-rect")
   .attr("height", h - m.top - m.bottom)
   .style("fill", "rgba(124, 169, 253, 0.5)") // Light blue fill
   .style("pointer-events", "none"); // Prevent bars from blocking interactions
+  
 
 
 
@@ -81,6 +89,7 @@ d3svg.append("g")
 .call(d3.axisBottom(xScale).tickFormat(d3.format("d"))) // "d" removes commas
 .selectAll("text")
 .style("font-size", "14px")
+.style("font-family", "Roboto, sans-serif")
 .style("font-weight", "bold");
 
 
@@ -89,6 +98,7 @@ d3svg.append("g")
       .call(d3.axisLeft(yScaleLeft))
       .selectAll("text")
       .style("font-size", "14px")
+      .style("font-family", "Roboto, sans-serif")
       .style("font-weight", "bold");
 
     d3svg.append("g")
@@ -96,6 +106,7 @@ d3svg.append("g")
       .call(d3.axisRight(yScaleRight))
       .selectAll("text")
       .style("font-size", "14px")
+      .style("font-family", "Roboto, sans-serif")
       .style("font-weight", "bold");
 
       d3svg.append("text")
@@ -107,6 +118,7 @@ d3svg.append("g")
   .style("font-weight", "bold")
   .style("fill", "#000")
   .style("text-anchor", "middle")
+  .style("font-family", "Roboto, sans-serif")
   .text("Primary Population");
 
     d3svg.append("text")
@@ -118,6 +130,7 @@ d3svg.append("g")
       .style("font-weight", "bold")
       .style("fill", "#000")
       .style("text-anchor", "middle")
+      .style("font-family", "Roboto, sans-serif")
       .text("Secondary Population");
 
     datasets.forEach(dataset => {
@@ -135,6 +148,7 @@ d3svg.append("g")
         .attr("stroke", color)
         .attr("stroke-width", 3)
         .attr("d", lineGenerator);
+        
 
       d3svg.selectAll(`circle-${dataset.aimag}`)
         .data(dataset.data)
@@ -168,6 +182,7 @@ d3svg.append("g")
         .attr("y", 12)
         .style("font-size", "16px")
         .style("font-weight", "bold")
+        .style("font-family", "Roboto, sans-serif")
         .style("fill", "#000")
         .text(dataset.aimag.charAt(0).toUpperCase() + dataset.aimag.slice(1));
     });
@@ -189,6 +204,7 @@ d3svg.append("g")
       .style("font-size", "16px")
       .style("font-weight", "bold")
       .style("fill", "#000")
+      .style("font-family", "Roboto, sans-serif")
       .text("Dzud Years");
 
       // === ADD PRIVATIZATION PERIOD TO LEGEND ===
@@ -208,6 +224,7 @@ privLegend.append("text")
 .style("font-size", "16px")
 .style("font-weight", "bold")
 .style("fill", "#000")
+.style("font-family", "Roboto, sans-serif")
 .text("Privatization Periods");
 
 
@@ -216,7 +233,7 @@ privLegend.append("text")
   
 
   return (
-    <div className="line-graph" style={{ width: "100%", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div className="line-graph" style={{ width: "100%", height: "100", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <svg ref={svgRef}></svg>
     </div>
   );
