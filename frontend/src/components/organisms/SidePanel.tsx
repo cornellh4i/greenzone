@@ -31,6 +31,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setGrazingRange,
     selectedLayerType,
     setSelectedLayerType,
+    // selectedCounty,
+    // setSelectedCounty,
 
     isPanelOpen,
     setIsPanelOpen,
@@ -55,6 +57,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   } = context;
 
   const [provinceData, setProvinceData] = useState<any | null>(null);
+  const [counties, setCounties] = useState<any[]>([]);
+  const [selectedCounty, setSelectedCounty] = useState<number | null>(null);
   // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -92,6 +96,18 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       }
     } catch (error) {
       console.error("Error fetching cell summary data:", error);
+    }
+  };
+
+  const loadCounties = async (provinceId: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/province/${provinceId}/counties`
+      );
+      const json = await response.json();
+      setCounties(json.data || []);
+    } catch (error) {
+      console.error("Error fetching counties:", error);
     }
   };
 
@@ -155,17 +171,73 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
-    if (selectedYear && selectedProvince) {
-      loadProvinceCellSummary(selectedProvince, selectedLayerType);
-      loadProvinceData(selectedProvince, displayName);
+    if (selectedYear && (selectedCounty || selectedProvince)) {
+      const id = selectedCounty || selectedProvince;
+      loadProvinceCellSummary(id, selectedLayerType);
+      loadProvinceData(id, displayName);
     }
-  }, [selectedProvince, selectedYear]);
+  }, [selectedProvince, selectedCounty, selectedYear]);
 
-  // Controls when to Exit Province/County Summary Mode
-  const handleBack = () => {
-    setProvinceData(null);
+  useEffect(() => {
+    if (selectedProvince) {
+      loadCounties(selectedProvince);
+    } else {
+      setCounties([]);
+      setSelectedCounty(null);
+    }
+  }, [selectedProvince]);
+
+// At the top of your file/component:
+const INITIAL_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
+
+// Zoom handling function:
+const handleZoom = (bounds: [number, number, number, number]) => {
+  if (!map) return; // 'map' comes from your Map instance via useRef/useState
+  
+  (bounds, {
+    padding: 50,
+    duration: 1000,
+    maxZoom: selectedCounty ? 10 : selectedProvince ? 8 : 5.5,
+  });
+};
+
+// Get province bounds:
+const getProvinceBounds = (provinceId: number | null): [number, number, number, number] => {
+  const province = provinces.find((p) => p.ID === provinceId);
+  return province?.view || INITIAL_BOUNDS;
+};
+
+// Correct back-button logic:
+// const handleBack = () => {
+//   if (selectedCounty) {
+//     // Exiting county -> back to province
+//     setSelectedCounty(null);
+//     handleZoom(getProvinceBounds(selectedProvince));
+//   } else if (selectedProvince) {
+//     // Exiting province -> back to entire Mongolia
+//     setSelectedProvince(null);
+//     handleZoom(INITIAL_BOUNDS);
+//   }
+
+//   // Clear province or county data if needed:
+//   setProvinceData(null);
+// };
+const handleBack = () => {
+  if (selectedCounty) {
+    // If viewing a county, zoom out to the selected province
+    setSelectedCounty(null);
+    const provinceBounds = getProvinceBounds(selectedProvince);
+    handleZoom(provinceBounds);
+  } else if (selectedProvince) {
+    // If viewing a province, zoom out to entire Mongolia
     setSelectedProvince(null);
-  };
+    handleZoom(INITIAL_BOUNDS);
+  }
+
+  // Clear detailed data when zooming out
+  setProvinceData(null);
+};
+
   // Controls when to close the SidePanel
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -411,6 +483,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                   ]}
                   livestock={livestockTypes}
                 />
+              )}
+              {counties.length > 0 && (
+                <div>
+                  <h2>Select County</h2>
+                  <select
+                    value={selectedCounty ?? ""}
+                    onChange={(e) => setSelectedCounty(Number(e.target.value))}
+                  >
+                    <option value="" disabled>
+                      Select a county
+                    </option>
+                    {counties.map((county) => (
+                      <option key={county.id} value={county.id}>
+                        {county.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
             </div>
           )}
