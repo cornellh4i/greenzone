@@ -172,7 +172,11 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
   };*/
 
-  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
+  const handleValueSelect = async (countyData: {
+    county_id: number,
+    county_name: string,
+    province_name: string
+  }) => {
     // Retrieve the county ID from the countyMap using the selected county name
     const countyId = countyData.county_id;
     console.log("CountyData received:" + countyId);

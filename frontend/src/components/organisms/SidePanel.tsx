@@ -17,7 +17,8 @@ interface SidePanelProps {
   yearOptions: string[];
   selectedCounty?: number | null;
 }
-const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) => {
+const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
+
   const context = useContext(Context);
 
   if (!context) {
@@ -51,9 +52,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) =>
     showZeroCells,
     setShowZeroCells,
 
+    selectedCounty: selectedCounty,
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
+
+  // Log the context value
+  console.log("Context selectedCounty:", selectedCounty);
+
+  // Modify your useEffect to use the context value instead of prop
+  useEffect(() => {
+    if (selectedCounty) {
+      setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
+    }
+  }, [selectedCounty]);
+
 
   const [provinceData, setProvinceData] = useState<any | null>(null);
 
@@ -144,14 +160,23 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) =>
 
 
   // Fetch data for the selected province
+  // Fetch data for the selected county
   const loadCountyData = async (countyID: number) => {
     console.log("county selected year!:" + selectedYear)
     try {
+      // First, get the county metadata to get names
+      const metadataResponse = await fetch(`http://localhost:8080/api/county/${countyID}`);
+      const metadataJson = await metadataResponse.json();
+      const sn = metadataJson.data[0].county_data.soum_name;
+      const pn = metadataJson.data[0].county_data.province_name;
+      const countyName = sn || "Unknown County";
+      const provinceName = pn || "Unknown Province";
+
+      // Then get yearly livestock data
       const response = await fetch(
         `http://localhost:8080/api/county/${countyID}/${selectedYear}`
       );
       const json_object = await response.json();
-
 
       const selectedData = {
         number_of_livestock: json_object.data[0].yearly_agg.total,
@@ -168,6 +193,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) =>
         y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
       }));
 
+      // Now we can use countyName and provinceName since we defined them above
       setCountyData({
         county_name: countyName,
         province_name: provinceName,
@@ -178,7 +204,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) =>
       });
       setProvinceData(null)
     } catch (error) {
-      console.error("Error fetching province data:", error);
+      console.error("Error fetching county data:", error);
     }
   };
   // Controls the Top Panel
@@ -200,6 +226,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedCounty }) =>
   useEffect(() => {
     if (selectedCounty) {
       setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
     }
   }, [selectedCounty]);
 
