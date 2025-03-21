@@ -8,9 +8,9 @@ interface LivestockData {
   data: { x: number; y: number }[];
 }
 
-interface ProvinceSummary {
+interface SummaryData {
   ranking: number;
-  aimag: string;
+  name: string;
   belowCapacity: number;
   atCapacity: number;
   aboveCapacity: number;
@@ -18,11 +18,12 @@ interface ProvinceSummary {
 
 const InsightsPanel: React.FC = () => {
   const [livestockData, setLivestockData] = useState<{ [key: string]: LivestockData[] }>({});
-  const [provinceSummaries, setProvinceSummaries] = useState<ProvinceSummary[]>([]);
+  const [summaries, setSummaries] = useState<SummaryData[]>([]);
   const [provinceIds, setProvinceIds] = useState<number[]>([]);
+  const [countyIds, setCountyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
-  
+
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
   const dzudYears = [2017, 2016, 2020, 2021];
   const privatizationPeriods = [2012, 2015, 2018, 2013];
@@ -32,8 +33,8 @@ const InsightsPanel: React.FC = () => {
   };
 
   const tableColumns = [
-    { field: 'ranking', headerName: 'Ranking', width: 100, format: (value: number) => value.toString() },
-    { field: 'aimag', headerName: 'Aimag', width: 200 },
+    { field: 'ranking', headerName: 'Ranking', width: 100 },
+    { field: 'name', headerName: tabValue === 0 ? "Aimag" : "Soum", width: 200 },
     { field: 'belowCapacity', headerName: 'Below Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'atCapacity', headerName: 'At Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'aboveCapacity', headerName: 'Above Capacity', width: 150, format: (value: number) => `${value}%` },
@@ -54,80 +55,95 @@ const InsightsPanel: React.FC = () => {
     }
   };
 
-  const fetchProvinceSummaries = async () => {
+  const fetchCountyIds = async () => {
     try {
       setLoading(true);
-      const promises = provinceIds.map((provinceId) =>
-        fetch(`http://localhost:8080/api/${provinceId}/carrying_capacity/cell-summary`)
-          .then((response) => response.json())
-          .catch((error) => {
-            console.error(`Error fetching data for province ${provinceId}:`, error);
-            return null;
-          })
-      );
+      const response = await fetch("http://localhost:8080/api/county");
+      const json = await response.json();
 
-      const results = await Promise.all(promises);
-      const validResults = results.filter(result => result && result.data && result.data.length > 0);
-
-      const formattedSummaries = validResults.map((result, index) => ({
-        ranking: index + 1,
-        aimag: result.data[0].province_name,
-        belowCapacity: result.data[0].cat1_percentage,
-        atCapacity: result.data[0].cat2_percentage,
-        aboveCapacity: result.data[0].cat3_percentage,
-      }));
-
-      formattedSummaries.sort((a, b) => a.belowCapacity - b.belowCapacity);
-
-      formattedSummaries.forEach((summary, index) => {
-        summary.ranking = index + 1;
-      });
-
-      setProvinceSummaries(formattedSummaries);
-      setLoading(false);
+      if (json.data) {
+        const ids = json.data.map((county: any) => county.county_id);
+        setCountyIds(ids);
+      }
     } catch (error) {
-      console.error("Error fetching province summaries:", error);
-      setLoading(false);
+      console.error("Error fetching county IDs:", error);
     }
   };
 
+  const fetchSummaries = async () => {
+    try {
+      setLoading(true);
+      const ids = tabValue === 0 ? provinceIds : countyIds;
+      const endpoint = tabValue === 0 ? "province" : "county";
+  
+      const promises = ids.map(async (id) => {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/${endpoint}/${id}/carrying_capacity/cell-summary`
+          );
+  
+          const text = await response.text();
+          console.log(`🔹 Raw Response for ${endpoint} ${id}:`, text);
+  
+          // Ensure response is valid JSON
+          if (response.headers.get("content-type")?.includes("application/json")) {
+            const jsonData = JSON.parse(text);
+            console.log(`✅ Parsed JSON for ${endpoint} ${id}:`, jsonData);
+            return jsonData;
+          } else {
+            console.error(`Unexpected response format for ${endpoint} ${id}:`, text);
+            return null;
+          }
+        } catch (error) {
+          console.error(`Error fetching data for ${endpoint} ${id}:`, error);
+          return null;
+        }
+      });
+  
+      const results = await Promise.all(promises);
+      console.log("🔹 All Results:", results);
+  
+      const validResults = results.filter((result) => result && result.data && result.data.length > 0);
+  
+      if (validResults.length === 0) {
+        console.warn("⚠️ No valid data retrieved!");
+      }
+  
+      const formattedSummaries = validResults.map((result, index) => ({
+        ranking: index + 1,
+        name: result.data[0]?.province_name || result.data[0]?.county_name || "Unknown",
+        belowCapacity: result.data[0]?.cat1_percentage ?? 0,
+        atCapacity: result.data[0]?.cat2_percentage ?? 0,
+        aboveCapacity: result.data[0]?.cat3_percentage ?? 0,
+      }));
+  
+      formattedSummaries.sort((a, b) => a.belowCapacity - b.belowCapacity);
+  
+      formattedSummaries.forEach((summary, index) => {
+        summary.ranking = index + 1;
+      });
+  
+      console.log("Final Summaries:", formattedSummaries);
+  
+      setSummaries(formattedSummaries);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching summaries:", error);
+      setLoading(false);
+    }
+  };
+  
+
   useEffect(() => {
     fetchProvinceIds();
+    fetchCountyIds();
   }, []);
 
   useEffect(() => {
-    if (provinceIds.length > 0) {
-      fetchProvinceSummaries();
+    if ((tabValue === 0 && provinceIds.length > 0) || (tabValue === 1 && countyIds.length > 0)) {
+      fetchSummaries();
     }
-  }, [provinceIds]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const allData: { [key: string]: LivestockData[] } = {};
-        await Promise.all(
-          livestockTypes.map(async (type) => {
-            const response = await fetch(`http://localhost:8080/api/provincebyclass/${type}`);
-            const json_object = await response.json();
-            const formattedData = [{
-              aimag: type,
-              data: json_object.data.map((item: any) => ({
-                x: item.year,
-                y: item.livestock_count
-              }))
-            }];
-            allData[type] = formattedData;
-          })
-        );
-        setLivestockData(allData);
-      } catch (error) {
-        console.error("Error fetching livestock data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  }, [provinceIds, countyIds, tabValue]);
 
   return (
     <Box sx={{ backgroundColor: '#F3F4F6', py: 8 }}>
@@ -148,10 +164,10 @@ const InsightsPanel: React.FC = () => {
               mb: 4
             }}
           >
-            Key conclusions
+            Key Conclusions
           </Typography>
 
-          <Box sx={{p: 4, borderRadius: 2 }}>
+          <Box sx={{ p: 4, borderRadius: 2 }}>
             <Typography 
               variant="h6" 
               sx={{ 
@@ -165,16 +181,7 @@ const InsightsPanel: React.FC = () => {
             <Box sx={{ 
               borderBottom: 1, 
               borderColor: 'divider', 
-              mb: 3,
-              '& .MuiTabs-root': {
-                minHeight: '48px',
-              },
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '1rem',
-                minHeight: '48px',
-              }
+              mb: 3
             }}>
               <Tabs 
                 value={tabValue} 
@@ -194,12 +201,12 @@ const InsightsPanel: React.FC = () => {
             </Box>
             <Table
               columns={tableColumns}
-              rows={provinceSummaries}
+              rows={summaries}
               loading={loading}
             />
           </Box>
 
-          <Box sx={{p: 4, borderRadius: 2 }}>
+          <Box sx={{ p: 4, borderRadius: 2 }}>
             <Typography 
               variant="h6" 
               sx={{ 

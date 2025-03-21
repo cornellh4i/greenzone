@@ -56,7 +56,7 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
 
 // === DZUD YEARS HIGHLIGHT ===
 d3svg.selectAll(".dzud-rect")
-  .data(dzudYears)
+  .data(dzudYears ?? [])
   .enter()
   .append("rect")
   .attr("x", d => xScale(d - 0.5)) 

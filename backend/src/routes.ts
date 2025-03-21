@@ -31,6 +31,7 @@ import {
   getCountyGeometry,
   getCountyGeometryByID,
   getCountyLivestockByID,
+  getCountyCellSummary
 } from "./controller/County";
 import {
   getBMCellsBelow,
@@ -75,6 +76,8 @@ router.get("/cells/z_score_zero", getZScoreZero);
 router.get("/cells/z_score_positive", getZScorePositive);
 router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
 
+router.get("/province/:province_id/:category_type/cell-summary", getProvinceCellSummary);
+router.get("/county/:county_id/:category_type/cell-summary/", getCountyCellSummary);
 //
 router.get("/cells/:year/:classificationType/:lowerBound/:upperBound",getCellValuesbyYearandCtype)
 // Route to update a hexagon
