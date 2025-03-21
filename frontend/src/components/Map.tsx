@@ -37,8 +37,8 @@ interface CellGeometry {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-  const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
-    const [provinces, setProvinces] = useState<Geometry[]>([]);
+const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
+  const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
   // const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
@@ -180,12 +180,12 @@ const MAP_STYLE =
 
         feature.province_geometry.coordinates[0][0].forEach((
           [lng, lat]: [number, number]) => {
-            console.log("Coordinates:", lng, lat);
-            bounds[0] = Math.min(bounds[0], lng); // Min longitude
-            bounds[1] = Math.min(bounds[1], lat); // Min latitude
-            bounds[2] = Math.max(bounds[2], lng); // Max longitude
-            bounds[3] = Math.max(bounds[3], lat); // Max latitude
-      });
+          console.log("Coordinates:", lng, lat);
+          bounds[0] = Math.min(bounds[0], lng); // Min longitude
+          bounds[1] = Math.min(bounds[1], lat); // Min latitude
+          bounds[2] = Math.max(bounds[2], lng); // Max longitude
+          bounds[3] = Math.max(bounds[3], lat); // Max latitude
+        });
         return {
           type: "Polygon",
           coordinates: feature.province_geometry.coordinates[0],
@@ -210,11 +210,11 @@ const MAP_STYLE =
 
         feature.county_geometry.coordinates[0].forEach((
           [lng, lat]: [number, number]) => {
-            bounds[0] = Math.min(bounds[0], lng); // Min longitude
-            bounds[1] = Math.min(bounds[1], lat); // Min latitude
-            bounds[2] = Math.max(bounds[2], lng); // Max longitude
-            bounds[3] = Math.max(bounds[3], lat); // Max latitude
-      });
+          bounds[0] = Math.min(bounds[0], lng); // Min longitude
+          bounds[1] = Math.min(bounds[1], lat); // Min latitude
+          bounds[2] = Math.max(bounds[2], lng); // Max longitude
+          bounds[3] = Math.max(bounds[3], lat); // Max latitude
+        });
         return {
           type: "Polygon",
           coordinates: feature.county_geometry.coordinates[0],
@@ -245,14 +245,15 @@ const MAP_STYLE =
     view: [number, number, number, number] | null,
     ID: number,
     areaType: SelectedType | null
-    ) => {
-      if (areaType === "province") {
-        setSelectedProvince(ID);
+  ) => {
+    if (areaType === "province") {
+      setSelectedProvince(ID);
     } if (areaType == "county") {
-        setSelectedCounty(ID);
+      setSelectedCounty(ID);
     } if (view) {
-    handleZoom(view);
-}};
+      handleZoom(view);
+    }
+  };
 
   useEffect(() => {
     loadCountiesGeometries();
@@ -303,19 +304,19 @@ const MAP_STYLE =
   const cellsBelowLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? belowCells
-    : belowCells.filter(d => d.grazing_range == grazingRange), // Point Data
+      ? belowCells
+      : belowCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 170, 60, 200], // Red color for visibility
     pickable: true,
   });
-  
+
   const cellsAtCapLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? atCapCells
-    : atCapCells.filter(d => d.grazing_range == grazingRange), // Point Data
+      ? atCapCells
+      : atCapCells.filter(d => d.grazing_range == grazingRange), // Point Data
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [255, 140, 90, 200], // Red color for visibility
@@ -324,10 +325,10 @@ const MAP_STYLE =
   const cellsAboveLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? aboveCells
-    : aboveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
-      return d.vertices;
-    },
+      ? aboveCells
+      : aboveCells.filter(d => d.grazing_range == grazingRange), getPosition: (d) => {
+        return d.vertices;
+      },
     getRadius: 5000, // Adjust size
     getFillColor: [214, 15, 2, 150], // Red color for visibility
     pickable: true,
@@ -336,10 +337,10 @@ const MAP_STYLE =
   const cellsNegativeLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? negativeCells
-    : negativeCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
-      return d.vertices;
-    },
+      ? negativeCells
+      : negativeCells.filter(d => d.grazing_range == grazingRange), getPosition: (d) => {
+        return d.vertices;
+      },
     getRadius: 5000, // Adjust size
     getFillColor: [128, 0, 128, 200], // Purple color for visibility
 
@@ -348,10 +349,10 @@ const MAP_STYLE =
   const cellsZeroLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? zeroCells
-    : zeroCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => {
-      return d.vertices;
-    },
+      ? zeroCells
+      : zeroCells.filter(d => d.grazing_range == grazingRange), getPosition: (d) => {
+        return d.vertices;
+      },
     getRadius: 5000, // Adjust size
     getFillColor: [0, 0, 139, 200], // Blue color for visibility
 
@@ -360,8 +361,8 @@ const MAP_STYLE =
   const cellsPositiveLayer = new ScatterplotLayer({
     id: "point-layer",
     data: !grazingRange
-    ? positiveCells
-    : positiveCells.filter(d => d.grazing_range == grazingRange),    getPosition: (d) => d.vertices,
+      ? positiveCells
+      : positiveCells.filter(d => d.grazing_range == grazingRange), getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 128, 128, 200], // Teal color
 
@@ -423,7 +424,7 @@ const MAP_STYLE =
         mapStyle={MAP_STYLE}
         // style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
-        // onMove={(evt) => setViewState(evt.viewState)}
+      // onMove={(evt) => setViewState(evt.viewState)}
       >
         {/* <NavigationControl position="top-left" /> */}
       </Map>

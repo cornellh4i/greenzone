@@ -15,8 +15,10 @@ import CloseIcon from "@mui/icons-material/Close";
 
 interface SidePanelProps {
   yearOptions: string[];
+  selectedCounty?: number | null;
 }
 const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
+
   const context = useContext(Context);
 
   if (!context) {
@@ -50,11 +52,29 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     showZeroCells,
     setShowZeroCells,
 
+    selectedCounty: selectedCounty,
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
 
+  // Log the context value
+  console.log("Context selectedCounty:", selectedCounty);
+
+  // Modify your useEffect to use the context value instead of prop
+  useEffect(() => {
+    if (selectedCounty) {
+      setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
+    }
+  }, [selectedCounty]);
+
+
   const [provinceData, setProvinceData] = useState<any | null>(null);
+
+
+  const [countyData, setCountyData] = useState<any | null>(null);
   // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -132,19 +152,69 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         selectedYear,
         formattedData,
       });
+      setCountyData(null);
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
   };
 
+
+  // Fetch data for the selected province
+  // Fetch data for the selected county
+  const loadCountyData = async (countyID: number) => {
+    console.log("county selected year!:" + selectedYear)
+    try {
+      // First, get the county metadata to get names
+      const metadataResponse = await fetch(`http://localhost:8080/api/county/${countyID}`);
+      const metadataJson = await metadataResponse.json();
+      const sn = metadataJson.data[0].county_data.soum_name;
+      const pn = metadataJson.data[0].county_data.province_name;
+      const countyName = sn || "Unknown County";
+      const provinceName = pn || "Unknown Province";
+
+      // Then get yearly livestock data
+      const response = await fetch(
+        `http://localhost:8080/api/county/${countyID}/${selectedYear}`
+      );
+      const json_object = await response.json();
+
+      const selectedData = {
+        number_of_livestock: json_object.data[0].yearly_agg.total,
+        number_of_cattle: json_object.data[0].yearly_agg.cattle,
+        number_of_goat: json_object.data[0].yearly_agg.goat,
+        number_of_sheep: json_object.data[0].yearly_agg.sheep,
+        number_of_camel: json_object.data[0].yearly_agg.camel,
+        number_of_horse: json_object.data[0].yearly_agg.horse,
+      };
+      console.log(selectedData);
+
+      const formattedData = livestockTypes.map((livestockType) => ({
+        x: livestockType,
+        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+      }));
+
+      // Now we can use countyName and provinceName since we defined them above
+      setCountyData({
+        county_name: countyName,
+        province_name: provinceName,
+        county_land_area: "N/A",
+        county_herders: "N/A",
+        selectedYear,
+        formattedData,
+      });
+      setProvinceData(null)
+    } catch (error) {
+      console.error("Error fetching county data:", error);
+    }
+  };
   // Controls the Top Panel
   useEffect(() => {
-    if (provinceData) {
+    if (provinceData || countyData) {
       setTopPanelOpen(true);
     } else {
       setTopPanelOpen(false);
     }
-  }, [provinceData, setTopPanelOpen]);
+  }, [provinceData, countyData, setTopPanelOpen]);
 
   // Controls whether to open up the SidePanel Or NOT
   useEffect(() => {
@@ -152,6 +222,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       setIsPanelOpen(true);
     }
   }, [selectedProvince, setIsPanelOpen]);
+
+  useEffect(() => {
+    if (selectedCounty) {
+      setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
+    }
+  }, [selectedCounty]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
@@ -164,6 +242,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   // Controls when to Exit Province/County Summary Mode
   const handleBack = () => {
     setProvinceData(null);
+    setCountyData(null);
     setSelectedProvince(null);
   };
   // Controls when to close the SidePanel
@@ -172,6 +251,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
     if (!isPanelOpen) {
       setProvinceData(null);
+      setCountyData(null);
       setSelectedProvince(null);
     }
   };
@@ -342,7 +422,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         }}
       >
         <Box>
-          {!provinceData ? (
+          {!provinceData && !countyData ? (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
@@ -350,7 +430,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               <h1>Carrying Capacity Early Warning System</h1>
               <Divider sx={{ mb: 2 }} />
               <p>
-                Please select a province or adjust the year slider to view data.
+                Please select a province or search for a county to view data.
               </p>
               <Slide
                 name="Year"
@@ -376,6 +456,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleBack} label="Back" />
               </div>
+              {/*
               <h1>{provinceData.province_name}</h1>
               <p>
                 <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
@@ -385,6 +466,37 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 <strong>Number of Herders:</strong>{" "}
                 {provinceData.province_herders}
               </p>
+          */}
+              {provinceData && (
+                <>
+                  <h1>{provinceData.province_name}</h1>
+                  <p>
+                    <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
+                    km²
+                  </p>
+                  <p>
+                    <strong>Number of Herders:</strong>{" "}
+                    {provinceData.province_herders}
+                  </p>
+                </>
+              )}
+
+              {countyData && (
+                <>
+                  <h1>{countyData.county_name}</h1>
+                  <p>
+                    <strong>Province:</strong> {countyData.province_name}
+                  </p>
+                  <p>
+                    <strong>Land Area:</strong> {countyData.county_land_area}
+                  </p>
+                  <p>
+                    <strong>Number of Herders:</strong>{" "}
+                    {countyData.county_herders}
+                  </p>
+                </>
+              )}
+
               <SidePanelPercentageModal
                 isOpen={true}
                 classificationType={selectedLayerType}
@@ -401,12 +513,35 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 }
               />
               <h2>Livestock Data for {selectedYear}</h2>
-              {provinceData.formattedData.length > 0 && (
+              {/*{provinceData.formattedData.length > 0 && (
                 <BarChart
                   datasets={[
                     {
                       aimag: provinceData.province_name,
                       data: provinceData.formattedData,
+                    },
+                  ]}
+                  livestock={livestockTypes}
+                />
+                )}*/}
+              {provinceData && provinceData.formattedData && provinceData.formattedData.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: provinceData.province_name,
+                      data: provinceData.formattedData,
+                    },
+                  ]}
+                  livestock={livestockTypes}
+                />
+              )}
+
+              {countyData && countyData.formattedData && countyData.formattedData.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: countyData.county_name,
+                      data: countyData.formattedData,
                     },
                   ]}
                   livestock={livestockTypes}
@@ -458,3 +593,4 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 };
 
 export default SidePanel;
+
