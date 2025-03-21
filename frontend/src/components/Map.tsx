@@ -783,7 +783,6 @@ const MapComponent: React.FC<{
     if (areaType === SelectedType.County && selectedProvince) {
       setSelectedCounty(ID);
       if (view) handleZoom(view);
-
       return;
     }
 
