@@ -61,6 +61,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const [countyData,setCountyData] =useState<any | null>(null);
 
   const [counties, setCounties] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<any[]>([]);
   // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -255,20 +256,36 @@ const getProvinceBounds = (provinceId: number | null): [number, number, number, 
 //   // Clear province or county data if needed:
 //   setProvinceData(null);
 // };
-const handleBack = () => {
-  if (selectedCounty) {
-    // If viewing a county, zoom out to the selected province
-    setSelectedCounty(null);
-    const provinceBounds = getProvinceBounds(selectedProvince);
-    handleZoom(provinceBounds);
-  } else if (selectedProvince) {
-    // If viewing a province, zoom out to entire Mongolia
-    setSelectedProvince(null);
-    handleZoom(INITIAL_BOUNDS);
-  }
-  // Clear detailed data when zooming out
-  setLivestockData(null);
+
+const handleProvinceBack = () => {
+  setProvinceData(null);
+  setSelectedProvince(null);
 };
+
+const handleCountyBack = () => {
+  setCountyData(null);
+  setSelectedCounty(null);
+}
+
+//   if (selectedCounty && selectedProvince) {
+//     // County -> Province
+//     setSelectedCounty(null);
+//     const provinceBounds = getProvinceBounds(selectedProvince);
+//     if (provinceBounds) {
+//       handleZoom(provinceBounds);
+//     } else {
+//       console.error("Province bounds not found for ID:", selectedProvince);
+//       handleZoom(INITIAL_BOUNDS); // fallback zoom
+//     }
+//   } else if (selectedProvince) {
+//     // Province -> Mongolia
+//     setSelectedProvince(null);
+//     handleZoom(INITIAL_BOUNDS);
+//   }
+
+//   // Clear detailed data
+//   setLivestockData(null);
+// };
 
   // Controls when to close the SidePanel
   const handlePanelToggle = () => {
@@ -478,7 +495,7 @@ const handleBack = () => {
           ) : (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                <Button onClick={handleBack} label="Back" />
+                <Button onClick={(!countyData)? handleProvinceBack: handleCountyBack} label="Back" />
               </div>
               <h1>{countyData ? countyData.soum_name: provinceData.province_name}</h1>
               <p>
