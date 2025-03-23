@@ -499,8 +499,25 @@ interface CellGeometry {
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) => void) => void }> = ({ onMapReady }) => {
+/**
+ * Optional helper if your county data has a `province_id` you can match.
+ * Without this, you'd need some other approach to filter soums to a single province.
+ */
+function belongsToProvince(soum: Geometry, selectedProvinceId: number) {
+  // If your data has an explicit province_id for each county, use that:
+  // return soum.province_id === selectedProvinceId;
+  //
+  // If not, you may need a different way to check ownership, e.g., a naming convention or a separate mapping.
+  // For now, we'll simply return true so you can refine with your real logic:
+  return true;
+}
 
+const MapComponent: React.FC<{
+  onMapReady?: (zoomToCounty: (countyId: number) => void) => void;
+}> = ({ onMapReady }) => {
+  /**
+   * State for province and county polygons
+   */
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
 
@@ -753,7 +770,6 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     ID: number | null,
     areaType: SelectedType | null
   ) => {
-
     // Province is clicked (only if no province is already selected):
     if (areaType === SelectedType.Province && !selectedProvince) {
       setSelectedProvince(ID);
@@ -852,24 +868,22 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     id: "cells-below-layer",
     data: !grazingRange
       ? belowCells
-      : belowCells.filter(d => d.grazing_range == grazingRange), // Point Data
+      : belowCells.filter((d) => d.grazing_range === grazingRange),
     getPosition: (d) => d.vertices,
     getRadius: 5000,
     getFillColor: [0, 170, 60, 200], // greenish
     pickable: true,
   });
-
   const cellsAtCapLayer = new ScatterplotLayer({
     id: "cells-atcap-layer",
     data: !grazingRange
       ? atCapCells
-      : atCapCells.filter(d => d.grazing_range == grazingRange), // Point Data
+      : atCapCells.filter((d) => d.grazing_range === grazingRange),
     getPosition: (d) => d.vertices,
     getRadius: 5000,
     getFillColor: [255, 140, 90, 200], // orange
     pickable: true,
   });
-
   const cellsAboveLayer = new ScatterplotLayer({
     id: "cells-above-layer",
     data: !grazingRange
@@ -894,14 +908,12 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
     id: "cells-zero-layer",
     data: !grazingRange
       ? zeroCells
-
       : zeroCells.filter((d) => d.grazing_range === grazingRange),
     getPosition: (d) => d.vertices,
     getRadius: 5000,
     getFillColor: [0, 0, 139, 200], // dark blue
     pickable: true,
   });
-
   const cellsPositiveLayer = new ScatterplotLayer({
     id: "cells-positive-layer",
     data: !grazingRange
@@ -993,6 +1005,8 @@ const MapComponent: React.FC<{ onMapReady?: (zoomToCounty: (countyId: number) =>
         initialViewState={INITIAL_VIEW_STATE}
         mapStyle={MAP_STYLE}
         onLoad={handleMapLoad}
+        // style={{ width: \"100vw\", height: \"100vh\" }} // If you want a full-screen map
+        // onMove={(evt) => setViewState(evt.viewState)}  // If you want manual control
       >
         {/* Optional navigation control */}
         {/* <NavigationControl position=\"top-left\" /> */}
