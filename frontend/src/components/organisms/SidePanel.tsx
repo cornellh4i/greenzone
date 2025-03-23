@@ -75,6 +75,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
 
   const [countyData, setCountyData] = useState<any | null>(null);
+  const [selectedData, setSelectedData] = useState<Record<string, number>>({});
   // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -126,23 +127,34 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       const json_object = await response.json();
       console.log(json_object.data[0].yearly_agg.total);
 
-      const { province_name, province_land_area, province_herders } =
+      const { province_name, province_land_area, province_herders} =
         json_object;
 
-      const selectedData = {
+      setSelectedData ({
         number_of_livestock: json_object.data[0].yearly_agg.total,
         number_of_cattle: json_object.data[0].yearly_agg.cattle,
         number_of_goat: json_object.data[0].yearly_agg.goat,
         number_of_sheep: json_object.data[0].yearly_agg.sheep,
         number_of_camel: json_object.data[0].yearly_agg.camel,
         number_of_horse: json_object.data[0].yearly_agg.horse,
-      };
+      });
       console.log(selectedData);
 
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,
         y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
       }));
+
+      
+      // Fetch province grazing range percentage
+      const grResponse = await fetch(`http://localhost:8080/api/province/${provinceID}/grazing-range`);
+      const grData = await grResponse.json();
+      console.log("Grazing Range Percentage Response:", grData);
+
+      // Extract grazing range percentage (default 0 if undefined)
+      const province_gr_percentage = grData.data ? Number(grData.data) : 0;
+
+      console.log("Extracted Grazing Range Percentage:", province_gr_percentage);
 
       setProvinceData({
         displayName,
@@ -151,6 +163,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         province_herders,
         selectedYear,
         formattedData,
+        province_gr_percentage,
       });
       setCountyData(null);
     } catch (error) {
@@ -274,7 +287,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1}}>
             <Chip
               label="Below"
               onClick={() => setShowBelowCells((prev) => !prev)}
@@ -453,18 +466,19 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           ) : (
             <div>
-              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+              <div style={{ position: "absolute", top: "10px", right: "10px"}}>
                 <Button onClick={handleBack} label="Back" />
               </div>
               {/*
-              <h1>{provinceData.province_name}</h1>
+              <h1>{provinceData.province_name}</h1> */}
               <p>
-                <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
-                km²
+                {/* {provinceData.province_land_area}{" "} <strong>km²</strong> &emsp; 
+                {provinceData.province_herders} {" "} <strong> herders</strong> */}
+                {12}{" "} <strong>km²</strong> &emsp; {56} {" "} <strong> herders</strong>
               </p>
               <p>
-                <strong>Number of Herders:</strong>{" "}
-                {provinceData.province_herders}
+                {/* {provinceData.province_herders} {" "} <strong>citizens</strong> &emsp;{provinceData.grazingRangePercentage} {" "} <strong>% grazing range</strong>              */}
+                {183}{" "}<strong>citizens</strong> &emsp; {provinceData.province_gr_percentage}<strong>% grazing range</strong>
               </p>
           */}
               {provinceData && (
@@ -512,8 +526,18 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                     : zScoreColors
                 }
               />
+              {/* <p>
               <h2>Livestock Data for {selectedYear}</h2>
-              {/*{provinceData.formattedData.length > 0 && (
+              <tab>TOTAL: {Math.floor(selectedData["number_of_livestock"])} Livestock </tab>
+              </p> */}
+              <Divider sx={{ my: 2 }} />
+              <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", marginBottom: "8px" }}>
+                <h2 style={{ margin: 0, whiteSpace: "nowrap" }}>{selectedYear} Livestock Count</h2>
+                  <p style={{ margin: 0, fontSize: "1em"}}>
+                    Total: {Math.floor(selectedData["number_of_livestock"])} livestock
+                  </p>
+              </div>
+              {provinceData.formattedData.length > 0 && (
                 <BarChart
                   datasets={[
                     {
@@ -522,6 +546,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                     },
                   ]}
                   livestock={livestockTypes}
+                  orientation = {false}
                 />
                 )}*/}
               {provinceData && provinceData.formattedData && provinceData.formattedData.length > 0 && (
