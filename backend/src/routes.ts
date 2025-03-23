@@ -20,6 +20,7 @@ import {
   getProvinceLivestockByID,
   getProvinceLivestockByClass,
   getProvinceCellSummary,
+  getProvinceGR,
   // getProvinceByName,
 } from "./controller/Province";
 import {
@@ -96,6 +97,9 @@ router.get("/provincegeo/:province_id", getProvinceGeometryByID);
 router.get("/provincebyclass/:type", getProvinceLivestockByClass);
 
 // router.get("/province/:province_name", getProvinceByName);
+
+// Route to get a province's GR %
+router.get("/province/:province_id/grazing-range", getProvinceGR);
 
 // Route to get a specific province by ID
 router.get("/province/:province_id", getProvinceByID);
