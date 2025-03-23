@@ -15,8 +15,10 @@ import CloseIcon from "@mui/icons-material/Close";
 
 interface SidePanelProps {
   yearOptions: string[];
+  selectedCounty?: number | null;
 }
 const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
+
   const context = useContext(Context);
 
   if (!context) {
@@ -52,12 +54,27 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     showZeroCells,
     setShowZeroCells,
 
+    selectedCounty: selectedCounty,
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     displayName,
   } = context;
 
-  const [provinceData,setProvinceData] =useState<any | null>(null);
-  const [countyData,setCountyData] =useState<any | null>(null);
+
+  // Modify your useEffect to use the context value instead of prop
+  useEffect(() => {
+    if (selectedCounty) {
+      setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
+    }
+  }, [selectedCounty]);
+
+
+  const [provinceData, setProvinceData] = useState<any | null>(null);
+
+
+  const [countyData, setCountyData] = useState<any | null>(null);
 
   const [counties, setCounties] = useState<any[]>([]);
   const [provinces, setProvinces] = useState<any[]>([]);
@@ -190,21 +207,70 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         province_name: county_data.province_name,
         county_livestock_data : formattedData,
       });
-      console.log(provinceData)
+      setCountyData(null);
     } catch (error) {
       console.error("Error fetching County Data", error);
     }
   };
 
 
+  // Fetch data for the selected province
+  // Fetch data for the selected county
+  const loadCountyData = async (countyID: number) => {
+    console.log("county selected year!:" + selectedYear)
+    try {
+      // First, get the county metadata to get names
+      const metadataResponse = await fetch(`http://localhost:8080/api/county/${countyID}`);
+      const metadataJson = await metadataResponse.json();
+      const sn = metadataJson.data[0].county_data.soum_name;
+      const pn = metadataJson.data[0].county_data.province_name;
+      const countyName = sn || "Unknown County";
+      const provinceName = pn || "Unknown Province";
+
+      // Then get yearly livestock data
+      const response = await fetch(
+        `http://localhost:8080/api/county/${countyID}/${selectedYear}`
+      );
+      const json_object = await response.json();
+
+      const selectedData = {
+        number_of_livestock: json_object.data[0].yearly_agg.total,
+        number_of_cattle: json_object.data[0].yearly_agg.cattle,
+        number_of_goat: json_object.data[0].yearly_agg.goat,
+        number_of_sheep: json_object.data[0].yearly_agg.sheep,
+        number_of_camel: json_object.data[0].yearly_agg.camel,
+        number_of_horse: json_object.data[0].yearly_agg.horse,
+      };
+      console.log(selectedData);
+
+      const formattedData = livestockTypes.map((livestockType) => ({
+        x: livestockType,
+        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+      }));
+
+      // Now we can use countyName and provinceName since we defined them above
+      setCountyData({
+        county_name: countyName,
+        province_name: provinceName,
+        county_land_area: "N/A",
+        county_herders: "N/A",
+        selectedYear,
+        formattedData,
+      });
+      setProvinceData(null)
+    } catch (error) {
+      console.error("Error fetching county data:", error);
+    }
+  };
+
   // Controls the Top Panel
   useEffect(() => {
-    if (provinceData) {
+    if (provinceData || countyData) {
       setTopPanelOpen(true);
     } else {
       setTopPanelOpen(false);
     }
-  }, [provinceData, setTopPanelOpen]);
+  }, [provinceData, countyData, setTopPanelOpen]);
 
   // Controls whether to open up the SidePanel Or NOT
   useEffect(() => {
@@ -212,6 +278,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       setIsPanelOpen(true);
     }
   }, [selectedProvince, setIsPanelOpen]);
+
+  useEffect(() => {
+    if (selectedCounty) {
+      setIsPanelOpen(true);
+      console.log("Selected county changed, loading data for ID:", selectedCounty);
+      loadCountyData(selectedCounty);
+    }
+  }, [selectedCounty]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
@@ -223,82 +297,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     
   }, [selectedProvince, selectedYear]);
 
-  useEffect(() => {
-    if (selectedYear && selectedCounty ) {
-      const id = selectedCounty ;
-      loadCountyData(id)
-    }
-    
-  }, [selectedCounty, selectedYear]);
-      
-
-
-
-// At the top of your file/component:
-const INITIAL_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
-
-// Zoom handling function:
-const handleZoom = (bounds: [number, number, number, number]) => {
-  if (!map) return; // 'map' comes from your Map instance via useRef/useState
-  
-  (bounds, {
-    padding: 50,
-    duration: 1000,
-    maxZoom: selectedCounty ? 10 : selectedProvince ? 8 : 5.5,
-  });
-};
-
-// Get province bounds:
-const getProvinceBounds = (provinceId: number | null): [number, number, number, number] => {
-  const province = provinces.find((p) => p.ID === provinceId);
-  return province?.view || INITIAL_BOUNDS;
-};
-
-// Correct back-button logic:
-// const handleBack = () => {
-//   if (selectedCounty) {
-//     // Exiting county -> back to province
-//     setSelectedCounty(null);
-//     handleZoom(getProvinceBounds(selectedProvince));
-//   } else if (selectedProvince) {
-//     // Exiting province -> back to entire Mongolia
-//     setSelectedProvince(null);
-//     handleZoom(INITIAL_BOUNDS);
-//   }
-
-//   // Clear province or county data if needed:
-//   setProvinceData(null);
-// };
-
-const handleProvinceBack = () => {
-  setProvinceData(null);
-  setSelectedProvince(null);
-};
-
-const handleCountyBack = () => {
-  setCountyData(null);
-  setSelectedCounty(null);
-}
-
-//   if (selectedCounty && selectedProvince) {
-//     // County -> Province
-//     setSelectedCounty(null);
-//     const provinceBounds = getProvinceBounds(selectedProvince);
-//     if (provinceBounds) {
-//       handleZoom(provinceBounds);
-//     } else {
-//       console.error("Province bounds not found for ID:", selectedProvince);
-//       handleZoom(INITIAL_BOUNDS); // fallback zoom
-//     } 
-//   } else if (selectedProvince) {
-//     // Province -> Mongolia
-//     setSelectedProvince(null);
-//     handleZoom(INITIAL_BOUNDS);
-//   }
-
-//   // Clear detailed data
-//   setLivestockData(null);
-// };
+  // Controls when to Exit Province/County Summary Mode
+  const handleBack = () => {
+    setProvinceData(null);
+    setCountyData(null);
+    setSelectedProvince(null);
+  };
 
   // Controls when to close the SidePanel
   const handlePanelToggle = () => {
@@ -306,6 +310,7 @@ const handleCountyBack = () => {
     setTopPanelOpen(true);
     if (!isPanelOpen) {
       setProvinceData(null);
+      setCountyData(null);
       setSelectedProvince(null);
     }
   };
@@ -476,7 +481,7 @@ const handleCountyBack = () => {
         }}
       >
         <Box>
-          {!countyData ? !provinceData ? (
+          {!provinceData && !countyData ? (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
@@ -484,7 +489,7 @@ const handleCountyBack = () => {
               <h1>Carrying Capacity Early Warning System</h1>
               <Divider sx={{ mb: 2 }} />
               <p>
-                Please select a province or adjust the year slider to view data.
+                Please select a province or search for a county to view data.
               </p>
               <Slide
                 name="Year"
@@ -510,8 +515,8 @@ const handleCountyBack = () => {
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleProvinceBack} label="Back" />
               </div>
-              <h1> Province Name</h1>
-              {/* <h1>{provinceData.province_name}</h1> */}
+              {/*
+              <h1>{provinceData.province_name}</h1> */}
               <p>
                 <strong>Province Land Area:</strong> {provinceData.province_land_area}{" "}
                 km²
@@ -520,6 +525,37 @@ const handleCountyBack = () => {
                 <strong>Total Herders in Province:</strong>{" "}
                 {provinceData.province_herders}
               </p>
+          */}
+              {provinceData && (
+                <>
+                  <h1>{provinceData.province_name}</h1>
+                  <p>
+                    <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
+                    km²
+                  </p>
+                  <p>
+                    <strong>Number of Herders:</strong>{" "}
+                    {provinceData.province_herders}
+                  </p>
+                </>
+              )}
+
+              {countyData && (
+                <>
+                  <h1>{countyData.county_name}</h1>
+                  <p>
+                    <strong>Province:</strong> {countyData.province_name}
+                  </p>
+                  <p>
+                    <strong>Land Area:</strong> {countyData.county_land_area}
+                  </p>
+                  <p>
+                    <strong>Number of Herders:</strong>{" "}
+                    {countyData.county_herders}
+                  </p>
+                </>
+              )}
+
               <SidePanelPercentageModal
                 isOpen={true}
                 classificationType={selectedLayerType}
@@ -557,6 +593,29 @@ const handleCountyBack = () => {
                   ]}
                   livestock={livestockTypes}
                   orientation = {false}
+                />
+                )}*/}
+              {provinceData && provinceData.formattedData && provinceData.formattedData.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: provinceData.province_name,
+                      data: provinceData.formattedData,
+                    },
+                  ]}
+                  livestock={livestockTypes}
+                />
+              )}
+
+              {countyData && countyData.formattedData && countyData.formattedData.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: countyData.county_name,
+                      data: countyData.formattedData,
+                    },
+                  ]}
+                  livestock={livestockTypes}
                 />
               )}
               {counties.length > 0 && (
@@ -683,3 +742,4 @@ const handleCountyBack = () => {
 };
 
 export default SidePanel;
+
