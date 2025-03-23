@@ -239,13 +239,11 @@ export const getCountyCellSummary = async (
       const county_id = parseInt(req.params.county_id as string, 10);
       const category_type = req.params.category_type as string;
 
-      // Validate county_id
       if (isNaN(county_id)) {
         res.status(400).json({ log: "Invalid county_id. It must be a number." });
         return;
       }
 
-      // Validate category_type
       if (!["carrying_capacity", "z_score"].includes(category_type)) {
         res.status(400).json({
           log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
@@ -253,7 +251,6 @@ export const getCountyCellSummary = async (
         return;
       }
 
-      // Fetch data
       const { data, error } = await supabase.rpc(
         "categorize_cells_by_county",
         {
