@@ -61,6 +61,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   const [counties, setCounties] = useState<any[]>([]);
   const [provinces, setProvinces] = useState<any[]>([]);
+
+  const [selectedData, setSelectedData] = useState<Record<string, number>>({});
   // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
   const [cellSummary, setCellSummary] = useState<number[]>([]);
 
@@ -123,10 +125,22 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         number_of_horse: json_object.data[0].yearly_agg.horse,
       };
 
+
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,
         y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
       }));
+
+      
+      // Fetch province grazing range percentage
+      const grResponse = await fetch(`http://localhost:8080/api/province/${provinceID}/grazing-range`);
+      const grData = await grResponse.json();
+      console.log("Grazing Range Percentage Response:", grData);
+
+      // Extract grazing range percentage (default 0 if undefined)
+      const province_gr_percentage = grData.data ? Number(grData.data) : 0;
+
+      console.log("Extracted Grazing Range Percentage:", province_gr_percentage);
 
       setProvinceData({
         selectedYear,
@@ -176,6 +190,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         province_name: county_data.province_name,
         county_livestock_data : formattedData,
       });
+      console.log(provinceData)
     } catch (error) {
       console.error("Error fetching County Data", error);
     }
@@ -313,7 +328,7 @@ const handleCountyBack = () => {
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1}}>
             <Chip
               label="Below"
               onClick={() => setShowBelowCells((prev) => !prev)}
@@ -495,7 +510,8 @@ const handleCountyBack = () => {
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handleProvinceBack} label="Back" />
               </div>
-              <h1>{provinceData.province_name}</h1>
+              <h1> Province Name</h1>
+              {/* <h1>{provinceData.province_name}</h1> */}
               <p>
                 <strong>Province Land Area:</strong> {provinceData.province_land_area}{" "}
                 km²
@@ -519,8 +535,19 @@ const handleCountyBack = () => {
                     : zScoreColors
                 }
               />
+              {/* <p>
               <h2>Livestock Data for {selectedYear}</h2>
-              {provinceData.province_livestock_data.length > 0 && (
+
+              <tab>TOTAL: {Math.floor(selectedData["number_of_livestock"])} Livestock </tab>
+              </p> */}
+              <Divider sx={{ my: 2 }} />
+              <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", marginBottom: "8px" }}>
+                <h2 style={{ margin: 0, whiteSpace: "nowrap" }}>{selectedYear} Livestock Count</h2>
+                  <p style={{ margin: 0, fontSize: "1em"}}>
+                    Total: {Math.floor(selectedData["number_of_livestock"])} livestock
+                  </p>
+              </div>
+              {provinceData.formattedData.length > 0 && (
                 <BarChart
                   datasets={[
                     {
@@ -529,6 +556,7 @@ const handleCountyBack = () => {
                     },
                   ]}
                   livestock={livestockTypes}
+                  orientation = {false}
                 />
               )}
               {counties.length > 0 && (
