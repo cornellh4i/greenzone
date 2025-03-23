@@ -20,13 +20,13 @@ interface SearchBarParams {
 }
 
 const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
-
+  console.log("HJURBUWOORKKJKJKJKRNI");
   const [selectedValue, setSelectedValue] = useState<
     | {
-      county_id: number;
-      county_name: string;
-      province_name: string;
-    }
+        county_id: number;
+        county_name: string;
+        province_name: string;
+      }
     | undefined
   >(undefined);
   console.log(countyMap);

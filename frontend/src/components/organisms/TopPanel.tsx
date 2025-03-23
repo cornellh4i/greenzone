@@ -172,17 +172,11 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen(true);
   };*/
 
-  const handleValueSelect = async (countyData: {
-    county_id: number,
-    county_name: string,
-    province_name: string
-  }) => {
+  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyData.county_id;
-    console.log("CountyData received:" + countyId);
+    const countyId = countyData.ID;
 
     if (countyId) {
-      console.log("WOHOOO IT WORKS")
       // Update the searched value with the county ID
       setSearched(countyId);
 
@@ -194,7 +188,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
 
       setSelectedCounty(countyId);
     } else {
-      console.log("hey there:", countyData.county_id);
       console.error("County ID not found for:", countyData.county_name);
     }
   };
@@ -235,7 +228,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       />
 
       <Button
-        onClick={() => { }} // Placeholder for future routing
+        onClick={() => {}} // Placeholder for future routing
         sx={{
           backgroundColor: "transparent",
           width: "50px",
