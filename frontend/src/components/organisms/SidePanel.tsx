@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck comment
+
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
 import { Box, Drawer, Divider, Typography, Switch, Chip } from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
-import Toggle from "@/components/atoms/Toggle";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
@@ -25,6 +24,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const {
     selectedProvince,
     setSelectedProvince,
+    selectedCounty,
+    setSelectedCounty,
     selectedYear,
     setSelectedYear,
     grazingRange,
@@ -55,9 +56,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   } = context;
 
   const [provinceData, setProvinceData] = useState<any | null>(null);
-  const [selectedData, setSelectedData] = useState<Record<string, number>>({});
-  // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
-  const [cellSummary, setCellSummary] = useState<number[]>([]);
+  const [countyData, setCountyData] = useState<any | null>(null);
 
   // Define color schemes & labels separately for clarity
   const carryingCapacityLabels = [
@@ -72,82 +71,120 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const zScoreColors = ["#3F7F7F", "#00008B", "#800080"];
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const loadProvinceCellSummary = async (
-    provinceId: number,
-    categoryType: string
+
+  const loadEntityCellSummary = async (
+    entityType: string,
+    entityID: number,
+    categoryType: LayerType | null
   ) => {
+    console.log(entityID);
+    console.log(entityType);
+    console.log(categoryType);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+        `http://localhost:8080/api/${entityType}/${entityID}/${categoryType}/cell-summary` // !!!!! change the api to include province or county
       );
-      const json = await response.json();
+
+      const response_json = await response.json();
       const percentages = [
-        json.data[0].cat1_percentage,
-        json.data[0].cat2_percentage,
-        json.data[0].cat3_percentage,
+        response_json.data[0].cat1_percentage || 0,
+        response_json.data[0].cat2_percentage || 0,
+        response_json.data[0].cat3_percentage || 0,
       ];
-      if (json.data) {
-        setCellSummary(percentages);
-      } else {
-        setCellSummary([]);
-      }
+      if (response_json.data) {
+        return percentages;
+      } else return [];
     } catch (error) {
-      console.error("Error fetching cell summary data:", error);
+      console.error("Error fetching Entity CellSummary:", error);
     }
   };
 
-  // Fetch data for the selected province
-  const loadProvinceData = async (provinceID: number, displayName: string) => {
+  const loadEntityLivestock = async (entityType: string, entityID: number) => {
     try {
-      console.log(selectedYear);
-      console.log(provinceID);
       const response = await fetch(
-        `http://localhost:8080/api/province/${provinceID}/${selectedYear}`
+        `http://localhost:8080/api/${entityType}/${entityID}/${selectedYear}/livestock`
       );
-      const json_object = await response.json();
-      console.log(json_object.data[0].yearly_agg.total);
-
-      const { province_name, province_land_area, province_herders} =
-        json_object;
-
-      setSelectedData ({
-        number_of_livestock: json_object.data[0].yearly_agg.total,
-        number_of_cattle: json_object.data[0].yearly_agg.cattle,
-        number_of_goat: json_object.data[0].yearly_agg.goat,
-        number_of_sheep: json_object.data[0].yearly_agg.sheep,
-        number_of_camel: json_object.data[0].yearly_agg.camel,
-        number_of_horse: json_object.data[0].yearly_agg.horse,
-      });
-      console.log(selectedData);
-
+      const response_json = await response.json();
+      const livestock_data = {
+        number_of_livestock: response_json.data[0].yearly_agg.total,
+        number_of_cattle: response_json.data[0].yearly_agg.cattle,
+        number_of_goat: response_json.data[0].yearly_agg.goat,
+        number_of_sheep: response_json.data[0].yearly_agg.sheep,
+        number_of_camel: response_json.data[0].yearly_agg.camel,
+        number_of_horse: response_json.data[0].yearly_agg.horse,
+      };
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,
-        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+        y: livestock_data[`number_of_${livestockType.toLowerCase()}`] || 0,
       }));
 
-      
-      // Fetch province grazing range percentage
-      const grResponse = await fetch(`http://localhost:8080/api/province/${provinceID}/grazing-range`);
-      const grData = await grResponse.json();
-      console.log("Grazing Range Percentage Response:", grData);
-
-      // Extract grazing range percentage (default 0 if undefined)
-      const province_gr_percentage = grData.data ? Number(grData.data) : 0;
-
-      console.log("Extracted Grazing Range Percentage:", province_gr_percentage);
-
-      setProvinceData({
-        displayName,
-        province_name,
-        province_land_area,
-        province_herders,
-        selectedYear,
-        formattedData,
-        province_gr_percentage,
-      });
-      console.log(provinceData)
+      if (response_json.data) {
+        return formattedData;
+      } else return [];
     } catch (error) {
-      console.error("Error fetching province data:", error);
+      console.error("Error fetching Entity Livestock:", error);
+    }
+  };
+
+  const loadEntityStats = async (entityType: string, entityID: number) => {
+    try {
+      // will be fixed later! for now we fix the values
+      const response = await fetch(
+        `http://localhost:8080/api/${entityType}/${entityID}`
+      );
+      const response_json = await response.json();
+      console.log(response_json);
+      const entityData = {
+        entityName:
+          response_json.data[0][`${entityType}_data`][
+            entityType === "county" ? "soum_name" : "province_name"
+          ],
+        entityLandArea: "1000",
+        entityHerders: "360",
+        entityGrazingRange: "300",
+      };
+      return entityData;
+    } catch (error) {
+      console.error("Error fetching Entity Statistics:", error);
+    }
+  };
+
+  const loadEntityData = async () => {
+    try {
+      if (selectedCounty) {
+        // if a county is selected- MAKE SURE Province first then county
+        const [countyStats, countyCellSummary, countyLivestock] =
+          await Promise.all([
+            loadEntityStats("county", selectedCounty),
+            loadEntityCellSummary("county", selectedCounty, selectedLayerType),
+            loadEntityLivestock("county", selectedCounty),
+          ]);
+        setCountyData({
+          countyStats,
+          countyCellSummary,
+          countyLivestock,
+        });
+      } else if (selectedProvince) {
+        const [provinceStats, provinceCellSummary, provinceLivestock] =
+          await Promise.all([
+            loadEntityStats("province", selectedProvince),
+            loadEntityCellSummary(
+              "province",
+              selectedProvince,
+              selectedLayerType
+            ),
+            loadEntityLivestock("province", selectedProvince),
+          ]);
+        setProvinceData({
+          provinceStats,
+          provinceCellSummary,
+          provinceLivestock,
+        });
+      } else {
+        return;
+      }
+    } catch (error) {
+      console.error("Error fetching Entity Data:", error);
     }
   };
 
@@ -162,23 +199,36 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   // Controls whether to open up the SidePanel Or NOT
   useEffect(() => {
-    if (selectedProvince) {
+    console.log("AHHHHHHH");
+    if (selectedProvince || selectedCounty) {
       setIsPanelOpen(true);
     }
-  }, [selectedProvince, setIsPanelOpen]);
+  }, [selectedProvince, selectedCounty, setIsPanelOpen]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
+    console.log(provinceData);
     if (selectedYear && selectedProvince) {
-      loadProvinceCellSummary(selectedProvince, selectedLayerType);
-      loadProvinceData(selectedProvince, displayName);
+      loadEntityData();
     }
   }, [selectedProvince, selectedYear]);
 
+  useEffect(() => {
+    if (selectedYear && selectedCounty) {
+      loadEntityData();
+    }
+  }, [selectedCounty, selectedYear]);
+
   // Controls when to Exit Province/County Summary Mode
-  const handleBack = () => {
+  const handleProvinceToMap = () => {
     setProvinceData(null);
     setSelectedProvince(null);
+    setCountyData(null);
+    setSelectedCounty(null);
+  };
+  const handleCountyToProvince = () => {
+    setCountyData(null);
+    setSelectedCounty(null);
   };
   // Controls when to close the SidePanel
   const handlePanelToggle = () => {
@@ -201,6 +251,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setShowPositiveCells(false);
     setShowZeroCells(false);
   };
+  console.log(selectedProvince);
 
   const options = [
     {
@@ -208,7 +259,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
-          <Box sx={{ display: "flex", gap: 1}}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Chip
               label="Below"
               onClick={() => setShowBelowCells((prev) => !prev)}
@@ -356,7 +407,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         }}
       >
         <Box>
-          {!provinceData ? (
+          {!selectedProvince ? (
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
@@ -387,24 +438,49 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           ) : (
             <div>
-              <div style={{ position: "absolute", top: "10px", right: "10px"}}>
-                <Button onClick={handleBack} label="Back" />
+              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+                <Button
+                  onClick={
+                    selectedCounty
+                      ? handleCountyToProvince
+                      : handleProvinceToMap
+                  }
+                  label="Back"
+                />
               </div>
-              <h1> Province Name</h1>
-              {/* <h1>{provinceData.province_name}</h1> */}
+              <h1> NAME </h1>
+              <h1>
+                {selectedCounty
+                  ? countyData.countyStats.entityName
+                  : provinceData.provinceStats.entityName}
+              </h1>
               <p>
-                {/* {provinceData.province_land_area}{" "} <strong>km²</strong> &emsp; 
-                {provinceData.province_herders} {" "} <strong> herders</strong> */}
-                {12}{" "} <strong>km²</strong> &emsp; {56} {" "} <strong> herders</strong>
+                {selectedCounty
+                  ? countyData.countyStats.entityLandArea
+                  : provinceData.provinceStats.entityLandArea}{" "}
+                <strong>km²</strong> &emsp;
+                {selectedCounty
+                  ? countyData.countyStats.entityHerders
+                  : provinceData.provinceStats.entityHerders}{" "}
+                <strong> herders </strong>
+                {selectedCounty
+                  ? countyData.countyStats.entityGrazingRange
+                  : provinceData.provinceStats.entityGrazingRange}{" "}
+                <strong>% grazing range</strong>
+                {selectedCounty
+                  ? countyData.countyStats.entityCitzens
+                  : provinceData.provinceStats.entityCitizens}{" "}
+                <strong>citizens</strong> &emsp;
               </p>
-              <p>
-                {/* {provinceData.province_herders} {" "} <strong>citizens</strong> &emsp;{provinceData.grazingRangePercentage} {" "} <strong>% grazing range</strong>              */}
-                {183}{" "}<strong>citizens</strong> &emsp; {provinceData.province_gr_percentage}<strong>% grazing range</strong>
-              </p>
+
               <SidePanelPercentageModal
                 isOpen={true}
                 classificationType={selectedLayerType}
-                classificationValues={cellSummary}
+                classificationValues={
+                  selectedCounty
+                    ? countyData.countyCellSummary
+                    : provinceData.provinceCellSummary
+                }
                 classificationLabels={
                   selectedLayerType === LayerType.CarryingCapacity
                     ? carryingCapacityLabels
@@ -416,27 +492,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                     : zScoreColors
                 }
               />
-              {/* <p>
-              <h2>Livestock Data for {selectedYear}</h2>
-              <tab>TOTAL: {Math.floor(selectedData["number_of_livestock"])} Livestock </tab>
-              </p> */}
               <Divider sx={{ my: 2 }} />
-              <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px", marginBottom: "8px" }}>
-                <h2 style={{ margin: 0, whiteSpace: "nowrap" }}>{selectedYear} Livestock Count</h2>
-                  <p style={{ margin: 0, fontSize: "1em"}}>
-                    Total: {Math.floor(selectedData["number_of_livestock"])} livestock
-                  </p>
-              </div>
-              {provinceData.formattedData.length > 0 && (
+              {(selectedCounty
+                ? countyData.formattedData
+                : provinceData.formattedData
+              ).length > 0 && (
                 <BarChart
                   datasets={[
                     {
-                      aimag: provinceData.province_name,
-                      data: provinceData.formattedData,
+                      aimag: selectedCounty
+                        ? countyData.county_name
+                        : provinceData.province_name,
+                      data: selectedCounty
+                        ? countyData.formattedData
+                        : provinceData.formattedData,
                     },
                   ]}
                   livestock={livestockTypes}
-                  orientation = {false}
+                  orientation={false}
                 />
               )}
             </div>

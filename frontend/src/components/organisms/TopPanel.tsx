@@ -166,13 +166,10 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     loadCountyData();
   }, []);
 
-  /*const handleValueSelect = async (provinceData: { value: number }) => {
-    setSearched(provinceData.value);
-    setDisplayName(provinceData);
-    setTopPanelOpen(true);
-  };*/
-
-  const handleValueSelect = async (countyData: { ID: number, name: string }) => {
+  const handleValueSelect = async (countyData: {
+    ID: number;
+    name: string;
+  }) => {
     // Retrieve the county ID from the countyMap using the selected county name
     const countyId = countyData.ID;
 
@@ -182,10 +179,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
 
       // Update the display name with the selected county name
       setDisplayName({ value: countyData.county_name });
-
-      // Open the top panel (if needed)
       setTopPanelOpen(true);
-
       setSelectedCounty(countyId);
     } else {
       console.error("County ID not found for:", countyData.county_name);
@@ -245,58 +239,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       />
     </div>
   );
-  //   <div
-  //     style={{
-  //       display: "flex",
-  //       alignItems: "center",
-  //       justifyContent: "space-between", // Adjusts layout distribution
-  //       gap: "15px",
-  //       padding: "10px",
-  //       backgroundColor: "rgba(255, 255, 255, 0.8)",
-  //       borderRadius: "15px",
-  //       boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
-  //     }}
-  //   >
-  //     <div style={{ flex: 1 }}>
-  //       <SearchBar uniqueData={uniqueData} onValueSelect={handleValueSelect} />
-  //     </div>
-
-  //     <Context.Provider value={context}>
-  //       <TopPanelLayerTypeSwitch />
-  //     </Context.Provider>
-
-  //     <Button
-  //       onClick={() => navigateTo("/landing")}
-  //       sx={{
-  //         backgroundColor: "grey",
-  //         width: "50px",
-  //         height: "50px",
-  //         display: "flex",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         borderRadius: "12px",
-  //       }}
-  //       startIcon={<HomeIcon />}
-  //     />
-
-  //     <Button
-  //       onClick={() => {}} // Placeholder for future routing
-  //       sx={{
-  //         backgroundColor: "transparent",
-  //         width: "50px",
-  //         height: "50px",
-  //         display: "flex",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //       }}
-  //       startIcon={
-  //         <Avatar sx={{ width: "40px", height: "40px" }}>
-  //           <PersonIcon />
-  //         </Avatar>
-  //       }
-  //     />
-  //   </div>
-  // );
 };
 
 export default TopPanel;

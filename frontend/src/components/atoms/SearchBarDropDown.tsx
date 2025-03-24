@@ -32,7 +32,6 @@ const Dropdown: React.FC<DropdownProps> = ({
   onInputChange,
   sx,
 }) => {
-  console.log(options);
   return (
     <Autocomplete
       options={options}
