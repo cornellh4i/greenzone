@@ -7,12 +7,14 @@ interface DropdownProps {
     county_id: number;
     county_name: string;
     province_name: string;
+    province_id: number;
   }[];
   value:
     | {
         county_id: number;
         county_name: string;
         province_name: string;
+        province_id: number;
       }
     | undefined;
 
@@ -20,6 +22,7 @@ interface DropdownProps {
     county_id: number;
     county_name: string;
     province_name: string;
+    province_id: number;
   }) => void;
   onInputChange: (inputValue: string) => void;
   sx?: React.CSSProperties;
@@ -32,7 +35,6 @@ const Dropdown: React.FC<DropdownProps> = ({
   onInputChange,
   sx,
 }) => {
-  console.log(options);
   return (
     <Autocomplete
       options={options}
@@ -46,6 +48,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           county_id: newValue.county_id,
           county_name: newValue.county_name,
           province_name: newValue.province_name,
+          province_id: newValue.province_id,
         });
       }}
       renderOption={(props, option) => (
