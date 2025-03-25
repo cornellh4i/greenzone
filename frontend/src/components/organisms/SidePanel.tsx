@@ -33,6 +33,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     selectedLayerType,
     setSelectedLayerType,
 
+    showGeneralPanel,
+    setShowGeneralPanel,
+
     isPanelOpen,
     setIsPanelOpen,
     setTopPanelOpen,
@@ -151,20 +154,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   const loadEntityData = async () => {
     try {
-      if (selectedCounty) {
-        // if a county is selected- MAKE SURE Province first then county
-        const [countyStats, countyCellSummary, countyLivestock] =
-          await Promise.all([
-            loadEntityStats("county", selectedCounty),
-            loadEntityCellSummary("county", selectedCounty, selectedLayerType),
-            loadEntityLivestock("county", selectedCounty),
-          ]);
-        setCountyData({
-          countyStats,
-          countyCellSummary,
-          countyLivestock,
-        });
-      } else if (selectedProvince) {
+      // Always load province data first if needed
+      if (selectedProvince && !provinceData) {
         const [provinceStats, provinceCellSummary, provinceLivestock] =
           await Promise.all([
             loadEntityStats("province", selectedProvince),
@@ -180,8 +171,17 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           provinceCellSummary,
           provinceLivestock,
         });
-      } else {
-        return;
+      }
+
+      // Then load county data if selected
+      if (selectedCounty) {
+        const [countyStats, countyCellSummary, countyLivestock] =
+          await Promise.all([
+            loadEntityStats("county", selectedCounty),
+            loadEntityCellSummary("county", selectedCounty, selectedLayerType),
+            loadEntityLivestock("county", selectedCounty),
+          ]);
+        setCountyData({ countyStats, countyCellSummary, countyLivestock });
       }
     } catch (error) {
       console.error("Error fetching Entity Data:", error);
@@ -198,24 +198,23 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   }, [provinceData, setTopPanelOpen]);
 
   // Controls whether to open up the SidePanel Or NOT
-  useEffect(() => {
-    console.log("AHHHHHHH");
-    if (selectedProvince || selectedCounty) {
-      setIsPanelOpen(true);
-    }
-  }, [selectedProvince, selectedCounty, setIsPanelOpen]);
+  // useEffect(() => {
+  //   if (selectedProvince || selectedCounty) {
+  //     setIsPanelOpen(true);
+  //   }
+  // }, [selectedProvince, selectedCounty, setIsPanelOpen]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
-    console.log(provinceData);
     if (selectedYear && selectedProvince) {
       loadEntityData();
+      setIsPanelOpen(true);
     }
   }, [selectedProvince, selectedYear]);
-
   useEffect(() => {
-    if (selectedYear && selectedCounty) {
+    if (selectedYear && selectedCounty && provinceData) {
       loadEntityData();
+      setIsPanelOpen(true);
     }
   }, [selectedCounty, selectedYear]);
 
@@ -225,6 +224,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setSelectedProvince(null);
     setCountyData(null);
     setSelectedCounty(null);
+    setShowGeneralPanel(false);
   };
   const handleCountyToProvince = () => {
     setCountyData(null);
@@ -251,7 +251,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setShowPositiveCells(false);
     setShowZeroCells(false);
   };
-  console.log(selectedProvince);
 
   const options = [
     {
@@ -388,7 +387,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         anchor="left"
         open={isPanelOpen ?? false}
         onClose={handlePanelToggle}
-        variant="persistent" // Allows interaction with the background
+        variant="persistent"
         PaperProps={{
           sx: {
             width: "35vw",
@@ -398,7 +397,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "6.1%", // Ensures the Drawer starts below the TopPanel
+            marginTop: "6.1%",
           },
         }}
         sx={{
@@ -407,7 +406,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         }}
       >
         <Box>
-          {!selectedProvince ? (
+          {!provinceData ? (
+            // General panel when no province data exists
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
                 <Button onClick={handlePanelToggle} label="Close" />
@@ -436,51 +436,27 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 />
               </div>
             </div>
-          ) : (
+          ) : provinceData && !countyData ? (
+            // Province details panel
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                <Button
-                  onClick={
-                    selectedCounty
-                      ? handleCountyToProvince
-                      : handleProvinceToMap
-                  }
-                  label="Back"
-                />
+                <Button onClick={handleProvinceToMap} label="Back" />
               </div>
-              <h1> NAME </h1>
-              <h1>
-                {selectedCounty
-                  ? countyData.countyStats.entityName
-                  : provinceData.provinceStats.entityName}
-              </h1>
+              <h1>{provinceData.provinceStats.entityName}</h1>
               <p>
-                {selectedCounty
-                  ? countyData.countyStats.entityLandArea
-                  : provinceData.provinceStats.entityLandArea}{" "}
-                <strong>km²</strong> &emsp;
-                {selectedCounty
-                  ? countyData.countyStats.entityHerders
-                  : provinceData.provinceStats.entityHerders}{" "}
-                <strong> herders </strong>
-                {selectedCounty
-                  ? countyData.countyStats.entityGrazingRange
-                  : provinceData.provinceStats.entityGrazingRange}{" "}
-                <strong>% grazing range</strong>
-                {selectedCounty
-                  ? countyData.countyStats.entityCitzens
-                  : provinceData.provinceStats.entityCitizens}{" "}
-                <strong>citizens</strong> &emsp;
+                {provinceData.provinceStats.entityLandArea} <strong>km²</strong>{" "}
+                &emsp;
+                {provinceData.provinceStats.entityHerders}{" "}
+                <strong>herders</strong> &emsp;
+                {provinceData.provinceStats.entityGrazingRange}{" "}
+                <strong>% grazing range</strong> &emsp;
+                {provinceData.provinceStats.entityCitizens}{" "}
+                <strong>citizens</strong>
               </p>
-
               <SidePanelPercentageModal
                 isOpen={true}
                 classificationType={selectedLayerType}
-                classificationValues={
-                  selectedCounty
-                    ? countyData.countyCellSummary
-                    : provinceData.provinceCellSummary
-                }
+                classificationValues={provinceData.provinceCellSummary}
                 classificationLabels={
                   selectedLayerType === LayerType.CarryingCapacity
                     ? carryingCapacityLabels
@@ -493,19 +469,58 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 }
               />
               <Divider sx={{ my: 2 }} />
-              {(selectedCounty
-                ? countyData.formattedData
-                : provinceData.formattedData
-              ).length > 0 && (
+              {provinceData.provinceLivestock?.length > 0 && (
                 <BarChart
                   datasets={[
                     {
-                      aimag: selectedCounty
-                        ? countyData.county_name
-                        : provinceData.province_name,
-                      data: selectedCounty
-                        ? countyData.formattedData
-                        : provinceData.formattedData,
+                      aimag: provinceData.province_name,
+                      data: provinceData.provinceLivestock,
+                    },
+                  ]}
+                  livestock={livestockTypes}
+                  orientation={false}
+                />
+              )}
+            </div>
+          ) : (
+            // County details panel
+            <div>
+              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+                <Button onClick={handleCountyToProvince} label="Back" />
+              </div>
+              <h1>{countyData.countyStats.entityName}</h1>
+              <p>
+                {countyData.countyStats.entityLandArea} <strong>km²</strong>{" "}
+                &emsp;
+                {countyData.countyStats.entityHerders} <strong>herders</strong>{" "}
+                &emsp;
+                {countyData.countyStats.entityGrazingRange}{" "}
+                <strong>% grazing range</strong> &emsp;
+                {countyData.countyStats.entityCitizens}{" "}
+                <strong>citizens</strong>
+              </p>
+              <SidePanelPercentageModal
+                isOpen={true}
+                classificationType={selectedLayerType}
+                classificationValues={countyData.countyCellSummary}
+                classificationLabels={
+                  selectedLayerType === LayerType.CarryingCapacity
+                    ? carryingCapacityLabels
+                    : zScoreLabels
+                }
+                classificationColourScheme={
+                  selectedLayerType === LayerType.CarryingCapacity
+                    ? carryingCapacityColors
+                    : zScoreColors
+                }
+              />
+              <Divider sx={{ my: 2 }} />
+              {countyData.countyLivestock?.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: countyData.county_name,
+                      data: countyData.countyLivestock,
                     },
                   ]}
                   livestock={livestockTypes}
@@ -515,40 +530,27 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           )}
         </Box>
+
+        {/* Rest of the drawer content */}
         <Divider sx={{ my: 2 }} />
-        {/* Row with icon, heading, and switch */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 0.5, // small margin bottom before the text below
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
           <AgricultureIcon sx={{ mr: 1 }} />
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{ mr: "auto" }} // pushes the switch to the right
-          >
+          <Typography variant="h6" component="h2" sx={{ mr: "auto" }}>
             Grazing Range
           </Typography>
           <Switch
             checked={grazingRange ?? false}
             onChange={(e) => setGrazingRange(e.target.checked)}
             sx={{
-              // Override track color when on
               "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "#2E7D32", // dark green
+                backgroundColor: "#2E7D32",
               },
-              // Override the thumb color when on
               "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#ffffff", // white thumb
+                color: "#ffffff",
               },
             }}
           />
         </Box>
-
-        {/* Descriptive text below */}
         <Typography variant="body2" color="text.secondary">
           View data only in land categorized as a grazing range.
         </Typography>

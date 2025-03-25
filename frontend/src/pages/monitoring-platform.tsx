@@ -13,6 +13,7 @@ const MonitoringPlatform: React.FC = () => {
   const [selectedLayerType, setSelectedLayerType] = useState(
     LayerType.CarryingCapacity
   );
+  const [showGeneralPanel, setShowGeneralPanel] = useState(true);
   // Associated with Carrying Capacity
 
   const [showBelowCells, setShowBelowCells] = useState(false);
@@ -43,6 +44,9 @@ const MonitoringPlatform: React.FC = () => {
     setTopPanelOpen,
     searched,
     setSearched,
+
+    showGeneralPanel,
+    setShowGeneralPanel,
 
     selectedLayerType,
     setSelectedLayerType,

@@ -146,11 +146,13 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           var countyId = county.county_id;
           var countyName = county.county_data.soum_name;
           var provinceName = county.county_data.province_name;
+          var provinceId = county.province_id;
           if (countyId && countyName && provinceName) {
             countyDictionary[countyId] = {
               county_id: countyId,
               county_name: countyName,
               province_name: provinceName,
+              province_id: provinceId,
             };
           }
         }
@@ -167,23 +169,21 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   }, []);
 
   const handleValueSelect = async (countyData: {
-    ID: number;
-    name: string;
+    county_id: number;
+    county_name: string;
+    province_name: string;
+    province_id: number;
   }) => {
     // Retrieve the county ID from the countyMap using the selected county name
-    const countyId = countyData.ID;
+    setSelectedCounty(null);
+    setSelectedProvince(null);
 
-    if (countyId) {
-      // Update the searched value with the county ID
-      setSearched(countyId);
+    // Set province first
+    setSelectedProvince(countyData.province_id);
 
-      // Update the display name with the selected county name
-      setDisplayName({ value: countyData.county_name });
-      setTopPanelOpen(true);
-      setSelectedCounty(countyId);
-    } else {
-      console.error("County ID not found for:", countyData.county_name);
-    }
+    // After a short delay, set county (allows province data to load)
+
+    setSelectedCounty(countyData.county_id);
   };
   if (!countyMap) return <div>LOADING</div>;
   return (

@@ -33,6 +33,14 @@ interface CellGeometry {
   vertices: [number, number][];
   grazing_range: boolean; // Add grazing boolean value
 }
+type Bounds = [number, number, number, number];
+
+interface ProvinceView {
+  [provinceId: number]: Bounds;
+}
+interface CountyView {
+  [countyId: number]: Bounds;
+}
 const INITIAL_VIEW_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -42,6 +50,8 @@ const MapComponent: React.FC<{
 }> = ({ onMapReady }) => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
+  const [provinceViews, setProvinceViews] = useState<ProvinceView | null>(null);
+  const [countyViews, setCountyViews] = useState<CountyView | null>(null);
   // const [showCells, setShowCells] = useState(false);
   const [map, setMap] = useState<MapRef | null>(null);
   // const [cells, setCells] = useState<CellGeometry[]>([]);
@@ -175,11 +185,11 @@ const MapComponent: React.FC<{
   const loadProvinceGeometries = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/provincegeo");
-
+      const provViews: ProvinceView = {};
       const json_object = await response.json();
       const geojsonData = json_object.data;
       const deckProvinceProj = geojsonData.map((feature: any) => {
-        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+        const bounds: Bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
         feature.province_geometry.coordinates[0][0].forEach(
           ([lng, lat]: [number, number]) => {
@@ -189,6 +199,7 @@ const MapComponent: React.FC<{
             bounds[3] = Math.max(bounds[3], lat); // Max latitude
           }
         );
+        provViews[feature.province_id] = bounds;
         return {
           type: "Polygon",
           coordinates: feature.province_geometry.coordinates[0],
@@ -197,19 +208,24 @@ const MapComponent: React.FC<{
           areaType: SelectedType.Province,
         };
       });
+      setProvinceViews(provViews);
       setProvinces(deckProvinceProj);
     } catch (error) {
       console.error("Error fetching province data:", error);
     }
   };
 
-  const loadCountiesGeometries = async () => {
+  //  change  to load countie for specific province
+  const loadCountiesGeometriesByProvince = async (province_id: number) => {
     try {
-      const response = await fetch("http://localhost:8080/api/countygeo");
+      const response = await fetch(
+        `http://localhost:8080/api/county/geom/${province_id}`
+      );
       const json_object = await response.json();
+      const soumViews: CountyView = {};
       const geojsonData = json_object.data;
       const deckSoumProj = geojsonData.map((feature: any) => {
-        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+        const bounds: Bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
         feature.county_geometry.coordinates[0].forEach(
           ([lng, lat]: [number, number]) => {
@@ -219,6 +235,7 @@ const MapComponent: React.FC<{
             bounds[3] = Math.max(bounds[3], lat); // Max latitude
           }
         );
+        soumViews[feature.county_id] = bounds;
         return {
           type: "Polygon",
           coordinates: feature.county_geometry.coordinates[0],
@@ -227,6 +244,7 @@ const MapComponent: React.FC<{
           areaType: SelectedType.County,
         };
       });
+      setCountyViews(soumViews);
       setSoums(deckSoumProj);
     } catch (error) {
       console.error("Error fetching province data:", error);
@@ -236,49 +254,44 @@ const MapComponent: React.FC<{
   const handleZoom = (bounds: [number, number, number, number] | null) => {
     if (map && bounds) {
       map.fitBounds(bounds, {
-        padding: 50, // Add padding to ensure the province is not cut off
-        maxZoom: selectedCounty ? 10 : selectedProvince ? 8 : 5.5,
-        duration: 1500, // Smooth animation duration (in ms)
+        padding: 50,
+        maxZoom: selectedCounty ? 9 : selectedProvince ? 8 : 5.5,
+        duration: 1000, // Smooth animation duration (in ms)
       });
     }
   };
 
-  const handleMapClick = (
-    view: [number, number, number, number] | null,
-    ID: number | null,
-    areaType: SelectedType | null
-  ) => {
+  const ZoomProcess = () => {
     // Province is clicked (only if no province is already selected):
-    if (areaType === SelectedType.Province && !selectedProvince) {
-      console.log("Inereeher and you clock province");
-      setSelectedProvince(ID);
-      setSelectedCounty(null);
-      if (view) handleZoom(view);
+    if (selectedProvince) {
+      loadCountiesGeometriesByProvince(selectedProvince);
 
+      // Use optional chaining and type assertion
+      const provinceView = provinceViews?.[selectedProvince] as
+        | Bounds
+        | undefined;
+
+      if (provinceView) {
+        handleZoom(provinceView);
+      }
       return;
     }
-
     // County is clicked (only if a province is already selected)
-    if (areaType === SelectedType.County && selectedProvince) {
-      setSelectedCounty(ID);
-      if (view) handleZoom(view);
-      return;
-    }
+    if (selectedProvince && selectedCounty) {
+      const countyView = countyViews?.[selectedCounty] as Bounds | undefined;
 
-    // If we clicked outside any polygon:
-    if (!areaType) {
-      // Reset to entire country
-      setSelectedProvince(null);
-      setSelectedCounty(null);
-      handleZoom(INITIAL_VIEW_BOUNDS);
+      if (countyView) {
+        handleZoom(countyView);
+      }
+      return;
     }
   };
-  useEffect(() => {
-    console.log(selectedProvince);
-  }, [selectedProvince]);
 
   useEffect(() => {
-    loadCountiesGeometries();
+    ZoomProcess();
+  }, [selectedCounty, selectedProvince]);
+
+  useEffect(() => {
     loadProvinceGeometries();
     loadCarryingCapacityCells();
     loadZScoreCells();
@@ -293,15 +306,13 @@ const MapComponent: React.FC<{
     getLineColor: [0, 0, 0],
     getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 1,
-    pickable: true,
-    autoHighlight: true,
-    highlightColor: [1000, 20, 20, 20],
+    pickable: !selectedProvince,
+    autoHighlight: !selectedProvince,
+    highlightColor: [255, 100, 100, 100],
     onClick: ({ object }) => {
-      console.log("justhsowmemee");
-      if (object) {
-        handleMapClick(object.view, object.ID, object.areaType);
-      } else {
-        handleMapClick(null, null, null); // Click outside the polygons
+      if (object && !selectedProvince) {
+        setSelectedProvince(object.ID);
+        // handleMapClick(object.view, object.ID, object.areaType);
       }
     },
   });
@@ -309,18 +320,20 @@ const MapComponent: React.FC<{
     id: "soum-layer",
     data: soums,
     getPolygon: (d) => d.coordinates,
-    // filled: true,
     getLineColor: [0, 0, 0, 70],
     getFillColor: [0, 0, 0, 0],
     lineWidthMinPixels: 0.8,
-    pickable: false,
-    autoHighlight: false,
+    pickable: !!selectedProvince,
+    autoHighlight: !!selectedProvince,
+    highlightColor: [255, 100, 100, 100],
     onClick: ({ object }) => {
-      if (object) {
-        handleMapClick(object.view, object.ID, object.areaType);
-      } else {
-        handleMapClick(null, null, null); // Click outside the polygons
+      if (object && selectedProvince) {
+        setSelectedCounty(object.ID);
       }
+      // } else if (!object) {
+      //   // Click outside polygons
+      //   handleMapClick(null, null, null);
+      // }
     },
   });
 
@@ -392,7 +405,6 @@ const MapComponent: React.FC<{
     getPosition: (d) => d.vertices,
     getRadius: 5000, // Adjust size
     getFillColor: [0, 128, 128, 200], // Teal color
-
     pickable: true,
   });
 
@@ -404,7 +416,9 @@ const MapComponent: React.FC<{
     if (!map) return; // Ensure map is loaded
     const layers = [];
     layers.push(provinceLayer);
-    layers.push(soumLayer);
+    if (selectedProvince && soums) {
+      layers.push(soumLayer);
+    }
     if (selectedLayerType == LayerType.ZScore) {
       if (showNegativeCells) layers.push(cellsNegativeLayer);
       if (showZeroCells) layers.push(cellsZeroLayer);
@@ -443,7 +457,7 @@ const MapComponent: React.FC<{
     }
   }, [map, onMapReady, soums]);
 
-  if (!provinces || (provinces.length === 0 && !soums) || soums.length === 0) {
+  if (!provinces || provinces.length === 0) {
     return <div>Loading...</div>;
   }
 

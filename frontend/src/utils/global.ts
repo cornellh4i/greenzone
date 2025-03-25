@@ -9,7 +9,7 @@ export enum LayerType {
 
 export enum SelectedType {
   Province = "province",
-  County = "county"
+  County = "county",
 }
 
 export type GlobalContext = {
@@ -41,6 +41,8 @@ export type GlobalContext = {
   setShowAtCapCells: SetState<boolean>;
   showAboveCells: boolean | null;
   setShowAboveCells: SetState<boolean>;
+  showGeneralPanel: boolean | null;
+  setShowGeneralPanel: SetState<boolean>;
 
   // Z-Score NDVI Related
 

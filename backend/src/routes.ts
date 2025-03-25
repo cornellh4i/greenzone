@@ -33,6 +33,7 @@ import {
   getCountyGeometryByID,
   getCountyLivestockByID,
   getCountyCellSummary,
+  getCountiesGeomInProvince,
 } from "./controller/County";
 import {
   getBMCellsBelow,
@@ -114,6 +115,7 @@ router.get(
 router.post("/county", createCounty);
 router.get("/county", getCounties);
 router.get("/countygeo", getCountyGeometry);
+router.get("/county/geom/:province_id", getCountiesGeomInProvince);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
 router.get("/county/:county_id/:year/livestock", getCountyLivestockByID);

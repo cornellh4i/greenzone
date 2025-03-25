@@ -215,7 +215,34 @@ export const getCountyCellSummary = async (
     }
   }
 };
+export const getCountiesGeomInProvince = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      const province_id = parseInt(req.params.province_id as string, 10);
+      const { data, error } = await supabase.rpc(
+        "retrieve_counties_geom_in_province",
+        {
+          p_id: province_id,
+        }
+      );
+      // Error handling in case the query fails
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
 
+      res
+        .status(201)
+        .json({ log: "Data was successfully collected", data: data });
+    } catch (error) {}
+  }
+};
 export const updateCounty = async (
   req: Request,
   res: Response
