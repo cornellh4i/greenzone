@@ -4,13 +4,23 @@
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
-import { Box, Drawer, Divider, Typography, Switch, Chip } from "@mui/material";
+import {
+  Box,
+  Drawer,
+  Divider,
+  Typography,
+  Switch,
+  Chip,
+  IconButton,
+} from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import CloseIcon from "@mui/icons-material/Close";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -383,6 +393,30 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   return (
     <div>
+      <Box
+        sx={{
+          position: "fixed",
+          left: isPanelOpen ? "calc(35vw - 24px)" : "-24px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 1201,
+          transition: "left 0.3s",
+          maxLeft: "376px", // 400px - 24px
+        }}
+      >
+        <IconButton
+          onClick={handlePanelToggle}
+          sx={{
+            backgroundColor: "background.paper",
+            borderRadius: "0 4px 4px 0",
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
+          }}
+        >
+          {isPanelOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+      </Box>
       <Drawer
         anchor="left"
         open={isPanelOpen ?? false}
@@ -397,21 +431,22 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "6.1%",
+            marginTop: "70px", // Match top panel height
+            height: "calc(100% - 70px)", // Prevent bottom overflow
           },
         }}
         sx={{
-          zIndex: 1200,
-          position: "relative",
+          zIndex: 1200, // Lower than top panel
+          position: "fixed",
+          top: "70px", // Start below top panel
+          left: 0,
+          bottom: 0,
         }}
       >
         <Box>
           {!provinceData ? (
             // General panel when no province data exists
             <div>
-              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                <Button onClick={handlePanelToggle} label="Close" />
-              </div>
               <h1>Carrying Capacity Early Warning System</h1>
               <Divider sx={{ mb: 2 }} />
               <p>

@@ -49,9 +49,9 @@ const TopPanelLayerTypeSwitch = () => {
   const buttonStyle = (isActive: boolean | null, color: string) => ({
     backgroundColor: isActive ? color : "grey",
     borderRadius: "50px",
-    padding: "10px 20px",
-    width: "100px",
-    height: "40px",
+    padding: "10px 10px",
+    width: "80px",
+    height: "35px",
     textAlign: "center",
     fontSize: "12px",
     fontWeight: "bold",
@@ -75,18 +75,17 @@ const TopPanelLayerTypeSwitch = () => {
       }}
     >
       <Dropdown
-        label="Select Year"
+        // label="Select Year" // i don't want it !!!
         options={years}
         value={selectedYear.toString()}
         onChange={(val) => setSelectedYear(val)}
         sx={{
           width: "120px",
-          height: "40px",
+          maxHeight: "40px",
           borderRadius: "30px",
           backgroundColor: "white", // Match button color
-          fontSize: "14px",
+          fontSize: "8px",
           color: "black",
-          fontWeight: "bold",
           textAlign: "center",
           display: "flex",
           alignItems: "center",
@@ -108,7 +107,7 @@ const TopPanelLayerTypeSwitch = () => {
         style={{
           backgroundColor: "#e6e6e6",
           padding: "15px",
-          borderRadius: "20px",
+          borderRadius: "50px",
           display: "flex",
           justifyContent: "center",
           flexWrap: "nowrap",
@@ -183,11 +182,11 @@ const TopPanelLayerTypeSwitch = () => {
           sx={{
             backgroundColor: "#555",
             color: "white",
-            borderRadius: "12px",
-            padding: "10px 20px",
+            borderRadius: "25px",
+            padding: "10px 10px",
             width: "140px",
-            height: "50px",
-            fontSize: "10px",
+            height: "35px",
+            fontSize: "12px",
             fontWeight: "bold",
           }}
         />

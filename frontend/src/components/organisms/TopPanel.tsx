@@ -189,14 +189,15 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   return (
     <div
       style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1300,
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between", // Adjusts layout distribution
-        gap: "10px",
-        padding: "10px",
         backgroundColor: "rgba(255, 255, 255, 0.8)",
-        borderRadius: "15px",
-        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+        borderRadius: "5px",
       }}
     >
       <div style={{ flex: 1 }}>
