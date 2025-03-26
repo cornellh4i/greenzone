@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   FormControl,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -57,7 +56,7 @@ export default function SignUpPage() {
             flexDirection: "column",
           }}
         >
-          <Typography variant="h5" component="h1" sx={{ color: "primary.main", fontWeight: 500, mb: 4 }}>
+          <Typography variant="h5" component="h1" sx={{ color: "primary.main", fontWeight: "bold", mb: 4 }}>
             GreenZone Analytics
           </Typography>
 
@@ -70,35 +69,32 @@ export default function SignUpPage() {
             </Typography>
 
             <Stack spacing={2.5}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    id="firstName"
-                    label="First Name"
-                    variant="outlined"
-                    defaultValue="Sonia"
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    id="lastName"
-                    label="Last Name"
-                    variant="outlined"
-                    defaultValue="Mar"
-                    size="small"
-                  />
-                </Grid>
-              </Grid>
+              {/* Name fields in a flex container instead of Grid */}
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <TextField
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  variant="outlined"
+                  defaultValue=""
+                  size="small"
+                />
+                <TextField
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  variant="outlined"
+                  defaultValue=""
+                  size="small"
+                />
+              </Box>
 
               <TextField
                 fullWidth
                 id="email"
                 label="Email"
                 variant="outlined"
-                defaultValue="email123@gmail.com"
+                defaultValue=""
                 size="small"
               />
 
@@ -108,7 +104,7 @@ export default function SignUpPage() {
                 label="Password"
                 type="password"
                 variant="outlined"
-                defaultValue="123Passwordabcdefghi"
+                defaultValue=""
                 size="small"
               />
 
@@ -160,7 +156,7 @@ export default function SignUpPage() {
 
             <Box sx={{ mt: 4, textAlign: "center" }}>
               <Typography variant="body2">
-                Already have an account?
+                <strong>Already have an account?</strong>
                 <Link href="#" style={{ color: "#2a5548", marginLeft: "4px", fontWeight: 500 }}>
                   Sign In
                 </Link>
