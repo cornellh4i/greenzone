@@ -171,14 +171,21 @@ export default function SignUpPage() {
 
         {/* Right side - Image */}
         <Box
-          sx={{
+        sx={{
             display: { xs: "none", md: "block" },
             flexGrow: 1,
             position: "relative",
-          }}
+        }}
         >
-          
-        </Box>
+        <Image
+            src= "/IMG_6493.jpg" // Replace with your actual image path inside public/
+            alt="Scenic mountain road"
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+        />
+</Box>
+
       </Box>
     </ThemeProvider>
   )
