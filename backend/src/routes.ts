@@ -43,7 +43,7 @@ import {
   getZScorePositive,
   getCellValuesbyYearandCtype,
 } from "./controller/Cell";
-
+import { SignupUser } from "./users";
 const router = express.Router();
 
 // Route to create a new hexagon
@@ -126,5 +126,21 @@ router.delete("/county/:county_id", deleteCounty);
 // Add these new routes
 router.get("/cells/grazing_range_true", getGrazingRangeTrue);
 router.get("/cells/grazing_range_false", getGrazingRangeFalse);
+
+router.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const response = await SignupUser(email, password);
+    if (response instanceof Error) {
+      res.status(400).json({ message: response });
+    } else {
+      res.status(200).json({ message: "User signed up successfully", response });
+      console.log("working", response);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;

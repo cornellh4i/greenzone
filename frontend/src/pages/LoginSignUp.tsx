@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import Image from "next/image"
@@ -39,10 +38,36 @@ const theme = createTheme({
 
 export default function SignUpPage() {
   const [role, setRole] = useState("Student")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+ 
   const handleRoleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value)
   }
+  const signUp = async () => {
+    const response = await fetch("http://localhost:8080/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log("User signed up successfully:", data)
+    } else {
+      const errorData = await response.json()
+      console.error("Error signing up:", errorData)
+    }
+  }
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -70,13 +95,17 @@ export default function SignUpPage() {
 
             <Stack spacing={2.5}>
               {/* Name fields in a flex container instead of Grid */}
-              <Box sx={{ display: "flex", gap: 2 }}>
+
+             
+
+                <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField
                   fullWidth
                   id="firstName"
                   label="First Name"
                   variant="outlined"
-                  defaultValue=""
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   size="small"
                 />
                 <TextField
@@ -84,29 +113,38 @@ export default function SignUpPage() {
                   id="lastName"
                   label="Last Name"
                   variant="outlined"
-                  defaultValue=""
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   size="small"
                 />
-              </Box>
+                </Box>
 
-              <TextField
+                <TextField
                 fullWidth
                 id="email"
                 label="Email"
                 variant="outlined"
-                defaultValue=""
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 size="small"
-              />
+                error={email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
+                helperText={
+                  email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                  ? "Please enter a valid email address"
+                  : ""
+                }
+                />
 
-              <TextField
+                <TextField
                 fullWidth
                 id="password"
                 label="Password"
                 type="password"
                 variant="outlined"
-                defaultValue=""
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 size="small"
-              />
+                />
 
               <FormControl fullWidth size="small">
                 <InputLabel id="role-label">Role / Occupation</InputLabel>
@@ -125,7 +163,7 @@ export default function SignUpPage() {
                 </Select>
               </FormControl>
 
-              <Button
+                <Button
                 variant="contained"
                 color="primary"
                 fullWidth
@@ -134,12 +172,18 @@ export default function SignUpPage() {
                   mt: 1,
                   bgcolor: "primary.main",
                   "&:hover": {
-                    bgcolor: "#224539",
+                  bgcolor: "#224539",
                   },
                 }}
-              >
+                onClick={async () => {
+                  if (email && password) {
+                  await signUp();
+                  window.location.href = "/login"; // Redirect to the login page
+                  }
+                }}
+                >
                 Sign Up
-              </Button>
+                </Button>
 
               <Typography variant="caption" sx={{ mt: 1 }}>
                 By signing up, you accept GreenZone Analytics&apos;
@@ -157,7 +201,7 @@ export default function SignUpPage() {
             <Box sx={{ mt: 4, textAlign: "center" }}>
               <Typography variant="body2">
                 <strong>Already have an account?</strong>
-                <Link href="#" style={{ color: "#2a5548", marginLeft: "4px", fontWeight: 500 }}>
+                <Link href="/login" style={{ color: "#2a5548", marginLeft: "4px", fontWeight: 500 }}>
                   Sign In
                 </Link>
               </Typography>
@@ -174,7 +218,7 @@ export default function SignUpPage() {
         }}
         >
         <Image
-            src= "/IMG_6493.jpg" // Replace with your actual image path inside public/
+            src= "/mountain.png" // Replace with your actual image path inside public/
             alt="Scenic mountain road"
             fill
             style={{ objectFit: "cover" }}
