@@ -98,14 +98,16 @@ const InsightsPanel: React.FC = () => {
       const results = await Promise.all(promises);
       const validResults = results.filter((result) => result && result.data && result.data.length > 0);
 
-      const formattedSummaries = validResults.map((result, index) => ({
-        ranking: index + 1,
-        name: result.data[0]?.soum_name ?? "Unknown",
-        aimag: result.data[0]?.province_name ?? "Unknown",
-        belowCapacity: result.data[0]?.cat1_percentage ?? 0,
-        atCapacity: result.data[0]?.cat2_percentage ?? 0,
-        aboveCapacity: result.data[0]?.cat3_percentage ?? 0,
-      }));
+      const formattedSummaries = validResults.map((result, index) => {      
+        return {
+          ranking: index + 1,
+          name: result.data[0]?.soum_name ?? "Unknown",
+          aimag: result.data[0]?.province_name ?? "Unknown",
+          belowCapacity: result.data[0]?.cat1_percentage ?? 0,
+          atCapacity: result.data[0]?.cat2_percentage ?? 0,
+          aboveCapacity: result.data[0]?.cat3_percentage ?? 0,
+        };
+      });
 
       formattedSummaries.sort((a, b) => {
         if (b.aboveCapacity !== a.aboveCapacity) {
@@ -124,6 +126,7 @@ const InsightsPanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
+    
   };
 
   useEffect(() => {
