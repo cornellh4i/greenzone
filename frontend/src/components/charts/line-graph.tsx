@@ -20,7 +20,7 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
     const h = 600;   // Fixed height
     const m = { 
       top: 80, 
-      right: 120,
+      right: 40,
       bottom: 60, 
       left: 120 
     };
@@ -31,18 +31,13 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock, dzudYears, privatizati
       .select(svgRef.current)
       .attr("width", "100%")
       .attr("height", "100%")
-      .attr("viewBox", `0 0 ${w + m.right} ${h + m.top}`)
+      .attr("viewBox", `0 0 ${w + m.left + m.right} ${h + m.top}`)
       .attr("preserveAspectRatio", "xMinYMin meet")
       .style("background-color", "#ffffff");
 
     const yScaleLeft = d3
       .scaleLinear()
       .domain([0, d3.max(allData, d => d.y)! * 1.1])
-      .range([h - m.bottom, m.top]);
-
-    const yScaleRight = d3
-      .scaleLinear()
-      .domain([0, d3.max(allData, d => d.y)! / 5])
       .range([h - m.bottom, m.top]);
 
     const xScale = d3
@@ -101,14 +96,6 @@ d3svg.append("g")
       .style("font-family", "Roboto, sans-serif")
       .style("font-weight", "bold");
 
-    d3svg.append("g")
-      .attr("transform", `translate(${w - m.right}, 0)`)
-      .call(d3.axisRight(yScaleRight))
-      .selectAll("text")
-      .style("font-size", "14px")
-      .style("font-family", "Roboto, sans-serif")
-      .style("font-weight", "bold");
-
       d3svg.append("text")
   .attr("transform", "rotate(-90)") 
   .attr("x", -(h / 2))
@@ -119,23 +106,11 @@ d3svg.append("g")
   .style("fill", "#000")
   .style("text-anchor", "middle")
   .style("font-family", "Roboto, sans-serif")
-  .text("Primary Population");
-
-    d3svg.append("text")
-      .attr("transform", "rotate(90)")
-      .attr("x", h / 2)
-      .attr("y", -w + 60)
-      .attr("dy", "-2.5em")
-      .style("font-size", "18px")
-      .style("font-weight", "bold")
-      .style("fill", "#000")
-      .style("text-anchor", "middle")
-      .style("font-family", "Roboto, sans-serif")
-      .text("Secondary Population");
+  .text("Population (Sheep Units)");
 
     datasets.forEach(dataset => {
       const color = colorScale(dataset.aimag);
-      const yScale = d3.max(dataset.data, d => d.y)! > 10000 ? yScaleLeft : yScaleRight;
+      const yScale = yScaleLeft;
 
       const lineGenerator = d3.line<{ x: number, y: number }>()
         .x(d => xScale(d.x))

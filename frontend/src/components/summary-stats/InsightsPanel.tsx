@@ -18,7 +18,8 @@ interface SummaryData {
 
 const InsightsPanel: React.FC = () => {
   const [livestockData, setLivestockData] = useState<{ [key: string]: LivestockData[] }>({});
-  const [summaries, setSummaries] = useState<SummaryData[]>([]);
+  const [provinceSummaries, setProvinceSummaries] = useState<SummaryData[]>([]);
+  const [countySummaries, setCountySummaries] = useState<SummaryData[]>([]);
   const [provinceIds, setProvinceIds] = useState<number[]>([]);
   const [countyIds, setCountyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +36,7 @@ const InsightsPanel: React.FC = () => {
   const tableColumns = [
     { field: 'ranking', headerName: 'Ranking', width: 100 },
     { field: 'name', headerName: tabValue === 0 ? "Aimag" : "Soum", width: 200 },
+  ...(tabValue === 1 ? [{ field: 'aimag', headerName: 'Aimag', width: 200 }] : []),
     { field: 'belowCapacity', headerName: 'Below Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'atCapacity', headerName: 'At Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'aboveCapacity', headerName: 'Above Capacity', width: 150, format: (value: number) => `${value}%` },
@@ -66,7 +68,11 @@ const InsightsPanel: React.FC = () => {
     }
   };
 
-  const fetchSummariesFromIds = async (ids: number[], endpoint: "province" | "county") => {
+  const fetchSummariesFromIds = async (
+    ids: number[],
+    endpoint: "province" | "county",
+    setSummaries: React.Dispatch<React.SetStateAction<SummaryData[]>>
+  ) => {
     try {
       setLoading(true);
       const promises = ids.map(async (id) => {
@@ -94,13 +100,22 @@ const InsightsPanel: React.FC = () => {
 
       const formattedSummaries = validResults.map((result, index) => ({
         ranking: index + 1,
-        name: result.data[0]?.province_name || result.data[0]?.county_name || "Unknown",
+        name: result.data[0]?.soum_name ?? "Unknown",
+        aimag: result.data[0]?.province_name ?? "Unknown",
         belowCapacity: result.data[0]?.cat1_percentage ?? 0,
         atCapacity: result.data[0]?.cat2_percentage ?? 0,
         aboveCapacity: result.data[0]?.cat3_percentage ?? 0,
       }));
 
-      formattedSummaries.sort((a, b) => a.belowCapacity - b.belowCapacity);
+      formattedSummaries.sort((a, b) => {
+        if (b.aboveCapacity !== a.aboveCapacity) {
+          return b.aboveCapacity - a.aboveCapacity; // Descending
+        } else if (b.atCapacity !== a.atCapacity) {
+          return b.atCapacity - a.atCapacity; // Descending
+        } else {
+          return a.belowCapacity - b.belowCapacity; // Ascending
+        }
+      });
       formattedSummaries.forEach((summary, index) => (summary.ranking = index + 1));
 
       setSummaries(formattedSummaries);
@@ -117,12 +132,16 @@ const InsightsPanel: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (tabValue === 0 && provinceIds.length > 0) {
-      fetchSummariesFromIds(provinceIds, "province");
-    } else if (tabValue === 1 && countyIds.length > 0) {
-      fetchSummariesFromIds(countyIds, "county");
+    if (provinceIds.length > 0) {
+      fetchSummariesFromIds(provinceIds, "province", setProvinceSummaries);
     }
-  }, [tabValue]);
+  }, [provinceIds]);
+  
+  useEffect(() => {
+    if (countyIds.length > 0) {
+      fetchSummariesFromIds(countyIds, "county", setCountySummaries);
+    }
+  }, [countyIds]);
 
   useEffect(() => {
     const fetchLivestockData = async () => {
@@ -177,7 +196,11 @@ const InsightsPanel: React.FC = () => {
                 <Tab label="Soums" />
               </Tabs>
             </Box>
-            <Table columns={tableColumns} rows={summaries} loading={loading} />
+            <Table
+  columns={tableColumns}
+  rows={tabValue === 0 ? provinceSummaries : countySummaries}
+  loading={loading}
+/>
           </Box>
 
           <Box sx={{ p: 4, borderRadius: 2 }}>
