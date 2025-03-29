@@ -25,6 +25,8 @@ const InsightsPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
   const [page, setPage] = useState(0);
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [counties, setCounties] = useState<any[]>([]);
 
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
   const dzudYears = [2017, 2016, 2020, 2021];
@@ -70,6 +72,21 @@ const InsightsPanel: React.FC = () => {
     }
   };
 
+  const getProvinceNameById = (id: number): string => {
+    const province = provinces.find((p) => p.province_id === id);
+    return province?.province_data?.province_name ?? "Unknown Province";
+  };
+  
+  const getSoumNameById = (id: number): string => {
+    const county = counties.find((c) => c.county_id === id);
+    return county?.county_data?.soum_name ?? "Unknown Soum";
+  };
+  
+  const getProvinceNameFromCountyId = (id: number): string => {
+    const county = counties.find((c) => c.county_id === id);
+    return county?.county_data?.province_name ?? "Unknown Province";
+  };
+
   const fetchSummariesFromIds = async (
     ids: number[],
     endpoint: "province" | "county",
@@ -86,7 +103,7 @@ const InsightsPanel: React.FC = () => {
 
           if (response.headers.get("content-type")?.includes("application/json")) {
             const jsonData = JSON.parse(text);
-            return jsonData;
+            return { id, data: jsonData.data };
           } else {
             console.error(`Unexpected format for ${endpoint} ${id}:`, text);
             return null;
@@ -98,17 +115,32 @@ const InsightsPanel: React.FC = () => {
       });
 
       const results = await Promise.all(promises);
-      const validResults = results.filter((result) => result && result.data && result.data.length > 0);
+      const validResults = results.filter(
+        (result): result is { id: number; data: any } =>
+          result !== null && result.data && result.data.length > 0
+      );
 
-      const formattedSummaries = validResults.map((result, index) => {    
-        console.log("Result data:", result.data);
+      const formattedSummaries = validResults.map((result, index) => {
+        const record = result.data[0];
+        const id = result.id;
+      
+        const name =
+          endpoint === "province"
+            ? getProvinceNameById(id)
+            : getSoumNameById(id);
+      
+        const aimag =
+          endpoint === "province"
+            ? ""
+            : getProvinceNameFromCountyId(id);
+      
         return {
           ranking: index + 1,
-          name: result.data[0]?.soum_name ?? "Unknown",
-          aimag: result.data[0]?.province_name ?? "Unknown",
-          belowCapacity: result.data[0]?.cat1_percentage ?? 0,
-          atCapacity: result.data[0]?.cat2_percentage ?? 0,
-          aboveCapacity: result.data[0]?.cat3_percentage ?? 0,
+          name,
+          aimag,
+          belowCapacity: record?.cat1_percentage ?? 0,
+          atCapacity: record?.cat2_percentage ?? 0,
+          aboveCapacity: record?.cat3_percentage ?? 0,
         };
       });
 
