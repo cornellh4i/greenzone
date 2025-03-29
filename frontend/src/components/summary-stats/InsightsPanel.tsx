@@ -3,6 +3,8 @@ import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
 
+/** edited */
+
 interface LivestockData {
   aimag: string;
   data: { x: number; y: number }[];
