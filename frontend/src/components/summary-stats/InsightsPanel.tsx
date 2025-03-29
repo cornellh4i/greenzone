@@ -53,8 +53,8 @@ const InsightsPanel: React.FC = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json = await response.json();
       if (json.data) {
-        const ids = json.data.map((province: any) => province.province_id);
-        setProvinceIds(ids);
+        setProvinceIds(json.data.map((province: any) => province.province_id));
+        setProvinces(json.data);
       }
     } catch (error) {
       console.error("Error fetching province IDs:", error);
@@ -67,7 +67,8 @@ const InsightsPanel: React.FC = () => {
       const json = await response.json();
       if (json.data) {
         const ids = json.data.map((county: any) => county.county_id);
-        setCountyIds(ids);
+        setCountyIds(json.data.map((county: any) => county.county_id));
+        setCounties(json.data);
       }
     } catch (error) {
       console.error("Error fetching county IDs:", error);
