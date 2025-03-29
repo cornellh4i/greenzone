@@ -46,11 +46,16 @@ interface TableProps {
   }[];
   rows: any[];
   loading?: boolean;
+  page?: number;
+  onPageChange?: (newPage: number) => void;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rows, loading = false }) => {
-  const [page, setPage] = useState(0);
+const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: propPage, onPageChange }) => {
+  const [internalPage, setInternalPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const page = propPage ?? internalPage;
+  const setPage = onPageChange ?? setInternalPage;
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -65,6 +70,10 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false }) => {
   const labelDisplayedRows = ({ from, to, count }: { from: number; to: number; count: number }) => {
     return `${from}–${to} of ${count}`;
   };
+
+  if (columns.length === 0) {
+    return null;
+  }
 
   return (
     <Box sx={{ width: '100%', overflowX: 'auto' }}>

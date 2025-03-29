@@ -24,6 +24,7 @@ const InsightsPanel: React.FC = () => {
   const [countyIds, setCountyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
+  const [page, setPage] = useState(0);
 
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
   const dzudYears = [2017, 2016, 2020, 2021];
@@ -31,6 +32,7 @@ const InsightsPanel: React.FC = () => {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+    setPage(0);
   };
 
   const tableColumns = [
@@ -98,7 +100,8 @@ const InsightsPanel: React.FC = () => {
       const results = await Promise.all(promises);
       const validResults = results.filter((result) => result && result.data && result.data.length > 0);
 
-      const formattedSummaries = validResults.map((result, index) => {      
+      const formattedSummaries = validResults.map((result, index) => {    
+        console.log("Result data:", result.data);
         return {
           ranking: index + 1,
           name: result.data[0]?.soum_name ?? "Unknown",
@@ -203,6 +206,8 @@ const InsightsPanel: React.FC = () => {
   columns={tableColumns}
   rows={tabValue === 0 ? provinceSummaries : countySummaries}
   loading={loading}
+  page={page}
+  onPageChange={(newPage: number) => setPage(newPage)}
 />
           </Box>
 
