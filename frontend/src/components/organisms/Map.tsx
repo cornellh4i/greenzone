@@ -7,7 +7,7 @@ import { PolygonLayer, ScatterplotLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Context, LayerType, SelectedType } from "../utils/global";
+import { Context, LayerType, SelectedType } from "../../utils/global";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -45,9 +45,7 @@ const INITIAL_VIEW_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
 const MAP_STYLE =
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
-const MapComponent: React.FC<{
-  onMapReady?: (zoomToCounty: (countyId: number) => void) => void;
-}> = ({ onMapReady }) => {
+const MapComponent: React.FC = () => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
   const [soums, setSoums] = useState<Geometry[]>([]);
   const [provinceViews, setProvinceViews] = useState<ProvinceView | null>(null);
@@ -110,6 +108,7 @@ const MapComponent: React.FC<{
           at_cap_response.json(),
           above_response.json(),
         ]);
+      console.log(json_below_response);
       setBelowCells(
         json_below_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
@@ -292,10 +291,10 @@ const MapComponent: React.FC<{
   }, [selectedCounty, selectedProvince]);
 
   useEffect(() => {
+    console.log("AYYEEEE");
     loadProvinceGeometries();
     loadCarryingCapacityCells();
     loadZScoreCells();
-    // loadGrazingRangeCells();
   }, [selectedYear]);
 
   const provinceLayer = new PolygonLayer({
@@ -451,11 +450,6 @@ const MapComponent: React.FC<{
     selectedYear,
     selectedLayerType,
   ]);
-  useEffect(() => {
-    if (map && onMapReady) {
-      onMapReady(handleZoom);
-    }
-  }, [map, onMapReady, soums]);
 
   if (!provinces || provinces.length === 0) {
     return <div>Loading...</div>;
@@ -468,7 +462,6 @@ const MapComponent: React.FC<{
         initialViewState={INITIAL_VIEW_STATE}
         // {...viewState}
         mapStyle={MAP_STYLE}
-        // style={{ width: "100vw", height: "100vh" }}
         onLoad={handleMapLoad}
         // onMove={(evt) => setViewState(evt.viewState)}
       >
