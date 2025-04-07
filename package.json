@@ -6,5 +6,8 @@
         "test": "cd backend && yarn run test",
         "start": " (cd frontend && yarn run start)"
     },
-    "packageManager": "yarn@4.5.0"
+    "packageManager": "yarn@4.5.0",
+    "dependencies": {
+        "lucide-react": "^0.487.0"
+    }
 }
