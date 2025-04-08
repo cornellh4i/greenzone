@@ -3,6 +3,8 @@ import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
 
+/** edited */
+
 interface LivestockData {
   aimag: string;
   data: { x: number; y: number }[];
@@ -51,8 +53,7 @@ const InsightsPanel: React.FC = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json = await response.json();
       if (json.data) {
-        const ids = json.data.map((province: any) => province.province_id);
-        setProvinceIds(ids);
+        setProvinceIds(json.data.map((province: any) => province.province_id));
         setProvinces(json.data);
       }
     } catch (error) {
