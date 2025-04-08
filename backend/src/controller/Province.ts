@@ -190,7 +190,8 @@ export const getProvinceCellSummary = async (
         });
         return;
       }
-      // Call the stored procedure using Supabase RPC
+
+      // Fetch data
       const { data, error } = await supabase.rpc(
         "categorize_cells_by_province",
         {
@@ -198,7 +199,7 @@ export const getProvinceCellSummary = async (
           category_type: category_type,
         }
       );
-      // Error handling in case the query fails
+
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -208,7 +209,7 @@ export const getProvinceCellSummary = async (
       }
 
       res
-        .status(201)
+        .status(200)
         .json({ log: "Data was successfully collected", data: data });
     } catch (error: any) {
       res
@@ -265,12 +266,10 @@ export const getProvinceGR = async (
 
     if (error) {
       console.error("Supabase RPC Error:", error.message);
-      res
-        .status(500)
-        .json({
-          log: "Error while collecting grazing range data",
-          error: error.message,
-        });
+      res.status(500).json({
+        log: "Error while collecting grazing range data",
+        error: error.message,
+      });
       return;
     }
 
