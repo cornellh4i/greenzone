@@ -336,3 +336,54 @@ export const getProvinceCellSummary = async (
 //     }
 //   }
 // };
+
+
+export const getProvinceGR = async (
+  req: Request, 
+  res: Response
+): Promise<void> => {
+  if (!supabase) {
+    res.status(500).json({ log: "Supabase connection is missing." });
+    return;
+  }
+
+  try {
+    console.log("Incoming request params:", req.params);
+
+    const { province_id } = req.params;
+    console.log(`Extracted province_id: ${province_id}`);
+
+    const parsedProvinceId = parseInt(province_id, 10);
+    console.log(`Parsed province_id: ${parsedProvinceId}`);
+
+    // Validate province_id
+    if (isNaN(parsedProvinceId) || parsedProvinceId < 11 || parsedProvinceId > 85) {
+      console.error("Invalid province_id:", parsedProvinceId);
+      res.status(400).json({ log: "Invalid province_id. It must be a valid number." });
+      return;
+    }
+
+    // Log before calling the RPC
+    console.log(`Calling Supabase RPC with p_id: ${parsedProvinceId}`);
+
+    // Call Supabase function
+    const { data, error } = await supabase.rpc("find_grazing_range_percentage", {
+      p_id: parsedProvinceId,
+    });
+
+    // Log response from Supabase
+    console.log("Supabase RPC Response:", { data, error });
+
+    if (error) {
+      console.error("Supabase RPC Error:", error.message);
+      res.status(500).json({ log: "Error while collecting grazing range data", error: error.message });
+      return;
+    }
+
+    console.log("Grazing Range Percentage Data:", data);
+    res.status(200).json({ log: "Grazing range percentage retrieved", data });
+  } catch (error: any) {
+    console.error("Unexpected Server Error:", error.message);
+    res.status(500).json({ log: "Internal server error", error: error.message });
+  }
+};

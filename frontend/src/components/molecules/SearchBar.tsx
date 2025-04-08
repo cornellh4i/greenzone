@@ -10,6 +10,7 @@ interface SearchBarParams {
       county_id: number;
       county_name: string;
       province_name: string;
+      province_id: number;
     };
   };
   onValueSelect: (countyData: {
@@ -25,9 +26,14 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
         county_id: number;
         county_name: string;
         province_name: string;
+        province_id: number;
       }
     | undefined
   >(undefined);
+
+  const [searchCounty, setSearchCounty] = useState<boolean | undefined>(
+    undefined
+  );
 
   const countyOptions = useMemo(
     () =>
@@ -36,7 +42,9 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
       })),
     [countyMap]
   );
-
+  // const [searchProvince, setSearchProvince] = useState<number | undefined>(
+  //   undefined
+  // );
   const [searchData, setSearchData] = useState(countyOptions);
   const fuse = useMemo(
     () =>
@@ -66,7 +74,9 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
     county_id: number;
     county_name: string;
     province_name: string;
+    province_id: number;
   }) => {
+    setSearchCounty(true);
     setSelectedValue(selectedItem);
   };
 

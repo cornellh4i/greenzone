@@ -1,17 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck comment
+
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
-import { Box, Drawer, Divider, Typography, Switch, Chip } from "@mui/material";
+import {
+  Box,
+  Drawer,
+  Divider,
+  Typography,
+  Switch,
+  Chip,
+  IconButton,
+} from "@mui/material";
 import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
-import Toggle from "@/components/atoms/Toggle";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import CloseIcon from "@mui/icons-material/Close";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -25,12 +34,17 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const {
     selectedProvince,
     setSelectedProvince,
+    selectedCounty,
+    setSelectedCounty,
     selectedYear,
     setSelectedYear,
     grazingRange,
     setGrazingRange,
     selectedLayerType,
     setSelectedLayerType,
+
+    showGeneralPanel,
+    setShowGeneralPanel,
 
     isPanelOpen,
     setIsPanelOpen,
@@ -55,8 +69,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   } = context;
 
   const [provinceData, setProvinceData] = useState<any | null>(null);
-  // THESE COLORS AND LABELS NEED TO GO IN GLOBAL
-  const [cellSummary, setCellSummary] = useState<number[]>([]);
+  const [countyData, setCountyData] = useState<any | null>(null);
 
   // Define color schemes & labels separately for clarity
   const carryingCapacityLabels = [
@@ -71,69 +84,117 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const zScoreColors = ["#3F7F7F", "#00008B", "#800080"];
 
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
-  const loadProvinceCellSummary = async (
-    provinceId: number,
-    categoryType: string
+
+  const loadEntityCellSummary = async (
+    entityType: string,
+    entityID: number,
+    categoryType: LayerType | null
   ) => {
+    console.log(entityID);
+    console.log(entityType);
+    console.log(categoryType);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+        `http://localhost:8080/api/${entityType}/${entityID}/${categoryType}/cell-summary` // !!!!! change the api to include province or county
       );
-      const json = await response.json();
+
+      const response_json = await response.json();
       const percentages = [
-        json.data[0].cat1_percentage,
-        json.data[0].cat2_percentage,
-        json.data[0].cat3_percentage,
+        response_json.data[0].cat1_percentage || 0,
+        response_json.data[0].cat2_percentage || 0,
+        response_json.data[0].cat3_percentage || 0,
       ];
-      if (json.data) {
-        setCellSummary(percentages);
-      } else {
-        setCellSummary([]);
-      }
+      if (response_json.data) {
+        return percentages;
+      } else return [];
     } catch (error) {
-      console.error("Error fetching cell summary data:", error);
+      console.error("Error fetching Entity CellSummary:", error);
     }
   };
 
-  // Fetch data for the selected province
-  const loadProvinceData = async (provinceID: number, displayName: string) => {
+  const loadEntityLivestock = async (entityType: string, entityID: number) => {
     try {
-      console.log(selectedYear);
-      console.log(provinceID);
       const response = await fetch(
-        `http://localhost:8080/api/province/${provinceID}/${selectedYear}`
+        `http://localhost:8080/api/${entityType}/${entityID}/${selectedYear}/livestock`
       );
-      const json_object = await response.json();
-      console.log(json_object.data[0].yearly_agg.total);
-
-      const { province_name, province_land_area, province_herders } =
-        json_object;
-
-      const selectedData = {
-        number_of_livestock: json_object.data[0].yearly_agg.total,
-        number_of_cattle: json_object.data[0].yearly_agg.cattle,
-        number_of_goat: json_object.data[0].yearly_agg.goat,
-        number_of_sheep: json_object.data[0].yearly_agg.sheep,
-        number_of_camel: json_object.data[0].yearly_agg.camel,
-        number_of_horse: json_object.data[0].yearly_agg.horse,
+      const response_json = await response.json();
+      const livestock_data = {
+        number_of_livestock: response_json.data[0].yearly_agg.total,
+        number_of_cattle: response_json.data[0].yearly_agg.cattle,
+        number_of_goat: response_json.data[0].yearly_agg.goat,
+        number_of_sheep: response_json.data[0].yearly_agg.sheep,
+        number_of_camel: response_json.data[0].yearly_agg.camel,
+        number_of_horse: response_json.data[0].yearly_agg.horse,
       };
-      console.log(selectedData);
-
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,
-        y: selectedData[`number_of_${livestockType.toLowerCase()}`] || 0,
+        y: livestock_data[`number_of_${livestockType.toLowerCase()}`] || 0,
       }));
 
-      setProvinceData({
-        displayName,
-        province_name,
-        province_land_area,
-        province_herders,
-        selectedYear,
-        formattedData,
-      });
+      if (response_json.data) {
+        return formattedData;
+      } else return [];
     } catch (error) {
-      console.error("Error fetching province data:", error);
+      console.error("Error fetching Entity Livestock:", error);
+    }
+  };
+
+  const loadEntityStats = async (entityType: string, entityID: number) => {
+    try {
+      // will be fixed later! for now we fix the values
+      const response = await fetch(
+        `http://localhost:8080/api/${entityType}/${entityID}`
+      );
+      const response_json = await response.json();
+      console.log(response_json);
+      const entityData = {
+        entityName:
+          response_json.data[0][`${entityType}_data`][
+            entityType === "county" ? "soum_name" : "province_name"
+          ],
+        entityLandArea: "1000",
+        entityHerders: "360",
+        entityGrazingRange: "300",
+      };
+      return entityData;
+    } catch (error) {
+      console.error("Error fetching Entity Statistics:", error);
+    }
+  };
+
+  const loadEntityData = async () => {
+    try {
+      // Always load province data first if needed
+      if (selectedProvince && !provinceData) {
+        const [provinceStats, provinceCellSummary, provinceLivestock] =
+          await Promise.all([
+            loadEntityStats("province", selectedProvince),
+            loadEntityCellSummary(
+              "province",
+              selectedProvince,
+              selectedLayerType
+            ),
+            loadEntityLivestock("province", selectedProvince),
+          ]);
+        setProvinceData({
+          provinceStats,
+          provinceCellSummary,
+          provinceLivestock,
+        });
+      }
+
+      // Then load county data if selected
+      if (selectedCounty) {
+        const [countyStats, countyCellSummary, countyLivestock] =
+          await Promise.all([
+            loadEntityStats("county", selectedCounty),
+            loadEntityCellSummary("county", selectedCounty, selectedLayerType),
+            loadEntityLivestock("county", selectedCounty),
+          ]);
+        setCountyData({ countyStats, countyCellSummary, countyLivestock });
+      }
+    } catch (error) {
+      console.error("Error fetching Entity Data:", error);
     }
   };
 
@@ -147,33 +208,42 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   }, [provinceData, setTopPanelOpen]);
 
   // Controls whether to open up the SidePanel Or NOT
-  useEffect(() => {
-    if (selectedProvince) {
-      setIsPanelOpen(true);
-    }
-  }, [selectedProvince, setIsPanelOpen]);
+  // useEffect(() => {
+  //   if (selectedProvince || selectedCounty) {
+  //     setIsPanelOpen(true);
+  //   }
+  // }, [selectedProvince, selectedCounty, setIsPanelOpen]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
     if (selectedYear && selectedProvince) {
-      loadProvinceCellSummary(selectedProvince, selectedLayerType);
-      loadProvinceData(selectedProvince, displayName);
+      loadEntityData();
+      setIsPanelOpen(true);
     }
   }, [selectedProvince, selectedYear]);
+  useEffect(() => {
+    if (selectedYear && selectedCounty && provinceData) {
+      loadEntityData();
+      setIsPanelOpen(true);
+    }
+  }, [selectedCounty, selectedYear]);
 
   // Controls when to Exit Province/County Summary Mode
-  const handleBack = () => {
+  const handleProvinceToMap = () => {
     setProvinceData(null);
     setSelectedProvince(null);
+    setCountyData(null);
+    setSelectedCounty(null);
+    setShowGeneralPanel(false);
+  };
+  const handleCountyToProvince = () => {
+    setCountyData(null);
+    setSelectedCounty(null);
   };
   // Controls when to close the SidePanel
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setTopPanelOpen(true);
-    if (!isPanelOpen) {
-      setProvinceData(null);
-      setSelectedProvince(null);
-    }
   };
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
@@ -319,11 +389,35 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   return (
     <div>
+      <Box
+        sx={{
+          position: "fixed",
+          left: isPanelOpen ? "calc(35vw - 24px)" : "-24px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 1201,
+          transition: "left 0.3s",
+          maxLeft: "376px", // 400px - 24px
+        }}
+      >
+        <IconButton
+          onClick={handlePanelToggle}
+          sx={{
+            backgroundColor: "background.paper",
+            borderRadius: "0 4px 4px 0",
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
+          }}
+        >
+          {isPanelOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+      </Box>
       <Drawer
         anchor="left"
         open={isPanelOpen ?? false}
         onClose={handlePanelToggle}
-        variant="persistent" // Allows interaction with the background
+        variant="persistent"
         PaperProps={{
           sx: {
             width: "35vw",
@@ -333,20 +427,22 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "6.1%", // Ensures the Drawer starts below the TopPanel
+            marginTop: "70px", // Match top panel height
+            height: "calc(100% - 70px)", // Prevent bottom overflow
           },
         }}
         sx={{
-          zIndex: 1200,
-          position: "relative",
+          zIndex: 1200, // Lower than top panel
+          position: "fixed",
+          top: "70px", // Start below top panel
+          left: 0,
+          bottom: 0,
         }}
       >
         <Box>
           {!provinceData ? (
+            // General panel when no province data exists
             <div>
-              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                <Button onClick={handlePanelToggle} label="Close" />
-              </div>
               <h1>Carrying Capacity Early Warning System</h1>
               <Divider sx={{ mb: 2 }} />
               <p>
@@ -371,24 +467,27 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 />
               </div>
             </div>
-          ) : (
+          ) : provinceData && !countyData ? (
+            // Province details panel
             <div>
               <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                <Button onClick={handleBack} label="Back" />
+                <Button onClick={handleProvinceToMap} label="Back" />
               </div>
-              <h1>{provinceData.province_name}</h1>
+              <h1>{provinceData.provinceStats.entityName}</h1>
               <p>
-                <strong>Land Area:</strong> {provinceData.province_land_area}{" "}
-                km²
-              </p>
-              <p>
-                <strong>Number of Herders:</strong>{" "}
-                {provinceData.province_herders}
+                {provinceData.provinceStats.entityLandArea} <strong>km²</strong>{" "}
+                &emsp;
+                {provinceData.provinceStats.entityHerders}{" "}
+                <strong>herders</strong> &emsp;
+                {provinceData.provinceStats.entityGrazingRange}{" "}
+                <strong>% grazing range</strong> &emsp;
+                {provinceData.provinceStats.entityCitizens}{" "}
+                <strong>citizens</strong>
               </p>
               <SidePanelPercentageModal
                 isOpen={true}
                 classificationType={selectedLayerType}
-                classificationValues={cellSummary}
+                classificationValues={provinceData.provinceCellSummary}
                 classificationLabels={
                   selectedLayerType === LayerType.CarryingCapacity
                     ? carryingCapacityLabels
@@ -400,55 +499,89 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                     : zScoreColors
                 }
               />
-              <h2>Livestock Data for {selectedYear}</h2>
-              {provinceData.formattedData.length > 0 && (
+              <Divider sx={{ my: 2 }} />
+              {provinceData.provinceLivestock?.length > 0 && (
                 <BarChart
                   datasets={[
                     {
                       aimag: provinceData.province_name,
-                      data: provinceData.formattedData,
+                      data: provinceData.provinceLivestock,
                     },
                   ]}
                   livestock={livestockTypes}
+                  orientation={false}
+                />
+              )}
+            </div>
+          ) : (
+            // County details panel
+            <div>
+              <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+                <Button onClick={handleCountyToProvince} label="Back" />
+              </div>
+              <h1>{countyData.countyStats.entityName}</h1>
+              <p>
+                {countyData.countyStats.entityLandArea} <strong>km²</strong>{" "}
+                &emsp;
+                {countyData.countyStats.entityHerders} <strong>herders</strong>{" "}
+                &emsp;
+                {countyData.countyStats.entityGrazingRange}{" "}
+                <strong>% grazing range</strong> &emsp;
+                {countyData.countyStats.entityCitizens}{" "}
+                <strong>citizens</strong>
+              </p>
+              <SidePanelPercentageModal
+                isOpen={true}
+                classificationType={selectedLayerType}
+                classificationValues={countyData.countyCellSummary}
+                classificationLabels={
+                  selectedLayerType === LayerType.CarryingCapacity
+                    ? carryingCapacityLabels
+                    : zScoreLabels
+                }
+                classificationColourScheme={
+                  selectedLayerType === LayerType.CarryingCapacity
+                    ? carryingCapacityColors
+                    : zScoreColors
+                }
+              />
+              <Divider sx={{ my: 2 }} />
+              {countyData.countyLivestock?.length > 0 && (
+                <BarChart
+                  datasets={[
+                    {
+                      aimag: countyData.county_name,
+                      data: countyData.countyLivestock,
+                    },
+                  ]}
+                  livestock={livestockTypes}
+                  orientation={false}
                 />
               )}
             </div>
           )}
         </Box>
+
+        {/* Rest of the drawer content */}
         <Divider sx={{ my: 2 }} />
-        {/* Row with icon, heading, and switch */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 0.5, // small margin bottom before the text below
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
           <AgricultureIcon sx={{ mr: 1 }} />
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{ mr: "auto" }} // pushes the switch to the right
-          >
+          <Typography variant="h6" component="h2" sx={{ mr: "auto" }}>
             Grazing Range
           </Typography>
           <Switch
             checked={grazingRange ?? false}
             onChange={(e) => setGrazingRange(e.target.checked)}
             sx={{
-              // Override track color when on
               "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "#2E7D32", // dark green
+                backgroundColor: "#2E7D32",
               },
-              // Override the thumb color when on
               "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#ffffff", // white thumb
+                color: "#ffffff",
               },
             }}
           />
         </Box>
-
-        {/* Descriptive text below */}
         <Typography variant="body2" color="text.secondary">
           View data only in land categorized as a grazing range.
         </Typography>
