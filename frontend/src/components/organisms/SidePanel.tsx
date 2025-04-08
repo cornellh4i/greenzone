@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import React, { useContext, useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import BarChart from "@/components/charts/barchart";
@@ -128,7 +125,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       };
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,
-        y: livestock_data[`number_of_${livestockType.toLowerCase()}`] || 0,
+        y:
+          livestock_data[
+            `number_of_${livestockType.toLowerCase()}` as keyof typeof livestock_data
+          ] || 0,
       }));
 
       if (response_json.data) {
@@ -165,7 +165,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const loadEntityData = async () => {
     try {
       // Always load province data first if needed
-      if (selectedProvince && !provinceData) {
+      if (selectedProvince) {
         const [provinceStats, provinceCellSummary, provinceLivestock] =
           await Promise.all([
             loadEntityStats("province", selectedProvince),
@@ -198,6 +198,23 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   };
 
+  /**** STATE MANAGEMENT ****/
+  // When a Province is selected/searched activates and SetPanel Open
+  useEffect(() => {
+    if (selectedYear && selectedProvince) {
+      loadEntityData();
+      setIsPanelOpen(true);
+    }
+  }, [selectedProvince, selectedYear]);
+
+  // When a County is selected/searched activates and SetPanel Open
+  useEffect(() => {
+    if (selectedYear && selectedCounty && provinceData) {
+      loadEntityData();
+      setIsPanelOpen(true);
+    }
+  }, [selectedCounty, selectedProvince, selectedYear]);
+
   // Controls the Top Panel
   useEffect(() => {
     if (provinceData) {
@@ -207,28 +224,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   }, [provinceData, setTopPanelOpen]);
 
-  // Controls whether to open up the SidePanel Or NOT
-  // useEffect(() => {
-  //   if (selectedProvince || selectedCounty) {
-  //     setIsPanelOpen(true);
-  //   }
-  // }, [selectedProvince, selectedCounty, setIsPanelOpen]);
-
-  // Controls when to fetch province/county specific summary data
-  useEffect(() => {
-    if (selectedYear && selectedProvince) {
-      loadEntityData();
-      setIsPanelOpen(true);
-    }
-  }, [selectedProvince, selectedYear]);
-  useEffect(() => {
-    if (selectedYear && selectedCounty && provinceData) {
-      loadEntityData();
-      setIsPanelOpen(true);
-    }
-  }, [selectedCounty, selectedYear]);
-
-  // Controls when to Exit Province/County Summary Mode
+  /**** EXITING FUNCTIONS ****/
+  // Closes the Province SidePanel --> moves to the General SidePanel
   const handleProvinceToMap = () => {
     setProvinceData(null);
     setSelectedProvince(null);
@@ -236,15 +233,18 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setSelectedCounty(null);
     setShowGeneralPanel(false);
   };
+  // Closes the County SidePanel --> moves to Province SidePanel
   const handleCountyToProvince = () => {
     setCountyData(null);
     setSelectedCounty(null);
   };
-  // Controls when to close the SidePanel
+  // Toggles (Open/Close) the SidePanel as a while regardless if its Prov/Count/General
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
     setTopPanelOpen(true);
   };
+
+  /**** OPTION/CHANGE VARIABLES ****/
   const handleYearSlider = (year: number) => {
     setSelectedYear(year);
   };
@@ -260,7 +260,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   const options = [
     {
-      name: LayerType.CarryingCapacity, // Use enum here
+      name: LayerType.CarryingCapacity,
       label: "Carrying Capacity",
       content: (
         <div style={{ display: "flex", gap: "10px" }}>
@@ -397,7 +397,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           transform: "translateY(-50%)",
           zIndex: 1201,
           transition: "left 0.3s",
-          maxLeft: "376px", // 400px - 24px
+          maxLeft: "350px",
         }}
       >
         <IconButton
@@ -427,8 +427,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             paddingTop: "20px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "70px", // Match top panel height
-            height: "calc(100% - 70px)", // Prevent bottom overflow
+            marginTop: "70px",
+            height: "calc(100% - 70px)",
           },
         }}
         sx={{
@@ -463,7 +463,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                   selectedOption={
                     selectedLayerType ?? LayerType.CarryingCapacity
                   }
-                  onChange={handleOptionChange}
+                  // only this long for type casting purposes
+                  onChange={(value: string) =>
+                    handleOptionChange(value as LayerType)
+                  }
                 />
               </div>
             </div>
@@ -562,7 +565,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           )}
         </Box>
 
-        {/* Rest of the drawer content */}
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
           <AgricultureIcon sx={{ mr: 1 }} />

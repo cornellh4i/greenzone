@@ -200,7 +200,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
         borderRadius: "5px",
       }}
     >
-      <div style={{ flex: 1 }}>
+      <div>
         <SearchBar countyMap={countyMap} onValueSelect={handleValueSelect} />
       </div>
 

@@ -67,14 +67,7 @@ const Slide: React.FC<SlideProps> = ({
           {" "}
           {name}
         </span>
-        <Box
-          ml={2}
-          p={1}
-          bgcolor="grey.300"
-          borderRadius="4px"
-          display="inline-block"
-          width="auto"
-        >
+        <Box ml={2} p={1} display="inline-block" width="auto">
           <span
             style={{
               fontFamily: "Poppins",
@@ -91,7 +84,18 @@ const Slide: React.FC<SlideProps> = ({
               options={options}
               value={sliderVal.toString()}
               onChange={(newVal) => handleDropdownChange(Number(newVal))}
-              sx={{ width: "64px", alignItems: "center" }}
+              sx={{
+                width: "80px",
+                backgroundColor: "white",
+                fontSize: "8px",
+                color: "black",
+                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                borderRadius: "10px",
+              }}
               label={""}
             />
           }

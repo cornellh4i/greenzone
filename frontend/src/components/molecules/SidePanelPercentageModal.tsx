@@ -10,7 +10,7 @@ interface SidePanelPercentageModalProps {
   /** Controls whether the section is visible or not */
   isOpen: boolean;
   /** True => Carrying Capacity; False => Z-Score */
-  classificationType: LayerType;
+  classificationType: LayerType | null;
   /** Numerical values (e.g., percentages) to display */
   classificationValues: number[];
   /** Labels for each classification category (e.g., "Below Capacity", "At Capacity", "Over Capacity") */
@@ -34,7 +34,10 @@ const SidePanelPercentageModal: React.FC<SidePanelPercentageModalProps> = ({
   if (!isOpen) return null;
 
   // Simple logic to decide the section title
-  const modalTitle = classificationType === LayerType.CarryingCapacity ? "Carrying Capacity" : "Z-Score";
+  const modalTitle =
+    classificationType === LayerType.CarryingCapacity
+      ? "Carrying Capacity"
+      : "Z-Score";
 
   return (
     <Box
