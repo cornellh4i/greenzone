@@ -83,7 +83,7 @@ const Dropdown: React.FC<DropdownProps> = ({
             }}
           >
             {option.entity_type == "Soum"
-              ? `Soum * ${option.entity_sub_name}`
+              ? `Soum • ${option.entity_sub_name}`
               : "Aimag"}
           </Typography>
         </Box>

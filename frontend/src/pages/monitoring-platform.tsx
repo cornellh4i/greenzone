@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Map from "../components/organisms/Map";
 import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
@@ -9,6 +9,7 @@ const MonitoringPlatform: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isTopPanelOpen, setTopPanelOpen] = useState(false);
   const [searched, setSearched] = useState<number | null>(null);
+  const [yearOptions, setYearOptions] = useState<string[]>([]);
 
   const [selectedLayerType, setSelectedLayerType] = useState(
     LayerType.CarryingCapacity
@@ -44,6 +45,8 @@ const MonitoringPlatform: React.FC = () => {
     setTopPanelOpen,
     searched,
     setSearched,
+    yearOptions,
+    setYearOptions,
 
     showGeneralPanel,
     setShowGeneralPanel,
@@ -76,9 +79,23 @@ const MonitoringPlatform: React.FC = () => {
     displayName,
     setDisplayName,
   };
-  const yearOptions = Array.from({ length: 2014 - 2002 + 1 }, (_, index) =>
-    (2002 + index).toString()
-  );
+  
+  const loadYearOptions = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/cells/years");
+      const response_json = await response.json();
+      const years = response_json.data.map((year: { year: number }) => year.year.toString());
+      setYearOptions(years.sort());
+      return;
+    } catch (error) {
+      console.error("Error fetching year options:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadYearOptions();
+  }, []);
+
   return (
     <>
       <div

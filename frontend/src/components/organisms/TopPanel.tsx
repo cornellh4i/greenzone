@@ -46,40 +46,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     router.push(path);
   };
 
-  const specialCharsToEnglishMap = {
-    Ö: "U",
-    ö: "u",
-    ü: "u",
-    ĭ: "i",
-    Ё: "yo",
-    ё: "yo",
-  };
-
-  const uniqueData = [
-    "Dornod",
-    "Bayan-Ulgii",
-    "Khovd",
-    "Govi-Altai",
-    "Bayankhongor",
-    "Umnugovi",
-    "Khuvsgul",
-    "Selenge",
-    "Tuv",
-    "Orkhon",
-    "Ulaanbaatar",
-    "Sukhbaatar",
-    "Dornogovi",
-    "Bulgan",
-    "Uvs",
-    "Zavkhan",
-    "Khentii",
-    "Darkhan-Uul",
-    "Govisumber",
-    "Arkhangai",
-    "Dundgovi",
-    "Uvurkhangai",
-  ];
-
   // State to store counties dictionary
   const [entityMap, setEntityMap] = useState<EntityMap | undefined>(undefined);
 
@@ -87,7 +53,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   const loadCountyData = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/county");
-      console.log(response);
       if (!response.ok) throw new Error("Failed to fetch county data");
       const json_object = await response.json();
       if (!json_object.data || !Array.isArray(json_object.data)) {
@@ -174,7 +139,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       setSelectedCounty(entityData.entity_id);
     }
   };
-  console.log(entityMap);
+
+  
   if (!entityMap) return <div>LOADING</div>;
   return (
     <div

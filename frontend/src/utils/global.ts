@@ -29,6 +29,8 @@ export type GlobalContext = {
   setSelectedOption: SetState<string>;
   displayName: string;
   setDisplayName: SetState<string>;
+  yearOptions: string[];
+  setYearOptions: SetState<string[]>;
 
   /////////////////////////////////////////
 

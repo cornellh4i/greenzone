@@ -108,7 +108,6 @@ const MapComponent: React.FC = () => {
           at_cap_response.json(),
           above_response.json(),
         ]);
-      console.log(json_below_response);
       setBelowCells(
         json_below_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
@@ -291,7 +290,6 @@ const MapComponent: React.FC = () => {
   }, [selectedCounty, selectedProvince]);
 
   useEffect(() => {
-    console.log("AYYEEEE");
     loadProvinceGeometries();
     loadCarryingCapacityCells();
     loadZScoreCells();

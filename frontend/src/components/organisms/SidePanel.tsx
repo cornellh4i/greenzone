@@ -87,12 +87,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     entityID: number,
     categoryType: LayerType | null
   ) => {
-    console.log(entityID);
-    console.log(entityType);
-    console.log(categoryType);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/${entityType}/${entityID}/${categoryType}/cell-summary` // !!!!! change the api to include province or county
+        `http://localhost:8080/api/${entityType}/${entityID}/${categoryType}/cell-summary`
       );
 
       const response_json = await response.json();
@@ -146,7 +143,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         `http://localhost:8080/api/${entityType}/${entityID}`
       );
       const response_json = await response.json();
-      console.log(response_json);
       const entityData = {
         entityName:
           response_json.data[0][`${entityType}_data`][
@@ -452,8 +448,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 name="Year"
                 selectedValue={selectedYear}
                 onChange={handleYearSlider}
-                min={2011}
-                max={2022}
+                min={Math.min(...yearOptions.map((year) => parseInt(year)))}
+                max={Math.max(...yearOptions.map((year) => parseInt(year)))}
                 options={yearOptions}
               />
               <div>
