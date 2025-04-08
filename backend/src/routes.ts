@@ -19,7 +19,11 @@ import {
   getCountyCellSummary,
   getCountiesGeomInProvince,
 } from "./controller/County";
+
+import { SignupUser } from "./users";
+
 import { getCellValuesbyYearandCtype } from "./controller/Cell";
+
 
 const router = express.Router();
 
@@ -52,5 +56,21 @@ router.get(
   "/county/:county_id/:category_type/cell-summary",
   getCountyCellSummary
 );
+
+router.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const response = await SignupUser(email, password);
+    if (response instanceof Error) {
+      res.status(400).json({ message: response });
+    } else {
+      res.status(200).json({ message: "User signed up successfully", response });
+      console.log("working", response);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;
