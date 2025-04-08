@@ -66,7 +66,7 @@ const InsightsPanel: React.FC = () => {
       const json = await response.json();
       if (json.data) {
         const ids = json.data.map((county: any) => county.county_id);
-        setCountyIds(ids);
+        setCountyIds(json.data.map((county: any) => county.county_id));
         setCounties(json.data);
       }
     } catch (error) {
