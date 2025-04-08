@@ -2,21 +2,17 @@ import React from "react";
 import { Autocomplete, TextField } from "@mui/material";
 import { Box, Typography } from "@mui/material";
 
+interface Entity {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string; // "province" or "county"
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
+
 interface DropdownProps {
-  options: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-    province_id: number;
-  }[];
-  value:
-    | {
-        county_id: number;
-        county_name: string;
-        province_name: string;
-        province_id: number;
-      }
-    | undefined;
+  options: Entity[];
+  value: Entity | undefined;
 
   onChange: (selectedItem: {
     county_id: number;
@@ -59,7 +55,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           sx={{ display: "flex", flexDirection: "column", padding: "10px" }}
         >
           <Typography sx={{ fontWeight: "bold", color: "black" }}>
-            {option.county_name} {/* County Name */}
+            {option.county_name}
           </Typography>
           <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
             {option.province_name}

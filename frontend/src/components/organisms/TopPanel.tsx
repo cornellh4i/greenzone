@@ -1,7 +1,9 @@
+
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck comment
+
 import React, { useContext, useState, useEffect } from "react";
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
@@ -14,6 +16,14 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { Context, LayerType } from "../../utils/global";
 import TopPanelLayerTypeSwitch from "../molecules/TopPanelLayerTypeSwitch";
 import { GetCounties } from "../../../../../backend/src/controller/County.ts";
+
+interface Entity {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string; // "province" or "county"
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
 
 interface TopPanelProps {
   yearOptions: string[];
@@ -223,7 +233,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       />
 
       <Button
-        onClick={() => {}} // Placeholder for future routing
+        onClick={() => { }} // Placeholder for future routing
         sx={{
           backgroundColor: "transparent",
           width: "50px",
@@ -243,3 +253,4 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
 };
 
 export default TopPanel;
+
