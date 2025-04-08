@@ -5,78 +5,65 @@ import SearchBarDropdown from "../atoms/SearchBarDropDown";
 import { IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
+interface CountyOption {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string;
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
 interface SearchBarParams {
-  countyMap: {
-    [county_id: number]: {
-      county_id: number;
-      county_name: string;
-      province_name: string;
-      province_id: number;
-    };
+  entityMap: {
+    [entity_id: number]: CountyOption;
   };
-  onValueSelect: (countyData: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }) => void;
+  onValueSelect: (entityData: CountyOption) => void;
 }
 
-const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
-  const [selectedValue, setSelectedValue] = useState<
-    | {
-        county_id: number;
-        county_name: string;
-        province_name: string;
-        province_id: number;
-      }
-    | undefined
-  >(undefined);
+const SearchBar: React.FC<SearchBarParams> = ({ entityMap, onValueSelect }) => {
+  const [selectedValue, setSelectedValue] = useState<CountyOption | undefined>(
+    undefined
+  );
 
   const [searchCounty, setSearchCounty] = useState<boolean | undefined>(
     undefined
   );
 
-  const countyOptions = useMemo(
+  const entityOptions = useMemo(
     () =>
-      Object.values(countyMap).map((county) => ({
-        ...county,
+      Object.values(entityMap).map((entity) => ({
+        ...entity,
       })),
-    [countyMap]
+    [entityMap]
   );
   // const [searchProvince, setSearchProvince] = useState<number | undefined>(
   //   undefined
   // );
-  const [searchData, setSearchData] = useState(countyOptions);
+  const [searchData, setSearchData] = useState(entityOptions);
   const fuse = useMemo(
     () =>
-      new Fuse(countyOptions, {
-        keys: ["county_name"],
+      new Fuse(entityOptions, {
+        keys: ["entity_name"],
         threshold: 0.8, // Reduce threshold for better matches
         minMatchCharLength: 2,
         includeScore: false, // Remove score to reduce computation overhead
         findAllMatches: true,
       }),
-    [countyOptions]
+    [entityOptions]
   );
 
   const handleSearch = useCallback(
     debounce((inputValue: string) => {
       if (!inputValue) {
-        setSearchData(countyOptions);
+        setSearchData(entityOptions);
         return;
       }
       setSearchData(fuse.search(inputValue).map((result) => result.item));
     }, 200), // Adjust debounce delay to 200ms for smoother search
-    [fuse, countyOptions]
+    [fuse, entityOptions]
   );
 
   // Handle user selection from dropdown
-  const handleSelection = (selectedItem: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-    province_id: number;
-  }) => {
+  const handleSelection = (selectedItem: CountyOption) => {
     setSearchCounty(true);
     setSelectedValue(selectedItem);
   };

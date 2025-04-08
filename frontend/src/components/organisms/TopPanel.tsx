@@ -1,7 +1,3 @@
-/* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck comment
 import React, { useContext, useState, useEffect } from "react";
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
@@ -13,12 +9,22 @@ import PersonIcon from "@mui/icons-material/Person";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { Context, LayerType } from "../../utils/global";
 import TopPanelLayerTypeSwitch from "../molecules/TopPanelLayerTypeSwitch";
-import { GetCounties } from "../../../../../backend/src/controller/County.ts";
 
 interface TopPanelProps {
   yearOptions: string[];
   //provinceOptions
   //CountyOptions
+}
+interface EntityOption {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string;
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
+
+interface EntityMap {
+  [entity_id: number]: EntityOption;
 }
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
@@ -33,38 +39,6 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     setTopPanelOpen,
     setSelectedCounty,
     setSelectedProvince,
-    //   selectedProvince,
-    //   isPanelOpen,
-    //   setIsPanelOpen,
-    //   isTopPanelOpen,
-    //   setTopPanelOpen,
-    //   carryingCapacity,
-    //   setCarryingCapacity,
-    //   showBelowCells,
-    //   setShowBelowCells,
-    //   showAtCapCells,
-    //   setShowAtCapCells,
-    //   showAboveCells,
-    //   setShowAboveCells,
-    //   ndviSelect,
-    //   setNdviSelect,
-    //   showPositiveCells,
-    //   setShowPositiveCells,
-    //   showZeroCells,
-    //   setShowZeroCells,
-    //   showNegativeCells,
-    //   setShowNegativeCells,
-    //   selectedYear,
-    //   setSelectedYear,
-    //   grazingRange,
-    //   setGrazingRange,
-    //   selectedOption,
-    //   setSelectedOption,
-    //   displayName,
-    //   setSearched,
-    //   setDisplayName,
-    //   selectedLayerType,
-    //   setSelectedLayerType,
   } = context;
   const router = useRouter();
 
@@ -107,58 +81,72 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   ];
 
   // State to store counties dictionary
-  const [countyMap, setCountyMap] = useState<{
-    [county_id: number]: {
-      county_id: number;
-      county_name: string;
-      province_name: string;
-    };
-  }>(undefined);
+  const [entityMap, setEntityMap] = useState<EntityMap | undefined>(undefined);
 
   // Fetch counties from `getCounties` function
   const loadCountyData = async () => {
     try {
-      console.log("Fetching county data...");
-
       const response = await fetch("http://localhost:8080/api/county");
       console.log(response);
       if (!response.ok) throw new Error("Failed to fetch county data");
-
       const json_object = await response.json();
-
       if (!json_object.data || !Array.isArray(json_object.data)) {
         throw new Error("Invalid data format from API");
       }
+      const responseProv = await fetch("http://localhost:8080/api/province");
+      if (!responseProv.ok) throw new Error("Failed to fetch county data");
+      const json_object_prov = await responseProv.json();
+      if (!json_object_prov.data || !Array.isArray(json_object_prov.data)) {
+        throw new Error("Invalid data format from API");
+      }
 
-      const countyDictionary: {
-        [county_id: number]: {
-          county_id: number;
-          county_name: string;
-          province_name: string;
-        };
-      } = {};
-
+      const entityDict: EntityMap = {};
+      json_object_prov.data.forEach(
+        (province: {
+          province_data: { province_name: string };
+          province_id: number;
+        }) => {
+          var entityId = province.province_id;
+          var entityName = province.province_data.province_name;
+          var entityType = "Province";
+          var entitySubId = null;
+          var entitySubName = null;
+          if (entityId && entityName) {
+            entityDict[entityId] = {
+              entity_id: entityId,
+              entity_name: entityName,
+              entity_type: entityType,
+              entity_sub_id: entitySubId,
+              entity_sub_name: entitySubName,
+            };
+          }
+        }
+      );
       json_object.data.forEach(
         (county: {
           county_data: { soum_name: string; province_name: string };
           county_id: number;
+          province_id: number;
         }) => {
-          var countyId = county.county_id;
-          var countyName = county.county_data.soum_name;
-          var provinceName = county.county_data.province_name;
-          var provinceId = county.province_id;
-          if (countyId && countyName && provinceName) {
-            countyDictionary[countyId] = {
-              county_id: countyId,
-              county_name: countyName,
-              province_name: provinceName,
-              province_id: provinceId,
+          var entityId = county.county_id;
+          var entityName = county.county_data.soum_name;
+          var entityType = "Soum";
+          var entitySubId = county.province_id;
+          var entitySubName = county.county_data.province_name;
+
+          if (entityId && entityName && entitySubName) {
+            entityDict[entityId] = {
+              entity_id: entityId,
+              entity_name: entityName,
+              entity_type: entityType,
+              entity_sub_id: entitySubId,
+              entity_sub_name: entitySubName,
             };
           }
         }
       );
 
-      setCountyMap(countyDictionary);
+      setEntityMap(entityDict);
     } catch (error) {
       console.error("Error fetching county data:", error);
     }
@@ -168,24 +156,26 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     loadCountyData();
   }, []);
 
-  const handleValueSelect = async (countyData: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-    province_id: number;
-  }) => {
-    // Retrieve the county ID from the countyMap using the selected county name
-    setSelectedCounty(null);
-    setSelectedProvince(null);
+  const handleValueSelect = async (entityData: EntityOption) => {
+    if (entityData.entity_type == "Province") {
+      setSelectedCounty(null);
+      setSelectedProvince(null);
+      // Set province first
+      setSelectedProvince(entityData.entity_id);
+    } else {
+      // Retrieve the county ID from the countyMap using the selected county name
+      setSelectedCounty(null);
+      setSelectedProvince(null);
 
-    // Set province first
-    setSelectedProvince(countyData.province_id);
+      // Set province first
+      setSelectedProvince(entityData.entity_sub_id);
 
-    // After a short delay, set county (allows province data to load)
-
-    setSelectedCounty(countyData.county_id);
+      // After a short delay, set county (allows province data to load)
+      setSelectedCounty(entityData.entity_id);
+    }
   };
-  if (!countyMap) return <div>LOADING</div>;
+  console.log(entityMap);
+  if (!entityMap) return <div>LOADING</div>;
   return (
     <div
       style={{
@@ -201,7 +191,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       }}
     >
       <div>
-        <SearchBar countyMap={countyMap} onValueSelect={handleValueSelect} />
+        <SearchBar entityMap={entityMap} onValueSelect={handleValueSelect} />
       </div>
 
       <Context.Provider value={context}>
