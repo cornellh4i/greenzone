@@ -3,10 +3,11 @@ import { Autocomplete, TextField } from "@mui/material";
 import { Box, Typography } from "@mui/material";
 
 interface CountyOption {
-  county_id: number;
-  county_name: string;
-  province_name: string;
-  province_id: number;
+  entity_id: number;
+  entity_name: string;
+  entity_type: string;
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
 }
 interface DropdownProps {
   options: CountyOption[];
@@ -27,17 +28,18 @@ const Dropdown: React.FC<DropdownProps> = ({
     <Autocomplete
       options={options}
       getOptionLabel={(option) =>
-        typeof option === "string" ? option : option.county_name
+        typeof option === "string" ? option : option.entity_name
       }
       value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string") {
         } else {
           onChange({
-            county_id: newValue.county_id,
-            county_name: newValue.county_name,
-            province_name: newValue.province_name,
-            province_id: newValue.province_id,
+            entity_id: newValue.entity_id,
+            entity_name: newValue.entity_name,
+            entity_type: newValue.entity_type,
+            entity_sub_id: newValue.entity_sub_id,
+            entity_sub_name: newValue.entity_sub_name,
           });
         }
       }}
@@ -45,7 +47,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         <Box
           component="li"
           {...props}
-          key={option.county_id}
+          key={option.entity_id}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -66,7 +68,7 @@ const Dropdown: React.FC<DropdownProps> = ({
               width: "100%",
             }}
           >
-            {option.county_name}
+            {option.entity_name}
           </Typography>
           <Typography
             sx={{
@@ -80,7 +82,9 @@ const Dropdown: React.FC<DropdownProps> = ({
               width: "100%",
             }}
           >
-            Soum * {option.province_name}
+            {option.entity_type == "Soum"
+              ? `Soum * ${option.entity_sub_name}`
+              : "Aimag"}
           </Typography>
         </Box>
       )}
