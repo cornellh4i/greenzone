@@ -51,7 +51,8 @@ const InsightsPanel: React.FC = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json = await response.json();
       if (json.data) {
-        setProvinceIds(json.data.map((province: any) => province.province_id));
+        const ids = json.data.map((province: any) => province.province_id);
+        setProvinceIds(ids);
         setProvinces(json.data);
       }
     } catch (error) {

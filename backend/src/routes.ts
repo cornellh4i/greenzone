@@ -77,6 +77,8 @@ router.get("/cells/z_score_negative", getZScoreNegative);
 router.get("/cells/z_score_zero", getZScoreZero);
 router.get("/cells/z_score_positive", getZScorePositive);
 
+router.get("/province/:province_id/:category_type/cell-summary", getProvinceCellSummary);
+router.get("/county/:county_id/:category_type/cell-summary/", getCountyCellSummary);
 //
 router.get(
   "/cells/:year/:classificationType/:lowerBound/:upperBound",
