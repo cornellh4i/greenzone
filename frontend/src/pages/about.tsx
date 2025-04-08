@@ -1,5 +1,5 @@
 import React from "react";
-import MapComponent from "@/components/Map";
+import MapComponent from "@/components/organisms/Map";
 import TopPanel from "@/components/organisms/TopPanel";
 // import SimpleMap from "@/components/MapWrapper";
 /** An About page */

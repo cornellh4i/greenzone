@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import Map from "../components/Map";
+import Map from "../components/organisms/Map";
 import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
 import { LayerType, Context } from "../utils/global";
 const MonitoringPlatform: React.FC = () => {
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
   const [selectedCounty, setSelectedCounty] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isTopPanelOpen, setTopPanelOpen] = useState(false);
-  const [searched, setSearched] = useState<string | null>(null);
+  const [searched, setSearched] = useState<number | null>(null);
 
   const [selectedLayerType, setSelectedLayerType] = useState(
     LayerType.CarryingCapacity
   );
+  const [showGeneralPanel, setShowGeneralPanel] = useState(true);
   // Associated with Carrying Capacity
 
   const [showBelowCells, setShowBelowCells] = useState(false);
@@ -43,6 +44,9 @@ const MonitoringPlatform: React.FC = () => {
     setTopPanelOpen,
     searched,
     setSearched,
+
+    showGeneralPanel,
+    setShowGeneralPanel,
 
     selectedLayerType,
     setSelectedLayerType,

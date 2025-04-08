@@ -2,25 +2,17 @@ import React from "react";
 import { Autocomplete, TextField } from "@mui/material";
 import { Box, Typography } from "@mui/material";
 
+interface CountyOption {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string;
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
 interface DropdownProps {
-  options: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }[];
-  value:
-    | {
-        county_id: number;
-        county_name: string;
-        province_name: string;
-      }
-    | undefined;
-
-  onChange: (selectedItem: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }) => void;
+  options: CountyOption[];
+  value: CountyOption | undefined;
+  onChange: (selectedItem: CountyOption) => void;
   onInputChange: (inputValue: string) => void;
   sx?: React.CSSProperties;
 }
@@ -32,52 +24,95 @@ const Dropdown: React.FC<DropdownProps> = ({
   onInputChange,
   sx,
 }) => {
-  console.log(options);
   return (
     <Autocomplete
       options={options}
       getOptionLabel={(option) =>
-        typeof option === "string" ? option : option.county_name
+        typeof option === "string" ? option : option.entity_name
       }
-      value={value || null}
+      value={value}
       onChange={(event, newValue) => {
-        console.log("User selected:", newValue.county_name);
-        onChange({
-          county_id: newValue.county_id,
-          county_name: newValue.county_name,
-          province_name: newValue.province_name,
-        });
+        if (typeof newValue === "string") {
+        } else {
+          onChange({
+            entity_id: newValue.entity_id,
+            entity_name: newValue.entity_name,
+            entity_type: newValue.entity_type,
+            entity_sub_id: newValue.entity_sub_id,
+            entity_sub_name: newValue.entity_sub_name,
+          });
+        }
       }}
       renderOption={(props, option) => (
         <Box
           component="li"
           {...props}
-          key={option.county_id}
-          sx={{ display: "flex", flexDirection: "column", padding: "10px" }}
+          key={option.entity_id}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "10px",
+            alignItems: "flex-start",
+            width: "100%",
+          }}
         >
-          <Typography sx={{ fontWeight: "bold", color: "black" }}>
-            {option.county_name} {/* County Name */}
+          <Typography
+            sx={{
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: "300",
+              fontSize: "17.5px",
+              lineHeight: "150%",
+              letterSpacing: "0.18px",
+              color: "black",
+              textAlign: "left",
+              width: "100%",
+            }}
+          >
+            {option.entity_name}
           </Typography>
-          <Typography sx={{ fontSize: "14px", color: "darkblue" }}>
-            {option.province_name}
+          <Typography
+            sx={{
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: "250",
+              fontSize: "13px",
+              lineHeight: "140%",
+              letterSpacing: "0.16px",
+              color: "grey",
+              textAlign: "left",
+              width: "100%",
+            }}
+          >
+            {option.entity_type == "Soum"
+              ? `Soum * ${option.entity_sub_name}`
+              : "Aimag"}
           </Typography>
         </Box>
       )}
       renderInput={(params) => (
         <TextField
           {...params}
-          label={"Select Option"}
+          label={"Search for aimag, soum"}
           variant="outlined"
           sx={{
             ...sx,
             "& .MuiOutlinedInput-root": {
               borderRadius: sx?.borderRadius || "20px",
-              color: sx?.color || "black",
-              fontWeight: sx?.fontWeight || "bold",
-              fontFamily: sx?.fontFamily || "Arial, sans-serif",
-              textAlign: "center",
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: "300",
+              width: "100%",
+              minWidth: "300px",
+              fontSize: "17px",
+              lineHeight: "150%",
+              letterSpacing: "0.18px",
+              verticalAlign: "middle",
+              color: "black",
+              textAlign: "left",
               "& input": {
-                textAlign: "center",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "300",
+                fontSize: "17px",
+                lineHeight: "150%",
+                letterSpacing: "0.18px",
               },
             },
             "& .MuiInputLabel-root": {

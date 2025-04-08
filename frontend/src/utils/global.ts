@@ -9,14 +9,14 @@ export enum LayerType {
 
 export enum SelectedType {
   Province = "province",
-  County = "county"
+  County = "county",
 }
 
 export type GlobalContext = {
   selectedProvince: number | null;
-  setSelectedProvince: SetState<number>;
+  setSelectedProvince: SetState<number | null>;
   selectedCounty: number | null;
-  setSelectedCounty: SetState<number>;
+  setSelectedCounty: SetState<number | null>;
   selectedYear: number;
   setSelectedYear: SetState<number>;
   isPanelOpen: boolean | null;
@@ -24,7 +24,7 @@ export type GlobalContext = {
   isTopPanelOpen: boolean | null;
   setTopPanelOpen: SetState<boolean>;
   searched: number | null;
-  setSearched: SetState<number>;
+  setSearched: SetState<number | null>;
   selectedOption: string | null; //"carryingCapacity"
   setSelectedOption: SetState<string>;
   displayName: string;
@@ -41,6 +41,8 @@ export type GlobalContext = {
   setShowAtCapCells: SetState<boolean>;
   showAboveCells: boolean | null;
   setShowAboveCells: SetState<boolean>;
+  showGeneralPanel: boolean | null;
+  setShowGeneralPanel: SetState<boolean>;
 
   // Z-Score NDVI Related
 

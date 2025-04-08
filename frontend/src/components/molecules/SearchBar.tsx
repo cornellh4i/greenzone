@@ -2,71 +2,69 @@ import React, { useState, useMemo, useCallback } from "react";
 import Fuse from "fuse.js";
 import { Box, debounce } from "@mui/material";
 import SearchBarDropdown from "../atoms/SearchBarDropDown";
-import Button from "../atoms/Button";
+import { IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
+interface CountyOption {
+  entity_id: number;
+  entity_name: string;
+  entity_type: string;
+  entity_sub_id: number | null;
+  entity_sub_name: string | null;
+}
 interface SearchBarParams {
-  countyMap: {
-    [county_id: number]: {
-      county_id: number;
-      county_name: string;
-      province_name: string;
-    };
+  entityMap: {
+    [entity_id: number]: CountyOption;
   };
-  onValueSelect: (countyData: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }) => void;
+  onValueSelect: (entityData: CountyOption) => void;
 }
 
-const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
-  const [selectedValue, setSelectedValue] = useState<
-    | {
-        county_id: number;
-        county_name: string;
-        province_name: string;
-      }
-    | undefined
-  >(undefined);
-
-  const countyOptions = useMemo(
-    () =>
-      Object.values(countyMap).map((county) => ({
-        ...county,
-      })),
-    [countyMap]
+const SearchBar: React.FC<SearchBarParams> = ({ entityMap, onValueSelect }) => {
+  const [selectedValue, setSelectedValue] = useState<CountyOption | undefined>(
+    undefined
   );
 
-  const [searchData, setSearchData] = useState(countyOptions);
+  const [searchCounty, setSearchCounty] = useState<boolean | undefined>(
+    undefined
+  );
+
+  const entityOptions = useMemo(
+    () =>
+      Object.values(entityMap).map((entity) => ({
+        ...entity,
+      })),
+    [entityMap]
+  );
+  // const [searchProvince, setSearchProvince] = useState<number | undefined>(
+  //   undefined
+  // );
+  const [searchData, setSearchData] = useState(entityOptions);
   const fuse = useMemo(
     () =>
-      new Fuse(countyOptions, {
-        keys: ["county_name"],
+      new Fuse(entityOptions, {
+        keys: ["entity_name"],
         threshold: 0.8, // Reduce threshold for better matches
         minMatchCharLength: 2,
         includeScore: false, // Remove score to reduce computation overhead
         findAllMatches: true,
       }),
-    [countyOptions]
+    [entityOptions]
   );
 
   const handleSearch = useCallback(
     debounce((inputValue: string) => {
       if (!inputValue) {
-        setSearchData(countyOptions);
+        setSearchData(entityOptions);
         return;
       }
       setSearchData(fuse.search(inputValue).map((result) => result.item));
     }, 200), // Adjust debounce delay to 200ms for smoother search
-    [fuse, countyOptions]
+    [fuse, entityOptions]
   );
 
   // Handle user selection from dropdown
-  const handleSelection = (selectedItem: {
-    county_id: number;
-    county_name: string;
-    province_name: string;
-  }) => {
+  const handleSelection = (selectedItem: CountyOption) => {
+    setSearchCounty(true);
     setSelectedValue(selectedItem);
   };
 
@@ -79,35 +77,38 @@ const SearchBar: React.FC<SearchBarParams> = ({ countyMap, onValueSelect }) => {
   };
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         display: "flex",
+        justifyContent: "center",
         alignItems: "center",
+        flexWrap: "nowrap",
         width: "100%",
+        padding: "5px",
       }}
     >
-      <Box sx={{ flexGrow: 1, minWidth: 150, paddingRight: "16px" }}>
-        <SearchBarDropdown
-          options={searchData}
-          value={selectedValue}
-          onChange={handleSelection} // fixes the value that the user clicks on
-          onInputChange={handleSearch} // searches while user types
-          // label="Select County"
-          sx={{ width: "100%" }}
-        />
-      </Box>
-      <Button
-        onClick={handleOptionClick}
-        label="Search"
-        sx={{
-          height: "50px",
-          width: "150px",
-          marginLeft: "auto",
-          flexShrink: 0,
-        }}
-        disabled={!selectedValue}
+      <SearchBarDropdown
+        options={searchData}
+        value={selectedValue}
+        onChange={handleSelection}
+        onInputChange={handleSearch}
       />
-    </Box>
+      <IconButton
+        onClick={handleOptionClick}
+        disabled={!selectedValue}
+        sx={
+          {
+            // position: "absolute",
+            // right: "20px",
+            // top: "50%",
+            // transform: "translateY(-50%)",
+            // color: "grey",
+          }
+        }
+      >
+        <SearchIcon />
+      </IconButton>
+    </div>
   );
 };
 

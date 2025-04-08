@@ -48,12 +48,12 @@ const TopPanelLayerTypeSwitch = () => {
 
   const buttonStyle = (isActive: boolean | null, color: string) => ({
     backgroundColor: isActive ? color : "grey",
-    borderRadius: "50px",
-    padding: "10px 20px",
-    width: "100px",
-    height: "40px",
+    borderRadius: "48px",
+    padding: "12px 24px 12px 24px",
+    width: "80px",
+    height: "35px",
     textAlign: "center",
-    fontSize: "12px",
+    fontSize: "11.5px",
     fontWeight: "bold",
     flex: "1 1 auto",
     minWidth: "100px",
@@ -75,45 +75,39 @@ const TopPanelLayerTypeSwitch = () => {
       }}
     >
       <Dropdown
-        label="Select Year"
         options={years}
         value={selectedYear.toString()}
-        onChange={(val) => setSelectedYear(val)}
+        onChange={(val) => setSelectedYear(Number(val))}
+        label={""}
         sx={{
           width: "120px",
-          height: "40px",
-          borderRadius: "30px",
-          backgroundColor: "white", // Match button color
-          fontSize: "14px",
+          backgroundColor: "white",
+          fontSize: "8px",
           color: "black",
-          fontWeight: "bold",
           textAlign: "center",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
         }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>Year: {selectedYear}</span>
-        </div>
-      </Dropdown>
+      />
+
       <Button
         onClick={() => setGrazingRange((prev) => !prev)}
         label="Grazing Range"
-        sx={buttonStyle(grazingRange, "green")}
+        sx={buttonStyle(grazingRange, "#065143")}
       />
 
       <div
         style={{
-          backgroundColor: "#e6e6e6",
-          padding: "15px",
-          borderRadius: "20px",
+          backgroundColor: "#E6EEEC",
+          padding: "12px 24px 12px 24px",
+          borderRadius: "48px",
           display: "flex",
           justifyContent: "center",
           flexWrap: "nowrap",
           overflowX: "auto",
-          width: "60%",
+          width: "70%",
           gap: "10px",
         }}
       >
@@ -122,19 +116,19 @@ const TopPanelLayerTypeSwitch = () => {
             <Button
               onClick={() => setShowBelowCells(!showBelowCells)}
               label="Below"
-              sx={buttonStyle(showBelowCells, "green")}
+              sx={buttonStyle(showBelowCells, "#008A16")}
               disabled={!(selectedLayerType == LayerType.CarryingCapacity)}
             />
             <Button
               onClick={() => setShowAtCapCells(!showAtCapCells)}
               label="At Capacity"
-              sx={buttonStyle(showAtCapCells, "#C6BF31")}
+              sx={buttonStyle(showAtCapCells, "#A66605")}
               disabled={!(selectedLayerType == LayerType.CarryingCapacity)}
             />
             <Button
               onClick={() => setShowAboveCells(!showAboveCells)}
               label="Above"
-              sx={buttonStyle(showAboveCells, "red")}
+              sx={buttonStyle(showAboveCells, "#BF0022")}
               disabled={!(selectedLayerType == LayerType.CarryingCapacity)}
             />
           </>
@@ -183,11 +177,11 @@ const TopPanelLayerTypeSwitch = () => {
           sx={{
             backgroundColor: "#555",
             color: "white",
-            borderRadius: "12px",
-            padding: "10px 20px",
+            borderRadius: "25px",
+            padding: "10px 10px",
             width: "140px",
-            height: "50px",
-            fontSize: "10px",
+            height: "35px",
+            fontSize: "12px",
             fontWeight: "bold",
           }}
         />

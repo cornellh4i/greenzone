@@ -2,75 +2,6 @@ import ProvinceModel from "../models/Province";
 import { Request, Response } from "express";
 import { supabase } from "../db/postgresconn";
 
-export const createProvince = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const province = req.body;
-    console.log(province);
-
-    // just double check if supabase client exists
-    if (supabase) {
-      const { data, error } = await supabase
-        .from("Provinces")
-        .insert([
-          {
-            province_id: province.province_id,
-            province_data: province.province_data,
-          },
-        ])
-        .select();
-
-      // error handling in case the insertion doesn't work
-      if (error) {
-        res.status(500).json({
-          log: "Error while inserting the data",
-          error: error.message,
-        });
-        return;
-      }
-      res
-        .status(201)
-        .json({ log: "Data was successfully inserted", data: data });
-    }
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-// // THIS IS A TESTER FUNCTION
-// export const createAllProvinces = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const feature = req.body;
-//     console.log(feature);
-//     const province = {
-//       aid: feature.properties.aid,
-//       province_name: feature.properties.name,
-//       province_counties: feature.properties.province_counties,
-//       province_land_area: feature.properties.province_land_area,
-//       province_herders: feature.properties.herders,
-//       province_number_of_livestock: feature.properties.livestock,
-//       province_number_of_cattle: feature.properties.number_of_cattle,
-//       province_number_of_goat: feature.properties.number_of_goat,
-//       province_number_of_sheep: feature.properties.number_of_sheep,
-//       province_number_of_camel: feature.properties.number_of_camel,
-//       province_number_of_horse: feature.properties.number_of_horse,
-//       geometry: feature.geometry,
-//     };
-//     console.log(province);
-//     // Insert all provinces at once using insertMany for efficiency
-//     const insertedProvinces = await new Province(province).save();
-
-//     res.status(201).json(insertedProvinces);
-//   } catch (error: any) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
-
 export const getProvinces = async (
   req: Request,
   res: Response
@@ -259,7 +190,8 @@ export const getProvinceCellSummary = async (
         });
         return;
       }
-      // Call the stored procedure using Supabase RPC
+
+      // Fetch data
       const { data, error } = await supabase.rpc(
         "categorize_cells_by_province",
         {
@@ -267,7 +199,7 @@ export const getProvinceCellSummary = async (
           category_type: category_type,
         }
       );
-      // Error handling in case the query fails
+
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -277,12 +209,76 @@ export const getProvinceCellSummary = async (
       }
 
       res
-        .status(201)
+        .status(200)
         .json({ log: "Data was successfully collected", data: data });
     } catch (error: any) {
       res
         .status(500)
         .json({ log: "Internal server error", error: error.message });
     }
+  }
+};
+
+export const getProvinceGR = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!supabase) {
+    res.status(500).json({ log: "Supabase connection is missing." });
+    return;
+  }
+
+  try {
+    console.log("Incoming request params:", req.params);
+
+    const { province_id } = req.params;
+    console.log(`Extracted province_id: ${province_id}`);
+
+    const parsedProvinceId = parseInt(province_id, 10);
+    console.log(`Parsed province_id: ${parsedProvinceId}`);
+
+    // Validate province_id
+    if (
+      isNaN(parsedProvinceId) ||
+      parsedProvinceId < 11 ||
+      parsedProvinceId > 85
+    ) {
+      console.error("Invalid province_id:", parsedProvinceId);
+      res
+        .status(400)
+        .json({ log: "Invalid province_id. It must be a valid number." });
+      return;
+    }
+
+    // Log before calling the RPC
+    console.log(`Calling Supabase RPC with p_id: ${parsedProvinceId}`);
+
+    // Call Supabase function
+    const { data, error } = await supabase.rpc(
+      "find_grazing_range_percentage",
+      {
+        p_id: parsedProvinceId,
+      }
+    );
+
+    // Log response from Supabase
+    console.log("Supabase RPC Response:", { data, error });
+
+    if (error) {
+      console.error("Supabase RPC Error:", error.message);
+      res.status(500).json({
+        log: "Error while collecting grazing range data",
+        error: error.message,
+      });
+      return;
+    }
+
+    console.log("Grazing Range Percentage Data:", data);
+    res.status(200).json({ log: "Grazing range percentage retrieved", data });
+  } catch (error: any) {
+    console.error("Unexpected Server Error:", error.message);
+    res
+      .status(500)
+      .json({ log: "Internal server error", error: error.message });
   }
 };
