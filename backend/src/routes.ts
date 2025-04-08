@@ -22,7 +22,7 @@ import {
 
 import { SignupUser } from "./users";
 
-import { getCellValuesbyYearandCtype } from "./controller/Cell";
+import { getCellValuesbyYearandCtype, getYearOptions } from "./controller/Cell";
 
 
 const router = express.Router();
@@ -31,6 +31,7 @@ router.get(
   "/cells/:year/:classificationType/:lowerBound/:upperBound",
   getCellValuesbyYearandCtype
 );
+router.get("/cells/yearOptions", getYearOptions);
 
 // Route to get all provinces
 router.get("/province", getProvinces);

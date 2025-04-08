@@ -97,3 +97,30 @@ export const getCellValuesbyYearandCtype = async (
     }
   }
 };
+
+
+export const getYearOptions = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("new_yearly_cell_data")
+        .select("year")
+
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the data",
+          error: error.message,
+        });
+        return;
+      }
+      res
+        .status(201)
+        .json({ log: "Data was successfully Collected", data: data });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+};
