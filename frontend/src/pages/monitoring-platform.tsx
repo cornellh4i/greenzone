@@ -79,18 +79,22 @@ const MonitoringPlatform: React.FC = () => {
     displayName,
     setDisplayName,
   };
-  
+
   const loadYearOptions = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/cells/years");
+      const response = await fetch(
+        "http://localhost:8080/api/cells/yearOptions"
+      );
       const response_json = await response.json();
-      const years = response_json.data.map((year: { year: number }) => year.year.toString());
+      const years = response_json.data.map((year: { year: number }) =>
+        year.year.toString()
+      );
       setYearOptions(years.sort());
       return;
     } catch (error) {
       console.error("Error fetching year options:", error);
     }
-  }
+  };
 
   useEffect(() => {
     loadYearOptions();
