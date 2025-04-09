@@ -420,10 +420,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             maxWidth: "400px",
             boxSizing: "border-box",
             p: 2,
-            paddingTop: "20px",
+            paddingTop: "10px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "70px",
+            marginTop: "78px",
             height: "calc(100% - 70px)",
           },
         }}
@@ -439,11 +439,23 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           {!provinceData ? (
             // General panel when no province data exists
             <div>
-              <h1>Carrying Capacity Early Warning System</h1>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  color: "#111",
+                  fontFamily: "Inter, Roboto, sans-serif",
+                  mt: 2,
+                  mb: 1,
+                }}
+              >
+                Carrying Capacity Early Warning System
+              </Typography>
               <Divider sx={{ mb: 2 }} />
-              <p>
+              <Typography variant="body2" color="#111">
                 Please select a province or adjust the year slider to view data.
-              </p>
+              </Typography>
+
               <Slide
                 name="Year"
                 selectedValue={selectedYear}

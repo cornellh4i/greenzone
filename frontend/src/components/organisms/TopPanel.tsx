@@ -9,6 +9,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { Context, LayerType } from "../../utils/global";
 import TopPanelLayerTypeSwitch from "../molecules/TopPanelLayerTypeSwitch";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface TopPanelProps {
   yearOptions: string[];
@@ -139,9 +140,26 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       setSelectedCounty(entityData.entity_id);
     }
   };
-
-  
-  if (!entityMap) return <div>LOADING</div>;
+  if (!entityMap) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#fff",
+          zIndex: 1300,
+        }}
+      >
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
     <div
       style={{
@@ -152,7 +170,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
         zIndex: 1300,
         display: "flex",
         alignItems: "center",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        backgroundColor: "white",
         borderRadius: "5px",
       }}
     >
