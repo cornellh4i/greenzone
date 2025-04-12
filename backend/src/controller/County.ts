@@ -181,40 +181,29 @@ export const getCountyCellSummary = async (
 ): Promise<void> => {
   if (supabase) {
     try {
-      const county_id = parseInt(req.params.county_id as string, 10);
-      const category_type = req.params.category_type as string;
+      const countyId = parseInt(req.params.id);
+      const classificationType = req.query.classificationType as string;
+      const year = parseInt(req.query.year as string);
 
-      // Validate category_type
-      if (!["carrying_capacity", "z_score"].includes(category_type)) {
-        res.status(400).json({
-          log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
-        });
-        return;
-      }
-      // Call the stored procedure using Supabase RPC
-      const { data, error } = await supabase.rpc("categorize_cells_by_county", {
-        c_id: county_id,
-        category_type: category_type,
+      const { data, error } = await supabase.rpc('categorize_cells_by_county', {
+        c_id: countyId,
+        classification_type: classificationType,
+        year: year
       });
-      // Error handling in case the query fails
+
       if (error) {
-        res.status(500).json({
-          log: "Error while collecting the data",
-          error: error.message,
-        });
+        res.status(500).json({ error: error.message });
         return;
       }
 
-      res
-        .status(201)
-        .json({ log: "Data was successfully collected", data: data });
-    } catch (error: any) {
-      res
-        .status(500)
-        .json({ log: "Internal server error", error: error.message });
+      res.status(200).json(data);
+    } catch (error) {
+      console.error("Error in getCountyCellSummary:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 };
+
 export const getCountiesGeomInProvince = async (
   req: Request,
   res: Response
@@ -285,47 +274,47 @@ export const deleteCounty = async (
   }
 };
 
-export const getCountyCellSummary = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  if (supabase) {
-    try {
-      const county_id = parseInt(req.params.county_id as string, 10);
-      const category_type = req.params.category_type as string;
+// export const getCountyCellSummary = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   if (supabase) {
+//     try {
+//       const county_id = parseInt(req.params.county_id as string, 10);
+//       const category_type = req.params.category_type as string;
 
-      if (isNaN(county_id)) {
-        res.status(400).json({ log: "Invalid county_id. It must be a number." });
-        return;
-      }
+//       if (isNaN(county_id)) {
+//         res.status(400).json({ log: "Invalid county_id. It must be a number." });
+//         return;
+//       }
 
-      if (!["carrying_capacity", "z_score"].includes(category_type)) {
-        res.status(400).json({
-          log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
-        });
-        return;
-      }
+//       if (!["carrying_capacity", "z_score"].includes(category_type)) {
+//         res.status(400).json({
+//           log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
+//         });
+//         return;
+//       }
 
-      const { data, error } = await supabase.rpc(
-        "categorize_cells_by_county",
-        {
-          c_id: county_id,
-          category_type: category_type,
-        }
-      );
+//       const { data, error } = await supabase.rpc(
+//         "categorize_cells_by_county",
+//         {
+//           c_id: county_id,
+//           category_type: category_type,
+//         }
+//       );
 
-      if (error) {
-        res.status(500).json({
-          log: "Error while collecting data from SQL function",
-          error: error.message,
-        });
-        return;
-      }
+//       if (error) {
+//         res.status(500).json({
+//           log: "Error while collecting data from SQL function",
+//           error: error.message,
+//         });
+//         return;
+//       }
 
-      res.status(200).json({ log: "Data collected successfully", data: data || [] });
-    } catch (error: any) {
-      console.error("Server Error:", error);
-      res.status(500).json({ log: "Internal server error", error: error.message });
-    }
-  }
-};
+//       res.status(200).json({ log: "Data collected successfully", data: data || [] });
+//     } catch (error: any) {
+//       console.error("Server Error:", error);
+//       res.status(500).json({ log: "Internal server error", error: error.message });
+//     }
+//   }
+// };

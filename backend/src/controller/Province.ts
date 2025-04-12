@@ -241,45 +241,25 @@ export const getProvinceCellSummary = async (
 ): Promise<void> => {
   if (supabase) {
     try {
-      const province_id = parseInt(req.params.province_id as string, 10);
-      const category_type = req.params.category_type as string;
+      const provinceId = parseInt(req.params.id);
+      const classificationType = req.query.classificationType as string;
+      const year = parseInt(req.query.year as string);
 
-      // Validate province_id
-      if (province_id < 11 || province_id > 85) {
-        res.status(400).json({
-          log: "Invalid province_id. It must be a valid number.",
-        });
-        return;
-      }
-
-      // Validate category_type
-      if (!["carrying_capacity", "z_score"].includes(category_type)) {
-        res.status(400).json({
-          log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
-        });
-        return;
-      }
-
-      // Fetch data
-      const { data, error } = await supabase.rpc(
-        "categorize_cells_by_province",
-        {
-          p_id: province_id,
-          category_type: category_type,
-        }
-      );
+      const { data, error } = await supabase.rpc('categorize_cells_by_province', {
+        p_id: provinceId,
+        classification_type: classificationType,
+        year: year
+      });
 
       if (error) {
-        res.status(500).json({
-          log: "Error while collecting the data",
-          error: error.message,
-        });
+        res.status(500).json({ error: error.message });
         return;
       }
 
-      res.status(200).json({ log: "Data was successfully collected", data: data });
-    } catch (error: any) {
-      res.status(500).json({ log: "Internal server error", error: error.message });
+      res.status(200).json(data);
+    } catch (error) {
+      console.error("Error in getProvinceCellSummary:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 };

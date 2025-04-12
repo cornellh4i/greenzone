@@ -270,6 +270,19 @@ const InsightsPanel: React.FC = () => {
                   privatizationPeriods={privatizationPeriods}
                 />
               )}
+              <Typography
+                sx={{
+                  fontSize: '0.875rem',
+                  color: '#6B7280',
+                  mt: 2,
+                  px: 2,
+                  fontStyle: 'italic',
+                  textAlign: 'center'
+                }}
+              >
+                Note: All livestock numbers are converted to sheep units using the following conversion rates:
+                Camel (5 units), Horse (7 units), Cattle (6 units), Sheep (1 unit), Goat (0.9 units)
+              </Typography>
             </Box>
           </Box>
         </Box>

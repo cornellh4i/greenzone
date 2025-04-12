@@ -22,10 +22,19 @@ import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
+interface ClassificationSummary {
+  totalCells: number;
+  cat1Percentage: number;
+  cat2Percentage: number;
+  cat3Percentage: number;
+}
+
 interface SidePanelProps {
   yearOptions: string[];
+  selectedYear: number;
 }
-const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
+
+const SidePanel: React.FC<SidePanelProps> = ({ yearOptions, selectedYear }) => {
   const context = useContext(Context);
 
   if (!context) {
@@ -36,7 +45,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setSelectedProvince,
     selectedCounty,
     setSelectedCounty,
-    selectedYear,
     setSelectedYear,
     grazingRange,
     setGrazingRange,
@@ -88,27 +96,32 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const loadEntityCellSummary = async (
     entityType: string,
     entityID: number,
-    categoryType: LayerType | null
-  ) => {
-    console.log(entityID);
-    console.log(entityType);
-    console.log(categoryType);
+    categoryType: LayerType | null,
+    classificationYear: number
+  ): Promise<ClassificationSummary | null> => {
     try {
+      const endpoint = entityType === "province"
+        ? `/api/province/${entityID}/cell-summary`
+        : `/api/county/${entityID}/cell-summary`;
+
       const response = await fetch(
-        `http://localhost:8080/api/${entityType}/${entityID}/${categoryType}/cell-summary` // !!!!! change the api to include province or county
+        `${endpoint}?classificationType=${categoryType?.toLowerCase()}&year=${classificationYear}`
       );
 
-      const response_json = await response.json();
-      const percentages = [
-        response_json.data[0].cat1_percentage || 0,
-        response_json.data[0].cat2_percentage || 0,
-        response_json.data[0].cat3_percentage || 0,
-      ];
-      if (response_json.data) {
-        return percentages;
-      } else return [];
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        totalCells: data.total_cells,
+        cat1Percentage: data.cat1_percentage,
+        cat2Percentage: data.cat2_percentage,
+        cat3Percentage: data.cat3_percentage,
+      };
     } catch (error) {
-      console.error("Error fetching Entity CellSummary:", error);
+      console.error('Error loading cell summary:', error);
+      return null;
     }
   };
 
@@ -172,7 +185,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             loadEntityCellSummary(
               "province",
               selectedProvince,
-              selectedLayerType
+              selectedLayerType,
+              selectedYear
             ),
             loadEntityLivestock("province", selectedProvince),
           ]);
@@ -188,7 +202,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         const [countyStats, countyCellSummary, countyLivestock] =
           await Promise.all([
             loadEntityStats("county", selectedCounty),
-            loadEntityCellSummary("county", selectedCounty, selectedLayerType),
+            loadEntityCellSummary("county", selectedCounty, selectedLayerType, selectedYear),
             loadEntityLivestock("county", selectedCounty),
           ]);
         setCountyData({ countyStats, countyCellSummary, countyLivestock });
@@ -206,13 +220,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       setTopPanelOpen(false);
     }
   }, [provinceData, setTopPanelOpen]);
-
-  // Controls whether to open up the SidePanel Or NOT
-  // useEffect(() => {
-  //   if (selectedProvince || selectedCounty) {
-  //     setIsPanelOpen(true);
-  //   }
-  // }, [selectedProvince, selectedCounty, setIsPanelOpen]);
 
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
