@@ -1,4 +1,5 @@
 import React from "react";
+import "../app/about.css";
 import MapComponent from "@/components/organisms/Map";
 import TopPanel from "@/components/organisms/TopPanel";
 // import SimpleMap from "@/components/MapWrapper";
@@ -33,82 +34,88 @@ const teamMembers = [
     name: "Oyut Armarjargal",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/oyut.png", // Replace with actual path if needed
+    image: "/Oyut.png", // Replace with actual path if needed
   },
   {
     name: "Khusel Avirmed",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/khusel.png", // Replace with actual path if needed
+    image: "/Khusel.png", // Replace with actual path if needed
   },
   {
     name: "Turbold Baatarchuluu",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/turbold.png", // Replace with actual path if needed
+    image: "/Turbold.png", // Replace with actual path if needed
   },
 ];
 
 const About = () => {
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-12">
-      <section className="flex flex-col md:flex-row items-start justify-between">
-        <div className="md:w-1/2 space-y-4">
-          <h1 className="text-3xl font-bold">About GreenZone</h1>
-          <h2 className="text-xl font-semibold">Our Purpose and Mission</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-          <p>Lorem ipsum dolor sit amet sed do eiusmod tempor.</p>
+    <div className="container">
+      <section className="hero">
+        <div className="hero-text">
+          <h1 className="text-3xl font-bold about-heading">About GreenZone</h1>
+          <div className="header-subtext">
+            <h2 className="text-xl about-section-title">
+              Our Purpose and Mission
+            </h2>
+            <p className="about-subtext">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+              eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
+              elit sed do eiusmod tempor.
+            </p>
+            <p className="about-subtext">
+              Lorem ipsum dolor sit amet sed do eiusmod tempor.
+            </p>
+          </div>
         </div>
         <div className="md:w-1/2 mt-8 md:mt-0 md:pl-8">
           <Image
-            src="/Users/srijaghosh/Desktop/Hack4Impact/GreenZone_Dev/greenzone/frontend/public/mountain.png" // Replace with actual path to the image
+            src="/Landscape.png" // Replace with actual path to the image
             alt="Landscape"
-            width={500}
-            height={300}
+            width={605}
+            height={346.13}
             className="rounded-xl object-cover"
           />
         </div>
       </section>
 
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Who We Are</h2>
-        <div className="space-y-4 text-justify">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-        </div>
+      <section className="who-we-are">
+        <h2 className="about-section-title">Who We Are</h2>
+        <p className="about-subtext">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
+          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+          eiusmod tempor.
+        </p>
+        <p className="about-subtext">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
+          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+          eiusmod tempor.
+        </p>
+        <p className="about-subtext">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
+          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+          eiusmod tempor.
+        </p>
+      </section>
 
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
+      <section className="contact-container">
           {teamMembers.map((member) => (
-            <div key={member.name}>
+            <div className="member-card" key={member.name}>
               <Image
                 src={member.image}
                 alt={member.name}
-                width={150}
-                height={150}
-                className="rounded-full mx-auto"
+                width={250}
+                height={250}
+                className="contact-photo"
               />
-              <h3 className="mt-4 font-semibold">{member.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">{member.description}</p>
+              <h3 className="mt-4 about-section-title contact-name">{member.name}</h3>
+              <p className="text-sm text-gray-600 mt-1 contact-description">
+                {member.description}
+              </p>
             </div>
           ))}
-        </div>
       </section>
     </div>
   );

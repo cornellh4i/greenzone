@@ -1,0 +1,99 @@
+  * {
+    margin: 0;
+  }
+  
+  .about-heading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+  }
+  
+  .about-subtext {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+  }
+  
+  .about-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+  }
+
+  .contact-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+  }
+  
+  .contact-description {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+  }  
+
+  .container {
+    width: 1600px;
+    height: 1304.43px;
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+  }
+
+  .hero {
+    display: flex;
+    gap: 140px;
+    align-items: center;
+  }
+
+  .hero-text {
+    width: 855px;
+    height: 347px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .header-subtext {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .who-we-are {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    p {
+        margin: 0;
+    }
+
+    h2 {
+        margin: 0;
+    }
+  }
+
+  .contact-container {
+    display: flex;
+    justify-content: center;
+    gap: 200px;
+  }
+
+  .member-card {
+    width: 300px;
+    height: 395.43px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    img {
+        display: block;
+        margin: 0 auto;
+    }
+    h3 {
+        text-align: center;
+    }
+  }
+  
+  
