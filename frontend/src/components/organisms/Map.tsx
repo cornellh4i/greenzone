@@ -313,6 +313,19 @@ const MapComponent: React.FC = () => {
       }
     },
   });
+
+  const provinceMaskLayer = new PolygonLayer({
+    id: "province-mask-layer",
+    data: provinces.filter((prov) => prov.ID !== selectedProvince),
+    getPolygon: (d) => d.coordinates,
+    filled: true,
+    getLineColor: [0, 0, 0, 0],
+    getFillColor: [255, 255, 255,  150],
+    lineWidthMinPixels: 0,
+    pickable: false,
+  });
+
+  // const soumLayer = new PolygonLayer({
   const soumLayer = new PolygonLayer({
     id: "soum-layer",
     data: soums,
@@ -415,6 +428,7 @@ const MapComponent: React.FC = () => {
     layers.push(provinceLayer);
     if (selectedProvince && soums) {
       layers.push(soumLayer);
+      layers.push(provinceMaskLayer);
     }
     if (selectedLayerType == LayerType.ZScore) {
       if (showNegativeCells) layers.push(cellsNegativeLayer);
