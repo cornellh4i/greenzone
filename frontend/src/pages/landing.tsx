@@ -22,12 +22,12 @@ const Landing : React.FC = () => {
       color="transparent"
       elevation={0}
       sx={{ backgroundColor: '#E6EEEC' }} 
-    >
+      >
       <Toolbar sx={{ justifyContent: 'space-between'}}>
         <Typography variant="h6" component="div" sx={{
-    color: '#065143', fontWeight: 'bold',
-    fontSize: isMobile ? '24px' : '30px',
-  }}>
+          color: '#065143', fontWeight: 'bold',
+          fontSize: isMobile ? '24px' : '30px',
+        }}>
           GreenZone Analytics
         </Typography>
         <Box
@@ -44,37 +44,37 @@ const Landing : React.FC = () => {
         >
         <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px',}}>
             About
-          </Button>
-          <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px', }} onClick={() => handleNavigate('/summary-stats')}>
-            Insights
-          </Button>
-          <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px',}}>
-            Methodologies
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: '#065143',
-              borderRadius: '12px',
-              '&:hover': { bgcolor: '#043F33' },
-              color: 'white',
-              fontSize: '18px',
-              textTransform: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1, 
-              paddingX: 2,
-              paddingY: 1,
-            }} onClick = {() => handleNavigate('/monitoring-platform')}
-          >
-              Launch
-  <img
-    src="/launch_icon.png"
-    alt="icon"
-    style={{ width: 20, height: 20 }}
-  /> 
-  </Button>
-  <Box sx={{ minWidth: 160 }}>
+        </Button>
+        <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px', }} onClick={() => handleNavigate('/summary-stats')}>
+          Insights
+        </Button>
+        <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px',}}>
+          Methodologies
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: '#065143',
+            borderRadius: '12px',
+            '&:hover': { bgcolor: '#043F33' },
+            color: 'white',
+            fontSize: '18px',
+            textTransform: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1, 
+            paddingX: 2,
+            paddingY: 1,
+          }} onClick = {() => handleNavigate('/monitoring-platform')}
+        >
+          Launch
+        <img
+          src="/launch_icon.png"
+          alt="icon"
+          style={{ width: 20, height: 20 }}
+        /> 
+      </Button>
+      <Box sx={{ minWidth: 160 }}>
             <Select
               value={selectedLanguage}
               onChange={handleLanguageChange}
@@ -460,7 +460,7 @@ const Landing : React.FC = () => {
             </Box>
         </Box>
 
-          {/* Contact */}
+        {/* Contact */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Contact Us
