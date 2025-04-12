@@ -65,7 +65,7 @@ const About = () => {
         </div>
         <div className="md:w-1/2 mt-8 md:mt-0 md:pl-8">
           <Image
-            src="/landscape.jpg" // Replace with actual path to the image
+            src="/Users/srijaghosh/Desktop/Hack4Impact/GreenZone_Dev/greenzone/frontend/public/mountain.png" // Replace with actual path to the image
             alt="Landscape"
             width={500}
             height={300}
