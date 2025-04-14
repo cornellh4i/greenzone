@@ -73,11 +73,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const livestockTypes = ["Cattle", "Horse", "Goat", "Camel", "Sheep"];
   const loadProvinceCellSummary = async (
     provinceId: number,
-    categoryType: string
+    categoryType: string,
+    classificationYear: number
   ) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/${provinceId}/${categoryType}/cell-summary`
+        `http://localhost:8080/api/province/${provinceId}/${categoryType}/cell-summary?year=${classificationYear}`
       );
       const json = await response.json();
       const percentages = [
@@ -101,7 +102,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       console.log(selectedYear);
       console.log(provinceID);
       const response = await fetch(
-        `http://localhost:8080/api/province/${provinceID}/${selectedYear}`
+        `http://localhost:8080/api/province/${provinceID}/data?year=${selectedYear}`
       );
       const json_object = await response.json();
       console.log(json_object.data[0].yearly_agg.total);
@@ -156,7 +157,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   // Controls when to fetch province/county specific summary data
   useEffect(() => {
     if (selectedYear && selectedProvince) {
-      loadProvinceCellSummary(selectedProvince, selectedLayerType);
+      loadProvinceCellSummary(selectedProvince, selectedLayerType, selectedYear);
       loadProvinceData(selectedProvince, displayName);
     }
   }, [selectedProvince, selectedYear]);

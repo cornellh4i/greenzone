@@ -57,28 +57,57 @@ const InsightsPanel: React.FC = () => {
   const fetchProvinceSummaries = async () => {
     try {
       setLoading(true);
-      const promises = provinceIds.map((provinceId) =>
-        fetch(`http://localhost:8080/api/${provinceId}/carrying_capacity/cell-summary`)
-          .then((response) => response.json())
-          .catch((error) => {
-            console.error(`Error fetching data for province ${provinceId}:`, error);
-            return null;
-          })
+      const yearRange = Array.from({ length: 2022 - 2011 + 1 }, (_, i) => 2011 + i);
+      
+      const summariesByYear = await Promise.all(
+        provinceIds.map(async (provinceId) => {
+          const yearPromises = yearRange.map(year =>
+            fetch(`http://localhost:8080/api/province/${provinceId}/carrying_capacity/cell-summary?year=${year}`)
+              .then(response => response.json())
+              .catch(error => {
+                console.error(`Error fetching data for province ${provinceId}, year ${year}:`, error);
+                return null;
+              })
+          );
+
+          const yearResults = await Promise.all(yearPromises);
+          const validYearResults = yearResults.filter(result => result && result.data && result.data.length > 0);
+
+          if (validYearResults.length === 0) return null;
+
+          // Calculate averages across years
+          const averages = validYearResults.reduce((acc, result) => {
+            acc.belowSum += result.data[0].cat1_percentage;
+            acc.atSum += result.data[0].cat2_percentage;
+            acc.aboveSum += result.data[0].cat3_percentage;
+            return acc;
+          }, { belowSum: 0, atSum: 0, aboveSum: 0 });
+
+          const count = validYearResults.length;
+          
+          return {
+            provinceName: validYearResults[0].data[0].province_name,
+            belowCapacity: Math.round(averages.belowSum / count * 100) / 100,
+            atCapacity: Math.round(averages.atSum / count * 100) / 100,
+            aboveCapacity: Math.round(averages.aboveSum / count * 100) / 100
+          };
+        })
       );
 
-      const results = await Promise.all(promises);
-      const validResults = results.filter(result => result && result.data && result.data.length > 0);
+      const validSummaries = summariesByYear.filter(summary => summary !== null);
 
-      const formattedSummaries = validResults.map((result, index) => ({
+      const formattedSummaries = validSummaries.map((summary, index) => ({
         ranking: index + 1,
-        aimag: result.data[0].province_name,
-        belowCapacity: result.data[0].cat1_percentage,
-        atCapacity: result.data[0].cat2_percentage,
-        aboveCapacity: result.data[0].cat3_percentage,
+        aimag: summary.provinceName,
+        belowCapacity: summary.belowCapacity,
+        atCapacity: summary.atCapacity,
+        aboveCapacity: summary.aboveCapacity,
       }));
 
+      // Sort by belowCapacity percentage
       formattedSummaries.sort((a, b) => a.belowCapacity - b.belowCapacity);
 
+      // Update rankings after sorting
       formattedSummaries.forEach((summary, index) => {
         summary.ranking = index + 1;
       });

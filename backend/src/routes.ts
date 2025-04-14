@@ -31,6 +31,7 @@ import {
   getCountyGeometry,
   getCountyGeometryByID,
   getCountyLivestockByID,
+  getCountyCellSummary,
 } from "./controller/County";
 import {
   getBMCellsBelow,
@@ -73,7 +74,8 @@ router.get("/cells/bm_pred_above", getBMCellsAbove);
 router.get("/cells/z_score_negative", getZScoreNegative);
 router.get("/cells/z_score_zero", getZScoreZero);
 router.get("/cells/z_score_positive", getZScorePositive);
-router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
+// router.get("/:province_id/:category_type/cell-summary", getProvinceCellSummary);
+router.get("/province/:province_id/:category_type/cell-summary", getProvinceCellSummary);
 
 //
 router.get("/cells/:year/:classificationType/:lowerBound/:upperBound",getCellValuesbyYearandCtype)
@@ -116,6 +118,7 @@ router.get("/countygeo", getCountyGeometry);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
 router.get("/county/:county_id/:year", getCountyLivestockByID);
+router.get("/county/:county_id/:category_type/cell-summary", getCountyCellSummary);
 
 // Route to update a county
 router.put("/county/:county_id", updateCounty);

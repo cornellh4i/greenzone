@@ -229,3 +229,70 @@ export const deleteCounty = async (
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getCountyCellSummary = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (supabase) {
+    try {
+      // Extract county_id and category_type from route parameters
+      const county_id = parseInt(req.params.county_id as string, 10);
+      const category_type = req.params.category_type as string;
+
+      // Validate county_id
+      if (isNaN(county_id)) {
+        res.status(400).json({
+          log: "Invalid county_id. It must be a valid number.",
+        });
+        return;
+      }
+
+      // Validate category_type
+      if (!["carrying_capacity", "z_score"].includes(category_type)) {
+        res.status(400).json({
+          log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
+        });
+        return;
+      }
+
+      // Extract and validate the target year from query parameters
+      const yearParam = req.query.year as string;
+      const target_year = parseInt(yearParam, 10);
+      if (!target_year || isNaN(target_year)) {
+        res.status(400).json({
+          log: "Invalid or missing year parameter.",
+        });
+        return;
+      }
+
+      // Call the stored procedure using Supabase RPC with the new target_year parameter
+      const { data, error } = await supabase.rpc(
+        "categorize_cells_by_county",
+        {
+          c_id: county_id,
+          category_type: category_type,
+          target_year: target_year,
+        }
+      );
+
+      if (error) {
+        res.status(500).json({
+          log: "Error while collecting the county data",
+          error: error.message,
+        });
+        return;
+      }
+
+      res.status(200).json({
+        log: "County cell summary successfully collected",
+        data: data,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        log: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+};
