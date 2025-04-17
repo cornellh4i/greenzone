@@ -23,4 +23,15 @@ async function SignupUser(email: string, password: string) {
     }
 }
 
-export { supabase, SignupUser };
+async function CanResetPassword(email:string){
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:3000/reset-password' 
+      })
+      if (error) {
+        // error.message already has Supabase’s description
+        throw new Error(`Password reset failed: ${error.message}`)
+      }
+      return { message: 'Password reset email sent', data }
+}
+
+export { supabase, SignupUser ,CanResetPassword};
