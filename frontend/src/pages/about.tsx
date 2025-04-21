@@ -70,15 +70,16 @@ const About = () => {
             </p>
           </div>
         </div>
-        <div className="md:w-1/2 mt-8 md:mt-0 md:pl-8">
-          <Image
-            src="/Landscape.png" // Replace with actual path to the image
-            alt="Landscape"
-            width={605}
-            height={346.13}
-            className="rounded-xl object-cover"
-          />
-        </div>
+        <div className="image-wrapper">
+  <Image
+    src="/Landscape.png"
+    alt="Landscape"
+    width={605}
+    height={346.13}
+    className="landscape-image"
+  />
+</div>
+
       </section>
 
       <section className="who-we-are">
