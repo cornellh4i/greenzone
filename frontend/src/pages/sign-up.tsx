@@ -59,7 +59,7 @@ export default function SignUpPage() {
         password,
       }),
     })
-
+    
     if (response.ok) {
       const data = await response.json()
       console.log("User signed up successfully:", data)
@@ -183,7 +183,15 @@ export default function SignUpPage() {
                   }
                 }}
                 >
-                Sign Up
+                  Sign Up
+                </Button>
+
+                <Button
+                  variant="text"
+                  sx={{ mt: 2, color: "primary.main" }}
+                  onClick={() => window.location.href = "/forgot-password"}
+                >
+                  Forgot Password?
                 </Button>
 
               <Typography variant="caption" sx={{ mt: 1 }}>
@@ -203,7 +211,7 @@ export default function SignUpPage() {
               <Typography variant="body2">
                 <strong>Already have an account?</strong>
                 <Link href="/login" style={{ color: "#2a5548", marginLeft: "4px", fontWeight: 500 }}>
-                  Sign In
+                  Login
                 </Link>
               </Typography>
             </Box>

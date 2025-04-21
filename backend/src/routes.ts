@@ -20,7 +20,7 @@ import {
   getCountiesGeomInProvince,
 } from "./controller/County";
 
-import { SignupUser } from "./users";
+import { SignupUser, CanResetPassword } from "./users";
 
 import { getCellValuesbyYearandCtype, getYearOptions } from "./controller/Cell";
 
@@ -72,6 +72,22 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+router.post("/can-reset-password", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const response = await CanResetPassword(email);
+    if (response instanceof Error) {
+      res.status(400).json({ message: response });
+    } else {
+      res.status(200).json({ message: "Reset password email sent", response });
+      console.log("working", response);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+);
 
 
 export default router;
