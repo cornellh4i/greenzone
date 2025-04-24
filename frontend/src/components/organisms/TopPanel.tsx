@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect} from "react";
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
 import { useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
 import { Avatar } from "@mui/material";
+import {Box, Typography, useMediaQuery} from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { Context, LayerType } from "../../utils/global";
@@ -30,6 +31,7 @@ interface EntityMap {
 
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   const context = useContext(Context);
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   if (!context) {
     throw new Error("Context must be used within a ContextProvider");
@@ -43,7 +45,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   } = context;
   const router = useRouter();
 
-  const navigateTo = (path: string) => {
+  const handleNavigate = (path: string) => {
     router.push(path);
   };
 
@@ -140,6 +142,9 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       setSelectedCounty(entityData.entity_id);
     }
   };
+
+  if (!isMobile) {
+
   if (!entityMap) {
     return (
       <div
@@ -183,7 +188,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       </Context.Provider>
 
       <Button
-        onClick={() => navigateTo("/landing")}
+        onClick={() => handleNavigate("/landing")}
         sx={{
           backgroundColor: "grey",
           width: "50px",
@@ -213,6 +218,46 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
         }
       />
     </div>
+  );
+}
+
+  return (
+    <Box sx={{ backgroundColor: 'white' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          px: 2,
+          py: 1.5,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: '600', fontSize: '22px' }}>
+          Carrying Capacity Early Warning System
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <img src="/home.png" alt="Home" style={{ width: 24, height: 24 }} onClick = {() => handleNavigate('/landing')}/>
+          <img src="/profile.png" alt="Profile" style={{ width: 24, height: 24 }} onClick = {() => handleNavigate('/about')}/>
+        </Box>
+      </Box>
+      <Box sx={{ px: 2, py: 1, pr: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <input
+          type="text"
+          placeholder="Search for aimag, soum"
+          style={{
+            width: '100%',
+            background: `url('/search.png') no-repeat 8px center`,
+            backgroundSize: '20px',
+            paddingLeft: '64px',
+            padding: '12px',
+            paddingRight: '16px',
+            borderRadius: '12px',
+            border: '1px solid #ccc',
+            fontSize: '16px',
+          }}
+        />
+      </Box>
+    </Box>
   );
 };
 

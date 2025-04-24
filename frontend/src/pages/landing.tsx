@@ -8,6 +8,9 @@ const Landing : React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
 
   return (
     <div>
@@ -48,7 +51,8 @@ const Landing : React.FC = () => {
               paddingX: 2,
               paddingY: 1,
               width: '40%',
-            }}
+              
+            }} onClick = {() => handleNavigate('/monitoring-platform')}
             >
               Launch Platform
             <img
@@ -192,7 +196,7 @@ const Landing : React.FC = () => {
           <Typography variant="body1" color="text.secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.
           </Typography>
-          <Button variant="outlined" color="success" sx={{ width: '150px', borderRadius: '12px', textTransform: 'none' }}>
+          <Button variant="outlined" color="success" sx={{ width: '150px', borderRadius: '12px', textTransform: 'none' }} onClick = {() => handleNavigate('/about')}>
             Learn more
           </Button>
         </Box>
@@ -259,7 +263,7 @@ const Landing : React.FC = () => {
             <Button
               variant="outlined"
               color="success"
-              sx={{ width: '150px', borderRadius: '12px', textTransform: 'none', color: 'white', borderColor: 'white'}}
+              sx={{ width: '150px', borderRadius: '12px', textTransform: 'none', color: 'white', borderColor: 'white'}} onClick = {() => handleNavigate('/summary-stats')}
             >
               Learn More
             </Button>
@@ -280,7 +284,7 @@ const Landing : React.FC = () => {
           <Typography variant="body1" color="text.secondary">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.
           </Typography>
-          <Button variant="outlined" color="success" sx={{ width: '150px', borderRadius: '12px', textTransform: 'none' }}>
+          <Button variant="outlined" color="success" sx={{ width: '150px', borderRadius: '12px', textTransform: 'none' }} onClick = {() => handleNavigate('/methodology')}>
             Learn More
           </Button>
         </Box>
