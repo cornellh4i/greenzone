@@ -12,7 +12,6 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function SignupUser(email: string, password: string, first_name: string, last_name: string, role: string) {
-    console.log(first_name, last_name, role)
     let { data, error } = await supabase.auth.signUp({
         email,
         password,
