@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Table as MUITable,
   TableBody,
@@ -12,27 +12,28 @@ import {
   styled,
 } from '@mui/material';
 
+// Custom styled TablePagination to move everything to the left
 const StyledTablePagination = styled(TablePagination)({
   '& .MuiToolbar-root': {
-    padding: '0 8px',
-    minHeight: '52px',
+    padding: '0 8px',  // Reduce default padding
+    minHeight: '52px', // Match default height
     display: 'flex',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-start', // Align content to left
     width: '100%',
   },
   '& .MuiTablePagination-spacer': {
-    display: 'none',
+    display: 'none', // Remove the spacer that pushes content right
   },
   '& .MuiTablePagination-displayedRows': {
     margin: 0,
-    order: 1,
+    order: 1, // Control the order of elements
   },
   '& .MuiTablePagination-actions': {
-    marginLeft: '8px',
-    order: 2,
+    marginLeft: '8px', // Space between text and arrows
+    order: 2, // Control the order of elements
   },
   '& .MuiTablePagination-select, & .MuiTablePagination-selectLabel': {
-    display: 'none',
+    display: 'none', // Hide rows per page selector
   },
 });
 
@@ -42,18 +43,22 @@ interface TableProps {
     headerName: string;
     width?: number;
     format?: (value: any) => string;
+    sortable?: boolean;
   }[];
   rows: any[];
   loading?: boolean;
   page?: number;
   onPageChange?: (newPage: number) => void;
+  sortConfig: {
+    field: string;
+    direction: 'asc' | 'desc' | null;
+  };
+  onSort: (field: string) => void;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: propPage, onPageChange }) => {
+const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: propPage, onPageChange, sortConfig, onSort }) => {
   const [internalPage, setInternalPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [sortField, setSortField] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const page = propPage ?? internalPage;
   const setPage = onPageChange ?? setInternalPage;
@@ -67,28 +72,47 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
     setPage(0);
   };
 
-  const handleSort = (field: string) => {
-    setSortOrder(prev => (sortField === field ? (prev === 'asc' ? 'desc' : 'asc') : 'asc'));
-    setSortField(field);
-  };
-
-  const sortedRows = useMemo(() => {
-    if (!sortField) return rows;
-
-    const sorted = [...rows].sort((a, b) => {
-      const valA = a[sortField];
-      const valB = b[sortField];
-
-      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  }, [rows, sortField, sortOrder]);
-
+  // Custom label display
   const labelDisplayedRows = ({ from, to, count }: { from: number; to: number; count: number }) => {
     return `${from}–${to} of ${count}`;
+  };
+
+  // Modify sorting function to use props
+  const sortedRows = React.useMemo(() => {
+    if (!sortConfig.field || !sortConfig.direction) {
+      // When no sorting is applied, show rows in original ranking order
+      return [...rows].sort((a, b) => a.originalRanking - b.originalRanking);
+    }
+
+    return [...rows].sort((a, b) => {
+      // For ranking column, sort by originalRanking
+      if (sortConfig.field === 'ranking') {
+        return sortConfig.direction === 'asc' 
+          ? a.originalRanking - b.originalRanking 
+          : b.originalRanking - a.originalRanking;
+      }
+
+      // For other columns
+      if (a[sortConfig.field] < b[sortConfig.field]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.field] > b[sortConfig.field]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      // If values are equal, maintain original order
+      return a.originalRanking - b.originalRanking;
+    }).map(row => ({
+      ...row,
+      // Always display the originalRanking in the ranking column
+      ranking: row.originalRanking
+    }));
+  }, [rows, sortConfig]);
+
+  // Modify handleSort to use props
+  const handleSort = (field: string) => {
+    const column = columns.find(col => col.field === field);
+    if (!column?.sortable) return;
+    onSort(field);
   };
 
   if (columns.length === 0) {
@@ -97,14 +121,11 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
 
   return (
     <Box sx={{ width: '100%', overflowX: 'auto' }}>
-      <TableContainer
-        component={Paper}
-        sx={{
-          boxShadow: 'none',
-          border: '1px solid rgba(224, 224, 224, 1)',
-          borderRadius: '8px',
-        }}
-      >
+      <TableContainer component={Paper} sx={{ 
+        boxShadow: 'none',
+        border: '1px solid rgba(224, 224, 224, 1)',
+        borderRadius: '8px',
+      }}>
         <MUITable sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#2F4F4F' }}>
@@ -115,13 +136,19 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
                     color: 'white',
                     fontWeight: 'bold',
                     width: column.width,
-                    cursor: 'pointer',
-                    userSelect: 'none',
+                    cursor: column.sortable ? 'pointer' : 'default',
+                    '&:hover': column.sortable ? {
+                      backgroundColor: '#1F3F3F'
+                    } : {}
                   }}
                   onClick={() => handleSort(column.field)}
                 >
                   {column.headerName}
-                  {sortField === column.field && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                  {column.sortable && sortConfig.field === column.field && (
+                    <span style={{ marginLeft: '4px' }}>
+                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
                 </TableCell>
               ))}
             </TableRow>
@@ -138,7 +165,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
                   <TableRow
-                    key={row.ranking || JSON.stringify(row)} // fallback key
+                    key={row.ranking}
                     sx={{
                       '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
                       '&:hover': { backgroundColor: '#e8e8e8' },
@@ -146,7 +173,9 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
                   >
                     {columns.map((column) => (
                       <TableCell key={column.field}>
-                        {column.format ? column.format(row[column.field]) : row[column.field]}
+                        {column.format 
+                          ? column.format(row[column.field])
+                          : row[column.field]}
                       </TableCell>
                     ))}
                   </TableRow>
