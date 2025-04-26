@@ -59,9 +59,9 @@ router.get(
 );
 
 router.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, firstName,lastName,role} = req.body;
   try {
-    const response = await SignupUser(email, password);
+    const response = await SignupUser(email, password,firstName,lastName,role);
     if (response instanceof Error) {
       res.status(400).json({ message: response });
     } else {

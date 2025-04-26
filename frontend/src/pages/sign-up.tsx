@@ -57,6 +57,9 @@ export default function SignUpPage() {
       body: JSON.stringify({
         email,
         password,
+        firstName,
+        lastName,
+        role,
       }),
     })
     

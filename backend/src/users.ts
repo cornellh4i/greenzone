@@ -11,11 +11,20 @@ if (!supabaseUrl || !supabaseKey) {
 }
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function SignupUser(email: string, password: string) {
+async function SignupUser(email: string, password: string, first_name: string, last_name: string, role: string) {
     let { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password
-      })
+        email,
+        password,
+        options: {
+            data: {
+                first_name: first_name,
+                last_name: last_name,
+                occupation: role,
+            }
+        }
+    })
+    console.log("data", data)
+    console.log("error", error)
     if (error) {
         throw new Error(`Error signing up: ${error.message}`);
     } else {
@@ -24,10 +33,10 @@ async function SignupUser(email: string, password: string) {
 }
 
 async function CanResetPassword(email:string){
+    console.log()
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'http://localhost:3000/reset-password' 
       })
-     
       if (error) {
         // error.message already has Supabase’s description
         throw new Error(`Password reset failed: ${error.message}`)
