@@ -32,13 +32,16 @@ const NavBar: React.FC = () => {
       elevation={0}
       sx={{ backgroundColor: '#E6EEEC' }} 
       >
+        
       <Toolbar sx={{ justifyContent: 'space-between'}}>
+      <Box onClick = {() => handleNavigate('/landing')}>
         <Typography variant="h6" component="div" sx={{
           color: '#065143', fontWeight: 'bold',
           fontSize: isMobile ? '24px' : '30px',
         }}>
           GreenZone Analytics
         </Typography>
+        </Box>
         <Box
           sx={{
             display: 'flex',

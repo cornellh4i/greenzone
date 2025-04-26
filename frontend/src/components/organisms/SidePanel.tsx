@@ -18,6 +18,7 @@ import AgricultureIcon from "@mui/icons-material/Agriculture";
 import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 interface SidePanelProps {
   yearOptions: string[];
@@ -28,6 +29,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   if (!context) {
     throw new Error("Context must be used within a ContextProvider");
   }
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const {
     selectedProvince,
     setSelectedProvince,
@@ -385,46 +388,75 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
 
   return (
     <div>
-      <Box
-        sx={{
-          position: "fixed",
-          left: isPanelOpen ? "calc(35vw - 24px)" : "-24px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1201,
-          transition: "left 0.3s",
-          maxLeft: "350px",
-        }}
-      >
-        <IconButton
-          onClick={handlePanelToggle}
+      {!isMobile && (
+        <Box
           sx={{
-            backgroundColor: "background.paper",
-            borderRadius: "0 4px 4px 0",
-            "&:hover": {
-              backgroundColor: "action.hover",
-            },
+            position: "fixed",
+            left: isPanelOpen ? "calc(35vw - 24px)" : "-24px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1201,
+            transition: "left 0.3s",
+            maxLeft: "350px",
           }}
         >
-          {isPanelOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
-      </Box>
+          <IconButton
+            onClick={handlePanelToggle}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: "0 4px 4px 0",
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+            }}
+          >
+            {isPanelOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </Box>
+      )}
+      {isMobile && !isPanelOpen && (
+          <Box
+            sx={{
+              position: "fixed",
+              bottom: 30,
+              right: 16,
+              zIndex: 1300,
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            <IconButton
+              onClick={handlePanelToggle}
+              sx={{ backgroundColor: "white", borderRadius: 2 }}
+            >
+              <span role="img" aria-label="settings">⚙️</span>
+            </IconButton>
+            <IconButton
+              sx={{ backgroundColor: "white", borderRadius: 2 }}
+            >
+              <span role="img" aria-label="help">❓</span>
+            </IconButton>
+          </Box>
+      )}
       <Drawer
-        anchor="left"
+        anchor={isMobile ? "bottom" : "left"}
         open={isPanelOpen ?? false}
         onClose={handlePanelToggle}
         variant="persistent"
         PaperProps={{
           sx: {
-            width: "35vw",
-            maxWidth: "400px",
+            width: isMobile ? "100%" : "35vw",
+            height: isMobile ? "75vh" : "calc(100% - 70px)",
+            maxWidth: isMobile ? "100%" : "400px",
             boxSizing: "border-box",
             p: 2,
             paddingTop: "10px",
             display: "flex",
             flexDirection: "column",
-            marginTop: "78px",
-            height: "calc(100% - 70px)",
+            marginTop: isMobile ? 0 : "78px",
+            borderTopLeftRadius: isMobile ? "12px" : 0,
+            borderTopRightRadius: isMobile ? "12px" : 0,
           },
         }}
         sx={{
@@ -436,6 +468,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         }}
       >
         <Box>
+        {isMobile && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+            <IconButton onClick={handlePanelToggle}>
+              <CloseIcon />
+            </IconButton>
+          </Box> )}
           {!provinceData ? (
             // General panel when no province data exists
             <div>
