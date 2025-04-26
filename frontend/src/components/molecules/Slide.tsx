@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Slider, Box } from "@mui/material";
 import Dropdown from "../atoms/DropDown";
 
@@ -20,6 +20,12 @@ const Slide: React.FC<SlideProps> = ({
   options = [],
 }) => {
   const [sliderVal, setSliderVal] = useState<number>(selectedValue || max);
+
+  useEffect(() => {
+    if (selectedValue !== null) {
+      setSliderVal(selectedValue);
+    }
+  }, [selectedValue]);
 
   const handleSliderChange = (_: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {

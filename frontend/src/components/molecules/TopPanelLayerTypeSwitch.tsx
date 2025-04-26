@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { Context, LayerType } from "../../utils/global";
 import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
+import Leaf from "../frontend/src/icons/leaf (1).svg"
 
 const TopPanelLayerTypeSwitch = () => {
   const context = useContext(Context);
@@ -43,11 +44,13 @@ const TopPanelLayerTypeSwitch = () => {
     "2019",
     "2020",
     "2021",
-    "2022",
+    "2022"
   ];
 
-  const buttonStyle = (isActive: boolean | null, color: string) => ({
-    backgroundColor: isActive ? color : "grey",
+  /*const buttonStyle = (isActive: boolean | null, color: string) => ({
+    backgroundColor: isActive ? color : "transparent",
+    border: isActive ? "none" : `2px solid ${color}`,
+    color: isActive ? "white" : color,
     borderRadius: "48px",
     padding: "12px 24px 12px 24px",
     width: "80px",
@@ -58,6 +61,25 @@ const TopPanelLayerTypeSwitch = () => {
     flex: "1 1 auto",
     minWidth: "100px",
     maxWidth: "200px",
+  });*/
+  const buttonStyle = (isActive: boolean | null, color: string, icon?: string) => ({
+    backgroundColor: isActive ? color : "transparent",
+    border: isActive ? "none" : `2px solid ${color}`,
+    color: isActive ? "white" : color,
+    borderRadius: "48px",
+    padding: "12px 24px 12px 24px",
+    width: "80px",
+    height: "35px",
+    fontSize: "11.5px",
+    fontWeight: "bold",
+    flex: "1 1 auto",
+    minWidth: "100px",
+    maxWidth: "200px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",  // Space between icon and text
+    position: "relative", // For positioning pseudo-elements if needed
   });
 
   return (
@@ -95,7 +117,11 @@ const TopPanelLayerTypeSwitch = () => {
       <Button
         onClick={() => setGrazingRange((prev) => !prev)}
         label="Grazing Range"
-        sx={buttonStyle(grazingRange, "#065143")}
+        sx={{
+          ...buttonStyle(grazingRange, "#065143"),
+          minWidth: "250px",   // CHANGED: Increased from 100px
+          maxWidth: "300px"    // CHANGED: Increased from 200px
+        }}
       />
 
       <div
@@ -175,16 +201,39 @@ const TopPanelLayerTypeSwitch = () => {
               : "Switch to CarCap"
           }
           sx={{
-            backgroundColor: "#555",
-            color: "white",
+            backgroundColor: "transparent",
+            color: "#343536",
             borderRadius: "25px",
-            padding: "10px 10px",
-            width: "140px",
+            padding: "1px 1px",
+            width: "100px",
             height: "35px",
             fontSize: "12px",
             fontWeight: "bold",
+            textDecoration: "underline",
+            textDecorationThickness: 2,
+            textUnderlineOffset: 3,
+            minWidth: "150px",
+            maxWidth: "250px",
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: "none",
+              backgroundColor: "transparent",
+              border: "none"
+            },
+            "&:focus": {
+              boxShadow: "none",
+              backgroundColor: "transparent",
+              border: "none"
+            },
+            "&:active": {
+              boxShadow: "none",
+              backgroundColor: "transparent",
+              border: "none"
+            }
+
           }}
         />
+
       </div>
     </div>
   );
