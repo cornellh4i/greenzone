@@ -185,6 +185,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       <Button
         onClick={() => navigateTo("/landing")}
         sx={{
+          // home button
           backgroundColor: "grey",
           width: "50px",
           height: "50px",
@@ -197,7 +198,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       />
 
       <Button
-        onClick={() => {}} // Placeholder for future routing
+        onClick={() => { }} // Placeholder for future routing
         sx={{
           backgroundColor: "transparent",
           width: "50px",

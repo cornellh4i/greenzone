@@ -124,7 +124,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         x: livestockType,
         y:
           livestock_data[
-            `number_of_${livestockType.toLowerCase()}` as keyof typeof livestock_data
+          `number_of_${livestockType.toLowerCase()}` as keyof typeof livestock_data
           ] || 0,
       }));
 
@@ -146,7 +146,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       const entityData = {
         entityName:
           response_json.data[0][`${entityType}_data`][
-            entityType === "county" ? "soum_name" : "province_name"
+          entityType === "county" ? "soum_name" : "province_name"
           ],
         entityLandArea: "1000",
         entityHerders: "360",
