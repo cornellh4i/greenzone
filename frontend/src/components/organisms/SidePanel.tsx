@@ -78,6 +78,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     "Over Capacity",
   ];
   const zScoreLabels = ["Positive", "Zero", "Negative"];
+  const [showGuide, setShowGuide] = useState(false);
 
   // You can adjust or refine these colors as needed
   const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
@@ -414,30 +415,31 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           </IconButton>
         </Box>
       )}
-      {isMobile && !isPanelOpen && (
-          <Box
-            sx={{
-              position: "fixed",
-              bottom: 30,
-              right: 16,
-              zIndex: 1300,
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
+      {!isPanelOpen && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 30,
+            right: 16,
+            zIndex: 1300,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
+        >
+          <IconButton
+            onClick={handlePanelToggle}
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           >
-            <IconButton
-              onClick={handlePanelToggle}
-              sx={{ backgroundColor: "white", borderRadius: 2 }}
-            >
-              <span role="img" aria-label="settings">⚙️</span>
-            </IconButton>
-            <IconButton
-              sx={{ backgroundColor: "white", borderRadius: 2 }}
-            >
-              <span role="img" aria-label="help">❓</span>
-            </IconButton>
-          </Box>
+            <span role="img" aria-label="settings">⚙️</span>
+          </IconButton>
+          <IconButton
+            onClick={() => setShowGuide(true)} // add this state
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
+          >
+            <span role="img" aria-label="help">❓</span>
+          </IconButton>
+        </Box>
       )}
       <Drawer
         anchor={isMobile ? "bottom" : "left"}

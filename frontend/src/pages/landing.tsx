@@ -200,22 +200,21 @@ const Landing : React.FC = () => {
             Learn more
           </Button>
         </Box>
-
         <Paper elevation={0} sx={{ bgcolor: 'transparent' }}>
-        <Box sx={{ width: { xs: '70%', sm: '70%', md: '90%' } }}>
-        <Box
-          component="img"
-          src="/landscape.png"
-          alt="mongolian landscape"
-          sx={{
-            width: '100%',
-            height: { xs: 80, sm: 200, md: 300 },
-            objectFit: 'cover',
-            objectPosition: 'center',
-            borderRadius: 3,
-          }}
-        />
-        </Box>
+        <Box sx={{ width: { xs: '100%', sm: '100%', md: '90%' }, mx: 'auto' }}>
+            <Box
+              component="img"
+              src="/landscape.png"
+              alt="mongolian landscape"
+              sx={{
+                width: '100%',
+                aspectRatio: '16 / 9',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                borderRadius: 3,
+              }}
+            />
+          </Box>
         </Paper>
       </Box>
       </Box>
@@ -237,20 +236,20 @@ const Landing : React.FC = () => {
         >
 
           <Paper elevation={0} sx={{ bgcolor: 'transparent' }}>
-          <Box sx={{ width: { xs: '70%', sm: '70%', md: '90%' } }}>
-          <Box
-            component="img"
-            src="/mountain.png"
-            alt="mongolian mountains"
-            sx={{
-              width: '100%',
-              height: { xs: 80, sm: 200, md: 300 },
-              objectFit: 'cover',
-              objectPosition: 'center',
-              borderRadius: 3,
-            }}
-          />
-          </Box>
+            <Box sx={{ width: { xs: '100%', sm: '100%', md: '90%' }, mx: 'auto' }}>
+              <Box
+                component="img"
+                src="/mountain.png"
+                alt="mongolian mountains"
+                sx={{
+                  width: '100%',
+                  aspectRatio: '16 / 9', // ensures clean scaling on all screen sizes
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  borderRadius: 3,
+                }}
+              />
+            </Box>
           </Paper>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -290,21 +289,21 @@ const Landing : React.FC = () => {
         </Box>
 
         <Paper elevation={0} sx={{ bgcolor: 'transparent' }}>
-        <Box sx={{ width: { xs: '70%', sm: '70%', md: '90%' } }}>
-        <Box
-          component="img"
-          src="/horse.png"
-          alt="mongolians with horses"
-          sx={{
-            width: '100%',
-            height: { xs: 80, sm: 200, md: 300 },
-            objectFit: 'cover',
-            objectPosition: 'center',
-            borderRadius: 3,
-          }}
-        />
-        </Box>
-        </Paper>
+          <Box sx={{ width: { xs: '100%', sm: '100%', md: '90%' }, mx: 'auto' }}>
+            <Box
+              component="img"
+              src="/horse.png"
+              alt="mongolians with horses"
+              sx={{
+                width: '100%',
+                aspectRatio: '16 / 9',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                borderRadius: 3,
+              }}
+            />
+          </Box>
+      </Paper>
       </Box>
       </Box>
     </section>

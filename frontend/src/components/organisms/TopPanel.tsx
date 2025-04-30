@@ -143,7 +143,7 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     }
   };
 
-  if (!isMobile) {
+
 
   if (!entityMap) {
     return (
@@ -165,6 +165,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
       </div>
     );
   }
+
+  if (!isMobile) {
   return (
     <div
       style={{
@@ -240,23 +242,9 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           <img src="/profile.png" alt="Profile" style={{ width: 24, height: 24 }} onClick = {() => handleNavigate('/about')}/>
         </Box>
       </Box>
-      <Box sx={{ px: 2, py: 1, pr: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <input
-          type="text"
-          placeholder="Search for aimag, soum"
-          style={{
-            width: '100%',
-            background: `url('/search.png') no-repeat 8px center`,
-            backgroundSize: '20px',
-            paddingLeft: '64px',
-            padding: '12px',
-            paddingRight: '16px',
-            borderRadius: '12px',
-            border: '1px solid #ccc',
-            fontSize: '16px',
-          }}
-        />
-      </Box>
+      <div>
+        <SearchBar entityMap={entityMap} onValueSelect={handleValueSelect} />
+      </div>
     </Box>
   );
 };
