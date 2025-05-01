@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table as MUITable,
   TableBody,
@@ -55,6 +55,14 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
   const [sortField, setSortField] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
+  const [originalRows, setOriginalRows] = useState(rows);
+
+  useEffect(() => {
+    setOriginalRows(rows);
+    setSortField('');
+    setSortOrder('asc');
+  }, [rows]);
+
   const page = propPage ?? internalPage;
   const setPage = onPageChange ?? setInternalPage;
 
@@ -73,9 +81,12 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
   };
 
   const sortedRows = useMemo(() => {
-    if (!sortField) return rows;
+    if (!sortField) return originalRows;
 
-    const sorted = [...rows].sort((a, b) => {
+    const sorted = [...originalRows].sort((a, b) => {
+      if (sortField === 'ranking') {
+        return sortOrder === 'asc' ? a.ranking - b.ranking : b.ranking - a.ranking;
+      }
       const valA = a[sortField];
       const valB = b[sortField];
 
@@ -85,7 +96,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
     });
 
     return sorted;
-  }, [rows, sortField, sortOrder]);
+  }, [originalRows, sortField, sortOrder]);
 
   const labelDisplayedRows = ({ from, to, count }: { from: number; to: number; count: number }) => {
     return `${from}–${to} of ${count}`;
@@ -133,12 +144,18 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
                   Loading...
                 </TableCell>
               </TableRow>
+            ) : sortedRows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center">
+                  No data available
+                </TableCell>
+              </TableRow>
             ) : (
               sortedRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
                   <TableRow
-                    key={row.ranking || JSON.stringify(row)} // fallback key
+                    key={row.ranking || JSON.stringify(row)}
                     sx={{
                       '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
                       '&:hover': { backgroundColor: '#e8e8e8' },
@@ -157,7 +174,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
         <StyledTablePagination
           rowsPerPageOptions={[10]}
           component="div"
-          count={rows.length}
+          count={originalRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
