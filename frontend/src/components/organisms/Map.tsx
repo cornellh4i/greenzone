@@ -60,9 +60,7 @@ const MapComponent: React.FC = () => {
   const [zeroCells, setZeroCells] = useState<CellGeometry[]>([]);
   const [positiveCells, setPositiveCells] = useState<CellGeometry[]>([]);
   const [grazingTrueCells, setGrazingTrueCells] = useState<CellGeometry[]>([]);
-  const [grazingFalseCells, setGrazingFalseCells] = useState<CellGeometry[]>(
-    []
-  );
+  const [grazingFalseCells, setGrazingFalseCells] = useState<CellGeometry[]>([]);
   const context = useContext(Context);
 
   if (!context) {

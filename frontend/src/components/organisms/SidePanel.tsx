@@ -78,6 +78,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     "Over Capacity",
   ];
   const zScoreLabels = ["Positive", "Zero", "Negative"];
+  const [showGuide, setShowGuide] = useState(false);
 
   // You can adjust or refine these colors as needed
   const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
@@ -414,30 +415,31 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           </IconButton>
         </Box>
       )}
-      {isMobile && !isPanelOpen && (
-          <Box
-            sx={{
-              position: "fixed",
-              bottom: 30,
-              right: 16,
-              zIndex: 1300,
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
+      {!isPanelOpen && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 30,
+            right: 16,
+            zIndex: 1300,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
+        >
+          <IconButton
+            onClick={handlePanelToggle}
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           >
-            <IconButton
-              onClick={handlePanelToggle}
-              sx={{ backgroundColor: "white", borderRadius: 2 }}
-            >
-              <span role="img" aria-label="settings">⚙️</span>
-            </IconButton>
-            <IconButton
-              sx={{ backgroundColor: "white", borderRadius: 2 }}
-            >
-              <span role="img" aria-label="help">❓</span>
-            </IconButton>
-          </Box>
+            <span role="img" aria-label="settings">⚙️</span>
+          </IconButton>
+          <IconButton
+            onClick={() => setShowGuide(true)} 
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
+          >
+            <span role="img" aria-label="help">❓</span>
+          </IconButton>
+        </Box>
       )}
       <Drawer
         anchor={isMobile ? "bottom" : "left"}
@@ -634,6 +636,45 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           View data only in land categorized as a grazing range.
         </Typography>
       </Drawer>
+      {showGuide && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1400,
+            bgcolor: "white",
+            p: 4,
+            borderRadius: 4,
+            boxShadow: 6,
+            width: { xs: '90%', sm: '70%', md: '50%', lg: '40%' },
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+            <Typography variant="h6" fontWeight="bold">Map Guide</Typography>
+            <IconButton onClick={() => setShowGuide(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            Summary
+          </Typography>
+          <Typography variant="body2" paragraph>
+            hey there delilah, how is it like in new york city?
+          </Typography>
+
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            Usage
+          </Typography>
+          <Typography variant="body2">
+            im a thousand miles away, but tonight you look so pretty. <br />
+            <strong>yes you do</strong> times square don't shine as bright as you, i swear it's true.
+          </Typography>
+        </Box>
+      )}
     </div>
   );
 };

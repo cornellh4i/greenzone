@@ -1,13 +1,15 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { AppBar, Toolbar, Box, Typography, Button, MenuItem, Select } from "@mui/material";
+import { AppBar, Toolbar, Box, Typography, Button, MenuItem, Select, Collapse, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'mn'>('en');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLanguageChange = (event: any) => {
     setSelectedLanguage(event.target.value);
   };
@@ -16,13 +18,10 @@ const NavBar: React.FC = () => {
   };
 
   const pages = [
-    { name: "Map", path: "/monitoring-platform" },
-    { name: "Landing", path: "/landing" },
+    { name: "Home", path: "/landing" },
     { name: "About", path: "/about" },
-    { name: "Methodology", path: "/methodology" },
-    { name: "Contact", path: "/contact" },
-    { name: "Login", path: "/login" },
-    { name: "Summary Stats", path: "/summary-stats" },
+    { name: "Insights", path: "/summary-stats" },
+    { name: "Methodologies", path: "/methodology" },
   ];
 
   return (
@@ -33,60 +32,43 @@ const NavBar: React.FC = () => {
       sx={{ backgroundColor: '#E6EEEC' }} 
       >
         
-      <Toolbar sx={{ justifyContent: 'space-between'}}>
-      <Box onClick = {() => handleNavigate('/landing')}>
+      <Toolbar sx={{ justifyContent: 'space-between', py: 4}}>
+      <Box onClick = {() => handleNavigate('/landing')} sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    maxWidth: "1200px",
+    px: 3,
+    mx: "auto",
+  }}>
         <Typography variant="h6" component="div" sx={{
           color: '#065143', fontWeight: 'bold',
           fontSize: isMobile ? '24px' : '30px',
         }}>
           GreenZone Analytics
         </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            gap: 2,
-            backgroundColor: '#E6EEEC',
-            padding: 1.5,
-            borderRadius: 2,
-            marginTop: isMobile ? 2 : 0,
-            alignItems: 'center',
-          }}
-        >
-        <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px',}} onClick = {() => handleNavigate('/about')}>
-            About
-        </Button>
-        <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px', }} onClick={() => handleNavigate('/summary-stats')}>
-          Insights
-        </Button>
-        <Button variant="text" color="inherit"sx={{ textTransform: 'none', fontSize: '18px',}} onClick = {() => handleNavigate('/methodology')}>
-          Methodologies
-        </Button>
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: '#065143',
-            borderRadius: '12px',
-            '&:hover': { bgcolor: '#043F33' },
-            color: 'white',
-            fontSize: '18px',
-            textTransform: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1, 
-            paddingX: 2,
-            paddingY: 1,
-          }} onClick = {() => handleNavigate('/monitoring-platform')}
-        >
-          Launch
-        <img
-          src="/launch_icon.png"
-          alt="icon"
-          style={{ width: 20, height: 20 }}
-        /> 
-      </Button>
-      <Box sx={{ minWidth: 160 }}>
+        <Box sx = {{ display: "flex", alignItems: "center" }}>
+        {isMobile ? (
+            <IconButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <MenuIcon sx={{ color: "#065143" }} />
+            </IconButton>
+          ) : (
+            <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+              {pages.map((page) => (
+                <Typography
+                  key={page.name}
+                  sx={{
+                    fontSize: "18px",
+                    cursor: "pointer",
+                    color: "#065143",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                  onClick={() => handleNavigate(page.path)}
+                >
+                  {page.name}
+                </Typography>
+              ))}
             <Select
               value={selectedLanguage}
               onChange={handleLanguageChange}
@@ -128,8 +110,99 @@ const NavBar: React.FC = () => {
               </MenuItem>
             </Select>
           </Box>
+          )}
+          </Box>
         </Box>
       </Toolbar>
+      {isMobile && (
+        <Collapse in={mobileMenuOpen} timeout="auto" unmountOnExit>
+          <Box
+            sx={{
+              px: 3,
+              pt: 1,
+              pb: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              backgroundColor: "#E6EEEC",
+            }}
+          >
+            {pages.map((page) => (
+              <Typography
+                key={page.name}
+                sx={{
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#000",
+                }}
+                onClick={() => handleNavigate(page.path)}
+              >
+                {page.name}
+              </Typography>
+            ))}
+
+            <Box
+              sx={{
+                display: 'flex',
+                border: '2px solid #065143',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                width: 'fit-content',
+              }}
+            >
+              <Button
+                onClick={() => setSelectedLanguage('en')}
+                disableRipple
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 1,
+                  minWidth: 120,
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  borderRadius: 0,
+                  backgroundColor: selectedLanguage === 'en' ? '#065143' : 'transparent',
+                  color: selectedLanguage === 'en' ? 'white' : '#000',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: selectedLanguage === 'en' ? '#043f33' : 'transparent',
+                  },
+                }}
+              >
+                <img src="/flags_en.png" alt="EN" width={20} />
+                English
+              </Button>
+
+              <Button
+                onClick={() => setSelectedLanguage('mn')}
+                disableRipple
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 1,
+                  minWidth: 120,
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  borderRadius: 0,
+                  backgroundColor: selectedLanguage === 'mn' ? '#065143' : 'transparent',
+                  color: selectedLanguage === 'mn' ? 'white' : '#000',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: selectedLanguage === 'mn' ? '#043f33' : 'transparent',
+                  },
+                }}
+              >
+                <img src="/flags_mn.png" alt="MN" width={20} />
+                Mongolian
+              </Button>
+            </Box>
+          </Box>
+        </Collapse>
+      )}
     </AppBar>
   );
 };
