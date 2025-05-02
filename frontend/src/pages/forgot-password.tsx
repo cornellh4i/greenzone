@@ -33,7 +33,6 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [suscess, setSuccess] = useState(false);
   const handleContinue = async () => {
-    console.log('clickl')
     const response = await fetch("http://localhost:8080/api/can-reset-password", {
         method: "POST",
         headers: {
