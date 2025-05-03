@@ -42,7 +42,7 @@ const InsightsPanel: React.FC = () => {
   const tableColumns = [
     { field: 'ranking', headerName: 'Ranking', width: 100 },
     { field: 'name', headerName: tabValue === 0 ? "Aimag" : "Soum", width: 200 },
-  ...(tabValue === 1 ? [{ field: 'aimag', headerName: 'Aimag', width: 200 }] : []),
+    ...(tabValue === 1 ? [{ field: 'aimag', headerName: 'Aimag', width: 200 }] : []),
     { field: 'belowCapacity', headerName: 'Below Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'atCapacity', headerName: 'At Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'aboveCapacity', headerName: 'Above Capacity', width: 150, format: (value: number) => `${value}%` },
@@ -79,12 +79,12 @@ const InsightsPanel: React.FC = () => {
     const province = provinces.find((p) => p.province_id === id);
     return province?.province_data?.province_name ?? "Unknown Province";
   };
-  
+
   const getSoumNameById = (id: number): string => {
     const county = counties.find((c) => c.county_id === id);
     return county?.county_data?.soum_name ?? "Unknown Soum";
   };
-  
+
   const getProvinceNameFromCountyId = (id: number): string => {
     const county = counties.find((c) => c.county_id === id);
     return county?.county_data?.province_name ?? "Unknown Province";
@@ -126,17 +126,17 @@ const InsightsPanel: React.FC = () => {
       const formattedSummaries = validResults.map((result, index) => {
         const record = result.data[0];
         const id = result.id;
-      
+
         const name =
           endpoint === "province"
             ? getProvinceNameById(id)
             : getSoumNameById(id);
-      
+
         const aimag =
           endpoint === "province"
             ? ""
             : getProvinceNameFromCountyId(id);
-      
+
         return {
           ranking: index + 1,
           name,
@@ -164,7 +164,7 @@ const InsightsPanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    
+
   };
 
   useEffect(() => {
@@ -177,7 +177,7 @@ const InsightsPanel: React.FC = () => {
       fetchSummariesFromIds(provinceIds, "province", setProvinceSummaries);
     }
   }, [provinceIds]);
-  
+
   useEffect(() => {
     if (countyIds.length > 0) {
       fetchSummariesFromIds(countyIds, "county", setCountySummaries);
@@ -208,9 +208,9 @@ const InsightsPanel: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchLivestockData();
-  }, []);  
+  }, []);
 
   return (
     <Box sx={{ backgroundColor: '#F3F4F6', py: 8 }}>
@@ -238,12 +238,12 @@ const InsightsPanel: React.FC = () => {
               </Tabs>
             </Box>
             <Table
-  columns={tableColumns}
-  rows={tabValue === 0 ? provinceSummaries : countySummaries}
-  loading={loading}
-  page={page}
-  onPageChange={(newPage: number) => setPage(newPage)}
-/>
+              columns={tableColumns}
+              rows={tabValue === 0 ? provinceSummaries : countySummaries}
+              loading={loading}
+              page={page}
+              onPageChange={(newPage: number) => setPage(newPage)}
+            />
           </Box>
 
           <Box sx={{ p: 4, borderRadius: 2 }}>

@@ -29,88 +29,88 @@ const NavBar: React.FC = () => {
       position="static"
       color="transparent"
       elevation={0}
-      sx={{ backgroundColor: '#E6EEEC' }} 
-      >
-        
-      <Toolbar sx={{ justifyContent: 'space-between', py: 4}}>
-      <Box onClick = {() => handleNavigate('/landing')} sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    maxWidth: "1200px",
-    px: 3,
-    mx: "auto",
-  }}>
-        <Typography variant="h6" component="div" sx={{
-          color: '#065143', fontWeight: 'bold',
-          fontSize: isMobile ? '24px' : '30px',
+      sx={{ backgroundColor: '#E6EEEC' }}
+    >
+
+      <Toolbar sx={{ justifyContent: 'space-between', py: 4 }}>
+        <Box onClick={() => handleNavigate('/landing')} sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "1200px",
+          px: 3,
+          mx: "auto",
         }}>
-          GreenZone Analytics
-        </Typography>
-        <Box sx = {{ display: "flex", alignItems: "center" }}>
-        {isMobile ? (
-            <IconButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              <MenuIcon sx={{ color: "#065143" }} />
-            </IconButton>
-          ) : (
-            <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-              {pages.map((page) => (
-                <Typography
-                  key={page.name}
+          <Typography variant="h6" component="div" sx={{
+            color: '#065143', fontWeight: 'bold',
+            fontSize: isMobile ? '24px' : '30px',
+          }}>
+            GreenZone Analytics
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {isMobile ? (
+              <IconButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <MenuIcon sx={{ color: "#065143" }} />
+              </IconButton>
+            ) : (
+              <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+                {pages.map((page) => (
+                  <Typography
+                    key={page.name}
+                    sx={{
+                      fontSize: "18px",
+                      cursor: "pointer",
+                      color: "#065143",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                    onClick={() => handleNavigate(page.path)}
+                  >
+                    {page.name}
+                  </Typography>
+                ))}
+                <Select
+                  value={selectedLanguage}
+                  onChange={handleLanguageChange}
+                  variant="standard"
+                  disableUnderline
                   sx={{
-                    fontSize: "18px",
-                    cursor: "pointer",
-                    color: "#065143",
-                    "&:hover": { textDecoration: "underline" },
+                    backgroundColor: '#E6EEEC',
+                    borderRadius: '12px',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '16px',
+                    paddingY: '4px',
+                    paddingX: '8px',
+                    '& .MuiSelect-icon': {
+                      right: 10,
+                    },
                   }}
-                  onClick={() => handleNavigate(page.path)}
+                  renderValue={() => (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <img
+                        src={`/flags_${selectedLanguage === 'en' ? 'en' : 'mn'}.png`}
+                        width={20}
+                        alt="flag"
+                      />
+                      <span>{selectedLanguage === 'en' ? 'EN' : 'MN'}</span>
+                    </Box>
+                  )}
                 >
-                  {page.name}
-                </Typography>
-              ))}
-            <Select
-              value={selectedLanguage}
-              onChange={handleLanguageChange}
-              variant="standard"
-              disableUnderline
-              sx={{
-                backgroundColor: '#E6EEEC',
-                borderRadius: '12px',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '16px',
-                paddingY: '4px',
-                paddingX: '8px',
-                '& .MuiSelect-icon': {
-                  right: 10,
-                },
-              }}
-              renderValue={() => (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <img
-                    src={`/flags_${selectedLanguage === 'en' ? 'en' : 'mn'}.png`}
-                    width={20}
-                    alt="flag"
-                  />
-                  <span>{selectedLanguage === 'en' ? 'EN' : 'MN'}</span>
-                </Box>
-              )}
-            >
-              <MenuItem value="en">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <img src="/flags_en.png" width={20} alt="EN" />
-                  EN
-                </Box>
-              </MenuItem>
-              <MenuItem value="mn">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <img src="/flags_mn.png" width={20} alt="MN" />
-                  MN
-                </Box>
-              </MenuItem>
-            </Select>
-          </Box>
-          )}
+                  <MenuItem value="en">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <img src="/flags_en.png" width={20} alt="EN" />
+                      EN
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="mn">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <img src="/flags_mn.png" width={20} alt="MN" />
+                      MN
+                    </Box>
+                  </MenuItem>
+                </Select>
+              </Box>
+            )}
           </Box>
         </Box>
       </Toolbar>
