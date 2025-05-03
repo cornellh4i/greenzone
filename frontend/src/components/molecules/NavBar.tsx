@@ -32,7 +32,7 @@ const NavBar: React.FC = () => {
       sx={{ backgroundColor: '#E6EEEC' }} 
       >
         
-      <Toolbar sx={{ justifyContent: 'space-between', py: 4}}>
+      <Toolbar sx={{ justifyContent: 'space-between', py: 2}}>
       <Box onClick = {() => handleNavigate('/landing')} sx={{
     display: "flex",
     justifyContent: "space-between",
@@ -137,7 +137,7 @@ const NavBar: React.FC = () => {
                 }}
                 onClick={() => handleNavigate(page.path)}
               >
-                {page.name}
+                {page.name}  
               </Typography>
             ))}
 
