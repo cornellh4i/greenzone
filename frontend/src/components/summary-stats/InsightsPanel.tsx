@@ -3,16 +3,14 @@ import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
 
-/** edited */
-
 interface LivestockData {
   aimag: string;
   data: { x: number; y: number }[];
 }
 
-interface SummaryData {
+interface ProvinceSummary {
   ranking: number;
-  name: string;
+  aimag: string;
   belowCapacity: number;
   atCapacity: number;
   aboveCapacity: number;
@@ -20,29 +18,22 @@ interface SummaryData {
 
 const InsightsPanel: React.FC = () => {
   const [livestockData, setLivestockData] = useState<{ [key: string]: LivestockData[] }>({});
-  const [provinceSummaries, setProvinceSummaries] = useState<SummaryData[]>([]);
-  const [countySummaries, setCountySummaries] = useState<SummaryData[]>([]);
+  const [provinceSummaries, setProvinceSummaries] = useState<ProvinceSummary[]>([]);
   const [provinceIds, setProvinceIds] = useState<number[]>([]);
-  const [countyIds, setCountyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
-  const [page, setPage] = useState(0);
-  const [provinces, setProvinces] = useState<any[]>([]);
-  const [counties, setCounties] = useState<any[]>([]);
-
+  
   const livestockTypes = ["cattle", "horse", "goat", "camel", "sheep"];
   const dzudYears = [2017, 2016, 2020, 2021];
   const privatizationPeriods = [2012, 2015, 2018, 2013];
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    setPage(0);
   };
 
   const tableColumns = [
-    { field: 'ranking', headerName: 'Ranking', width: 100 },
-    { field: 'name', headerName: tabValue === 0 ? "Aimag" : "Soum", width: 200 },
-  ...(tabValue === 1 ? [{ field: 'aimag', headerName: 'Aimag', width: 200 }] : []),
+    { field: 'ranking', headerName: 'Ranking', width: 100, format: (value: number) => value.toString() },
+    { field: 'aimag', headerName: 'Aimag', width: 200 },
     { field: 'belowCapacity', headerName: 'Below Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'atCapacity', headerName: 'At Capacity', width: 150, format: (value: number) => `${value}%` },
     { field: 'aboveCapacity', headerName: 'Above Capacity', width: 150, format: (value: number) => `${value}%` },
@@ -50,154 +41,109 @@ const InsightsPanel: React.FC = () => {
 
   const fetchProvinceIds = async () => {
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:8080/api/province");
       const json = await response.json();
+
       if (json.data) {
-        setProvinceIds(json.data.map((province: any) => province.province_id));
-        setProvinces(json.data);
+        const ids = json.data.map((province: any) => province.province_id);
+        setProvinceIds(ids);
       }
     } catch (error) {
       console.error("Error fetching province IDs:", error);
     }
   };
 
-  const fetchCountyIds = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/county");
-      const json = await response.json();
-      if (json.data) {
-        const ids = json.data.map((county: any) => county.county_id);
-        setCountyIds(json.data.map((county: any) => county.county_id));
-        setCounties(json.data);
-      }
-    } catch (error) {
-      console.error("Error fetching county IDs:", error);
-    }
-  };
-
-  const getProvinceNameById = (id: number): string => {
-    const province = provinces.find((p) => p.province_id === id);
-    return province?.province_data?.province_name ?? "Unknown Province";
-  };
-  
-  const getSoumNameById = (id: number): string => {
-    const county = counties.find((c) => c.county_id === id);
-    return county?.county_data?.soum_name ?? "Unknown Soum";
-  };
-  
-  const getProvinceNameFromCountyId = (id: number): string => {
-    const county = counties.find((c) => c.county_id === id);
-    return county?.county_data?.province_name ?? "Unknown Province";
-  };
-
-  const fetchSummariesFromIds = async (
-    ids: number[],
-    endpoint: "province" | "county",
-    setSummaries: React.Dispatch<React.SetStateAction<SummaryData[]>>
-  ) => {
+  const fetchProvinceSummaries = async () => {
     try {
       setLoading(true);
-      const promises = ids.map(async (id) => {
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/${endpoint}/${id}/carrying_capacity/cell-summary`
+      const yearRange = Array.from({ length: 2022 - 2011 + 1 }, (_, i) => 2011 + i);
+      
+      const summariesByYear = await Promise.all(
+        provinceIds.map(async (provinceId) => {
+          const yearPromises = yearRange.map(year =>
+            fetch(`http://localhost:8080/api/province/${provinceId}/carrying_capacity/cell-summary?year=${year}`)
+              .then(response => response.json())
+              .catch(error => {
+                console.error(`Error fetching data for province ${provinceId}, year ${year}:`, error);
+                return null;
+              })
           );
-          const text = await response.text();
 
-          if (response.headers.get("content-type")?.includes("application/json")) {
-            const jsonData = JSON.parse(text);
-            return { id, data: jsonData.data };
-          } else {
-            console.error(`Unexpected format for ${endpoint} ${id}:`, text);
-            return null;
-          }
-        } catch (error) {
-          console.error(`Error fetching summary for ${endpoint} ${id}:`, error);
-          return null;
-        }
-      });
+          const yearResults = await Promise.all(yearPromises);
+          const validYearResults = yearResults.filter(result => result && result.data && result.data.length > 0);
 
-      const results = await Promise.all(promises);
-      const validResults = results.filter(
-        (result): result is { id: number; data: any } =>
-          result !== null && result.data && result.data.length > 0
+          if (validYearResults.length === 0) return null;
+
+          // Calculate averages across years
+          const averages = validYearResults.reduce((acc, result) => {
+            acc.belowSum += result.data[0].cat1_percentage;
+            acc.atSum += result.data[0].cat2_percentage;
+            acc.aboveSum += result.data[0].cat3_percentage;
+            return acc;
+          }, { belowSum: 0, atSum: 0, aboveSum: 0 });
+
+          const count = validYearResults.length;
+          
+          return {
+            provinceName: validYearResults[0].data[0].province_name,
+            belowCapacity: Math.round(averages.belowSum / count * 100) / 100,
+            atCapacity: Math.round(averages.atSum / count * 100) / 100,
+            aboveCapacity: Math.round(averages.aboveSum / count * 100) / 100
+          };
+        })
       );
 
-      const formattedSummaries = validResults.map((result, index) => {
-        const record = result.data[0];
-        const id = result.id;
-      
-        const name =
-          endpoint === "province"
-            ? getProvinceNameById(id)
-            : getSoumNameById(id);
-      
-        const aimag =
-          endpoint === "province"
-            ? ""
-            : getProvinceNameFromCountyId(id);
-      
-        return {
-          ranking: index + 1,
-          name,
-          aimag,
-          belowCapacity: record?.cat1_percentage ?? 0,
-          atCapacity: record?.cat2_percentage ?? 0,
-          aboveCapacity: record?.cat3_percentage ?? 0,
-        };
+      const validSummaries = summariesByYear.filter(summary => summary !== null);
+
+      const formattedSummaries = validSummaries.map((summary, index) => ({
+        ranking: index + 1,
+        aimag: summary.provinceName,
+        belowCapacity: summary.belowCapacity,
+        atCapacity: summary.atCapacity,
+        aboveCapacity: summary.aboveCapacity,
+      }));
+
+      // Sort by belowCapacity percentage
+      formattedSummaries.sort((a, b) => a.belowCapacity - b.belowCapacity);
+
+      // Update rankings after sorting
+      formattedSummaries.forEach((summary, index) => {
+        summary.ranking = index + 1;
       });
 
-      formattedSummaries.sort((a, b) => {
-        if (b.aboveCapacity !== a.aboveCapacity) {
-          return b.aboveCapacity - a.aboveCapacity; // Descending
-        } else if (b.atCapacity !== a.atCapacity) {
-          return b.atCapacity - a.atCapacity; // Descending
-        } else {
-          return a.belowCapacity - b.belowCapacity; // Ascending
-        }
-      });
-      formattedSummaries.forEach((summary, index) => (summary.ranking = index + 1));
-
-      setSummaries(formattedSummaries);
+      setProvinceSummaries(formattedSummaries);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching summaries:", error);
-    } finally {
+      console.error("Error fetching province summaries:", error);
       setLoading(false);
     }
-    
   };
 
   useEffect(() => {
     fetchProvinceIds();
-    fetchCountyIds();
   }, []);
 
   useEffect(() => {
     if (provinceIds.length > 0) {
-      fetchSummariesFromIds(provinceIds, "province", setProvinceSummaries);
+      fetchProvinceSummaries();
     }
   }, [provinceIds]);
-  
-  useEffect(() => {
-    if (countyIds.length > 0) {
-      fetchSummariesFromIds(countyIds, "county", setCountySummaries);
-    }
-  }, [countyIds]);
 
   useEffect(() => {
-    const fetchLivestockData = async () => {
+    const fetchData = async () => {
       try {
         const allData: { [key: string]: LivestockData[] } = {};
         await Promise.all(
           livestockTypes.map(async (type) => {
             const response = await fetch(`http://localhost:8080/api/provincebyclass/${type}`);
-            const json = await response.json();
+            const json_object = await response.json();
             const formattedData = [{
               aimag: type,
-              data: json.data.map((item: any) => ({
+              data: json_object.data.map((item: any) => ({
                 x: item.year,
-                y: item.livestock_count,
-              })),
+                y: item.livestock_count
+              }))
             }];
             allData[type] = formattedData;
           })
@@ -208,29 +154,67 @@ const InsightsPanel: React.FC = () => {
         setLoading(false);
       }
     };
-  
-    fetchLivestockData();
-  }, []);  
+
+    fetchData();
+  }, []);
 
   return (
     <Box sx={{ backgroundColor: '#F3F4F6', py: 8 }}>
       <Container maxWidth="xl">
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, padding: { xs: 2, md: 4 } }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827', mb: 4 }}>
-            Key Conclusions
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            padding: { xs: 2, md: 4 },
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 700,
+              color: '#111827',
+              mb: 4
+            }}
+          >
+            Key conclusions
           </Typography>
 
-          <Box sx={{ p: 4, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+          <Box sx={{p: 4, borderRadius: 2 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 600,
+                color: '#111827',
+                mb: 3
+              }}
+            >
               Regions by Carrying Capacity & Breakdown
             </Typography>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-              <Tabs
-                value={tabValue}
+            <Box sx={{ 
+              borderBottom: 1, 
+              borderColor: 'divider', 
+              mb: 3,
+              '& .MuiTabs-root': {
+                minHeight: '48px',
+              },
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                minHeight: '48px',
+              }
+            }}>
+              <Tabs 
+                value={tabValue} 
                 onChange={handleTabChange}
                 sx={{
-                  '& .Mui-selected': { color: '#2563EB' },
-                  '& .MuiTabs-indicator': { backgroundColor: '#2563EB' },
+                  '& .Mui-selected': {
+                    color: '#2563EB',
+                  },
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: '#2563EB',
+                  }
                 }}
               >
                 <Tab label="Aimags" />
@@ -238,16 +222,21 @@ const InsightsPanel: React.FC = () => {
               </Tabs>
             </Box>
             <Table
-  columns={tableColumns}
-  rows={tabValue === 0 ? provinceSummaries : countySummaries}
-  loading={loading}
-  page={page}
-  onPageChange={(newPage: number) => setPage(newPage)}
-/>
+              columns={tableColumns}
+              rows={provinceSummaries}
+              loading={loading}
+            />
           </Box>
 
-          <Box sx={{ p: 4, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+          <Box sx={{p: 4, borderRadius: 2 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 600,
+                color: '#111827',
+                mb: 3
+              }}
+            >
               Livestock Population by Type and Year
             </Typography>
             <Box
@@ -260,7 +249,7 @@ const InsightsPanel: React.FC = () => {
                   minWidth: '1500px',
                   width: '100%',
                   height: '600px',
-                },
+                }
               }}
             >
               {Object.keys(livestockData).length > 0 && (
@@ -271,6 +260,19 @@ const InsightsPanel: React.FC = () => {
                   privatizationPeriods={privatizationPeriods}
                 />
               )}
+              <Typography
+                sx={{
+                  fontSize: '0.875rem',
+                  color: '#6B7280',
+                  mt: 2,
+                  px: 2,
+                  fontStyle: 'italic',
+                  textAlign: 'center'
+                }}
+              >
+                Note: All livestock numbers are converted to sheep units using the following conversion rates:
+                Camel (5 units), Horse (7 units), Cattle (6 units), Sheep (1 unit), Goat (0.9 units)
+              </Typography>
             </Box>
           </Box>
         </Box>
