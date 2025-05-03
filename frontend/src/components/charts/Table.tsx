@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Table as MUITable,
   TableBody,
@@ -55,14 +55,6 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
   const [sortField, setSortField] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [originalRows, setOriginalRows] = useState(rows);
-
-  useEffect(() => {
-    setOriginalRows(rows);
-    setSortField('');
-    setSortOrder('asc');
-  }, [rows]);
-
   const page = propPage ?? internalPage;
   const setPage = onPageChange ?? setInternalPage;
 
@@ -81,12 +73,9 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
   };
 
   const sortedRows = useMemo(() => {
-    if (!sortField) return originalRows;
+    if (!sortField) return rows;
 
-    const sorted = [...originalRows].sort((a, b) => {
-      if (sortField === 'ranking') {
-        return sortOrder === 'asc' ? a.ranking - b.ranking : b.ranking - a.ranking;
-      }
+    const sorted = [...rows].sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
 
@@ -96,7 +85,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
     });
 
     return sorted;
-  }, [originalRows, sortField, sortOrder]);
+  }, [rows, sortField, sortOrder]);
 
   const labelDisplayedRows = ({ from, to, count }: { from: number; to: number; count: number }) => {
     return `${from}–${to} of ${count}`;
@@ -138,43 +127,52 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} align="center">
-                  Loading...
+  {loading ? (
+    <TableRow>
+      <TableCell colSpan={columns.length} align="center">
+        Loading...
+      </TableCell>
+    </TableRow>
+  ) : (
+    sortedRows
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((row, index) => {
+        const absoluteIndex = page * rowsPerPage + index;
+        return (
+          <TableRow
+            key={JSON.stringify(row)} // avoid using `row.ranking` as key
+            sx={{
+              '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
+              '&:hover': { backgroundColor: '#e8e8e8' },
+            }}
+          >
+            {columns.map((column) => {
+              // Special handling for "ranking" column
+              if (column.field === 'ranking') {
+                return (
+                  <TableCell key={column.field}>
+                    {absoluteIndex + 1}
+                  </TableCell>
+                );
+              }
+
+              return (
+                <TableCell key={column.field}>
+                  {column.format ? column.format(row[column.field]) : row[column.field]}
                 </TableCell>
-              </TableRow>
-            ) : sortedRows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} align="center">
-                  No data available
-                </TableCell>
-              </TableRow>
-            ) : (
-              sortedRows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <TableRow
-                    key={row.ranking || JSON.stringify(row)}
-                    sx={{
-                      '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
-                      '&:hover': { backgroundColor: '#e8e8e8' },
-                    }}
-                  >
-                    {columns.map((column) => (
-                      <TableCell key={column.field}>
-                        {column.format ? column.format(row[column.field]) : row[column.field]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
+              );
+            })}
+          </TableRow>
+        );
+      })
+  )}
+</TableBody>
+
         </MUITable>
         <StyledTablePagination
           rowsPerPageOptions={[10]}
           component="div"
-          count={originalRows.length}
+          count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
