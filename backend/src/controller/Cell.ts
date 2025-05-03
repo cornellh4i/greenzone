@@ -62,7 +62,7 @@ export const getCellValuesbyYearandCtype = async (
 
       while (hasMoreData) {
         const { data, error } = await supabase
-          .rpc("categorize_cells_by_year", {
+          .rpc("categorize_cells_by_year_flat", {
             selected_year: selected_year,
             category_type: classificationType,
             gte: gte,

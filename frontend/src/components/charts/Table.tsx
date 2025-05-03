@@ -127,32 +127,47 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} align="center">
-                  Loading...
+  {loading ? (
+    <TableRow>
+      <TableCell colSpan={columns.length} align="center">
+        Loading...
+      </TableCell>
+    </TableRow>
+  ) : (
+    sortedRows
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((row, index) => {
+        const absoluteIndex = page * rowsPerPage + index;
+        return (
+          <TableRow
+            key={JSON.stringify(row)} // avoid using `row.ranking` as key
+            sx={{
+              '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
+              '&:hover': { backgroundColor: '#e8e8e8' },
+            }}
+          >
+            {columns.map((column) => {
+              // Special handling for "ranking" column
+              if (column.field === 'ranking') {
+                return (
+                  <TableCell key={column.field}>
+                    {absoluteIndex + 1}
+                  </TableCell>
+                );
+              }
+
+              return (
+                <TableCell key={column.field}>
+                  {column.format ? column.format(row[column.field]) : row[column.field]}
                 </TableCell>
-              </TableRow>
-            ) : (
-              sortedRows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <TableRow
-                    key={row.ranking || JSON.stringify(row)} // fallback key
-                    sx={{
-                      '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
-                      '&:hover': { backgroundColor: '#e8e8e8' },
-                    }}
-                  >
-                    {columns.map((column) => (
-                      <TableCell key={column.field}>
-                        {column.format ? column.format(row[column.field]) : row[column.field]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
+              );
+            })}
+          </TableRow>
+        );
+      })
+  )}
+</TableBody>
+
         </MUITable>
         <StyledTablePagination
           rowsPerPageOptions={[10]}

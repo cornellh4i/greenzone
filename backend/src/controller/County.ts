@@ -11,9 +11,8 @@ export const getCounties = async (
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from("Counties")
-        .select("county_id,province_id,county_data");
-      // error handling in case the collection doesn't work
+        .from("County_Data")
+        .select("county_id,province_id,sid,soum_name,province_name");
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -37,9 +36,8 @@ export const getCountyGeometry = async (
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from("Counties")
+        .from("County_Data")
         .select("county_id,province_id,county_geometry");
-      // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -64,10 +62,9 @@ export const getCountyByID = async (
     try {
       const { county_id } = req.params;
       const { data, error } = await supabase
-        .from("Counties")
-        .select("county_id,province_id,county_data")
+        .from("County_Data")
+        .select("county_id,province_id,sid,soum_name,province_name")
         .eq("county_id", county_id);
-      // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -92,10 +89,9 @@ export const getCountyGeometryByID = async (
     try {
       const { county_id } = req.params;
       const { data, error } = await supabase
-        .from("Counties")
+        .from("County_Data")
         .select("county_id,province_id,county_geometry")
         .eq("county_id", county_id);
-      // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -120,11 +116,10 @@ export const getCountyLivestockByID = async (
     try {
       const { county_id, year } = req.params;
       const { data, error } = await supabase
-        .from("county_livestock")
-        .select("yearly_agg")
+        .from("counties_livestock")
+        .select("goat,camel,horse,sheep,cattle,total")
         .eq("asid", county_id)
         .eq("year", year);
-      // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -150,19 +145,18 @@ export const getCountyCellSummary = async (
       const county_id = parseInt(req.params.county_id as string, 10);
       const category_type = req.params.category_type as string;
 
-      // Validate category_type
       if (!["carrying_capacity", "z_score"].includes(category_type)) {
         res.status(400).json({
           log: "Invalid category type. Use 'carrying_capacity' or 'z_score'.",
         });
         return;
       }
-      // Call the stored procedure using Supabase RPC
-      const { data, error } = await supabase.rpc("categorize_cells_by_county", {
+
+      const { data, error } = await supabase.rpc("categorize_cells_by_new_county", {
         c_id: county_id,
         category_type: category_type,
       });
-      // Error handling in case the query fails
+
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
@@ -181,6 +175,7 @@ export const getCountyCellSummary = async (
     }
   }
 };
+
 export const getCountiesGeomInProvince = async (
   req: Request,
   res: Response
@@ -189,12 +184,11 @@ export const getCountiesGeomInProvince = async (
     try {
       const province_id = parseInt(req.params.province_id as string, 10);
       const { data, error } = await supabase.rpc(
-        "retrieve_counties_geom_in_province",
+        "retrieve_new_counties_geom_in_province",
         {
           p_id: province_id,
         }
       );
-      // Error handling in case the query fails
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",
