@@ -182,7 +182,7 @@ export default function SignUpPage() {
                 onClick={async () => {
                   if (email && password) {
                   await signUp();
-                  window.location.href = "/login"; // Redirect to the landing page
+                  window.location.href = "/landing"; // Redirect to the landing page
                   }
                 }}
                 >

@@ -57,15 +57,15 @@ async function CanResetPassword(email: string) {
     return { message: 'Password reset email sent', data };
 }
 
-async function ChangePassword(email:string, newPassword:string){
+async function ChangePassword( newPassword:string){
     const { data, error } = await supabase.auth.updateUser({
-        email: email,
         password: newPassword,
       })
       if (error) {
         // error.message already has Supabase’s description
         throw new Error(`Password change failed: ${error.message}`)
       }
+      console.log(data)
       return { message: 'Password change sucess', data }
 }
 

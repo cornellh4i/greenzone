@@ -118,9 +118,7 @@ export default function ResetPasswordPage() {
               color="primary"
               fullWidth
               sx={{ py: 1.5, mt: 1 }}
-              onClick={() => window.location.href = "/login" 
-                //changePassword is supposed to be called here, but for now we just redirect to landing page
-                }
+              onClick={changePassword}
             >
               Change Password
             </Button>
