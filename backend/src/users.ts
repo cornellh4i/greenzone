@@ -31,17 +31,43 @@ async function SignupUser(email: string, password: string, first_name: string, l
         return { message: "User signed up successfully", data };
     }
 }
+async function LoginUser(email: string, password: string) {
+    let { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+    })
+    console.log("data", data)
+    console.log("error", error)
+    if (error) {
+        throw new Error(`Error Logging in: ${error.message}`);
+    } else {
+        return { message: "User logged in successfully", data };
+    }
+}
 
-async function CanResetPassword(email:string){
-    console.log()
+
+
+async function CanResetPassword(email: string) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:3000/reset-password' 
+        redirectTo: `http://localhost:3000/reset-password?email=${encodeURIComponent(email)}`,
+    });
+    if (error) {
+        throw new Error(`Password reset failed: ${error.message}`);
+    }
+    return { message: 'Password reset email sent', data };
+}
+
+async function ChangePassword( newPassword:string){
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
       })
       if (error) {
         // error.message already has Supabase’s description
-        throw new Error(`Password reset failed: ${error.message}`)
+        throw new Error(`Password change failed: ${error.message}`)
       }
-      return { message: 'Password reset email sent', data }
+      console.log(data)
+      return { message: 'Password change sucess', data }
 }
 
-export { supabase, SignupUser ,CanResetPassword};
+
+export { supabase, SignupUser ,CanResetPassword, LoginUser, ChangePassword};

@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabaseClient";
+// import { supabase } from "../config/supabaseClient";
 
 /*
 export async function getProvinceLivestock(provinceName: string, year: number) {

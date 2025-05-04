@@ -20,7 +20,7 @@ import {
   getCountiesGeomInProvince,
 } from "./controller/County";
 
-import { SignupUser, CanResetPassword } from "./users";
+import { SignupUser, CanResetPassword, LoginUser, ChangePassword } from "./users";
 
 import { getCellValuesbyYearandCtype, getYearOptions } from "./controller/Cell";
 
@@ -73,6 +73,21 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+router.post("/login", async (req, res) => {
+  const { email, password} = req.body;
+  try {
+    const response = await LoginUser(email, password);
+    if (response instanceof Error) {
+      res.status(400).json({ message: response });
+    } else {
+      res.status(200).json({ message: "User logged in successfully", response });
+      console.log("working", response);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Login Error" });
+  }
+});
+
 router.post("/can-reset-password", async (req, res) => {
   const { email } = req.body;
   try {
@@ -85,6 +100,22 @@ router.post("/can-reset-password", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/change-password", async (req, res) => {
+  const { email, newPassword } = req.body;
+  try {
+    const response = await ChangePassword(email, newPassword);
+    if (response instanceof Error) {
+      res.status(400).json({ message: response });
+    } else {
+      res.status(200).json({ message: "Password Changed", response });
+      console.log("working", response);
+    }
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Internal server error" ,error});
   }
 }
 );
