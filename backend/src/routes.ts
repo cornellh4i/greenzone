@@ -22,14 +22,20 @@ import {
 
 import { SignupUser, CanResetPassword } from "./users";
 
-import { getCellValuesbyYearandCtype, getYearOptions } from "./controller/Cell";
-
+import {
+  getCellValuesbyYearandCtype,
+  getYearOptions,
+  getCellCategorySummary,
+} from "./controller/Cell";
 
 const router = express.Router();
-
 router.get(
   "/cells/:year/:classificationType/:lowerBound/:upperBound",
   getCellValuesbyYearandCtype
+);
+router.get(
+  "/cell/:entityType/:entityId/:classificationType/:selectedYear",
+  getCellCategorySummary
 );
 router.get("/cells/yearOptions", getYearOptions);
 
@@ -59,13 +65,21 @@ router.get(
 );
 
 router.post("/signup", async (req, res) => {
-  const { email, password, firstName,lastName,role} = req.body;
+  const { email, password, firstName, lastName, role } = req.body;
   try {
-    const response = await SignupUser(email, password,firstName,lastName,role);
+    const response = await SignupUser(
+      email,
+      password,
+      firstName,
+      lastName,
+      role
+    );
     if (response instanceof Error) {
       res.status(400).json({ message: response });
     } else {
-      res.status(200).json({ message: "User signed up successfully", response });
+      res
+        .status(200)
+        .json({ message: "User signed up successfully", response });
       console.log("working", response);
     }
   } catch (error) {
@@ -86,8 +100,6 @@ router.post("/can-reset-password", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
-}
-);
-
+});
 
 export default router;

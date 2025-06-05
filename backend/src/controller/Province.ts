@@ -192,13 +192,11 @@ export const getProvinceCellSummary = async (
       }
 
       // Fetch data
-      const { data, error } = await supabase.rpc(
-        "categorize_cells_by_province",
-        {
-          p_id: province_id,
-          category_type: category_type,
-        }
-      );
+      const { data, error } = await supabase.rpc("get_category_summary", {
+        p_id: 22,
+        category_type: "z_score",
+        selected_year: 2023, // Assuming a default year, can be modified as needed
+      });
 
       if (error) {
         res.status(500).json({
