@@ -189,9 +189,9 @@ export const getCountiesGeomInProvince = async (
     try {
       const province_id = parseInt(req.params.province_id as string, 10);
       const { data, error } = await supabase.rpc(
-        "retrieve_counties_geom_in_province",
+        "retrive_counties_geom_province",
         {
-          p_id: province_id,
+          input_province_id: province_id,
         }
       );
       // Error handling in case the query fails

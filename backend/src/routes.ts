@@ -42,15 +42,11 @@ router.get("/cells/yearOptions", getYearOptions);
 // Route to get all provinces
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
-router.get("/provincegeo/:province_id", getProvinceGeometryByID);
+
 router.get("/provincebyclass/:type", getProvinceLivestockByClass);
-router.get("/province/:province_id/grazing-range", getProvinceGR);
+
 router.get("/province/:province_id", getProvinceByID);
 router.get("/province/:province_id/:year/livestock", getProvinceLivestockByID);
-router.get(
-  "/province/:province_id/:category_type/cell-summary",
-  getProvinceCellSummary
-);
 
 // Route to create a new county
 router.get("/county", getCounties);
@@ -59,10 +55,6 @@ router.get("/county/geom/:province_id", getCountiesGeomInProvince);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
 router.get("/county/:county_id/:year/livestock", getCountyLivestockByID);
-router.get(
-  "/county/:county_id/:category_type/cell-summary",
-  getCountyCellSummary
-);
 
 router.post("/signup", async (req, res) => {
   const { email, password, firstName, lastName, role } = req.body;

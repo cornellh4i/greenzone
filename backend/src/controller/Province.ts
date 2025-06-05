@@ -35,8 +35,8 @@ export const getProvinceGeometry = async (
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from("Provinces")
-        .select("province_id, province_data->province_name, province_geometry");
+        .from("Province_Data")
+        .select("id, name, wkb_geometry");
       // error handling in case the insertion doesn't work
       if (error) {
         res.status(500).json({
@@ -146,9 +146,12 @@ export const getProvinceLivestockByClass = async (
   if (supabase) {
     try {
       const { type } = req.params;
-      const { data, error } = await supabase.rpc("fetch_livestock_by_class", {
-        livestock_type: type,
-      });
+      const { data, error } = await supabase.rpc(
+        "fetch_new_livestock_by_class",
+        {
+          livestock_type: type,
+        }
+      );
       // error handling in case the collection doesn't work
       if (error) {
         res.status(500).json({

@@ -19,7 +19,9 @@ interface SummaryData {
 }
 
 const InsightsPanel: React.FC = () => {
-  const [livestockData, setLivestockData] = useState<{ [key: string]: LivestockData[] }>({});
+  const [livestockData, setLivestockData] = useState<{
+    [key: string]: LivestockData[];
+  }>({});
   const [provinceSummaries, setProvinceSummaries] = useState<SummaryData[]>([]);
   const [countySummaries, setCountySummaries] = useState<SummaryData[]>([]);
   const [provinceIds, setProvinceIds] = useState<number[]>([]);
@@ -40,12 +42,33 @@ const InsightsPanel: React.FC = () => {
   };
 
   const tableColumns = [
-    { field: 'ranking', headerName: 'Ranking', width: 100 },
-    { field: 'name', headerName: tabValue === 0 ? "Aimag" : "Soum", width: 200 },
-    ...(tabValue === 1 ? [{ field: 'aimag', headerName: 'Aimag', width: 200 }] : []),
-    { field: 'belowCapacity', headerName: 'Below Capacity', width: 150, format: (value: number) => `${value}%` },
-    { field: 'atCapacity', headerName: 'At Capacity', width: 150, format: (value: number) => `${value}%` },
-    { field: 'aboveCapacity', headerName: 'Above Capacity', width: 150, format: (value: number) => `${value}%` },
+    { field: "ranking", headerName: "Ranking", width: 100 },
+    {
+      field: "name",
+      headerName: tabValue === 0 ? "Aimag" : "Soum",
+      width: 200,
+    },
+    ...(tabValue === 1
+      ? [{ field: "aimag", headerName: "Aimag", width: 200 }]
+      : []),
+    {
+      field: "belowCapacity",
+      headerName: "Below Capacity",
+      width: 150,
+      format: (value: number) => `${value}%`,
+    },
+    {
+      field: "atCapacity",
+      headerName: "At Capacity",
+      width: 150,
+      format: (value: number) => `${value}%`,
+    },
+    {
+      field: "aboveCapacity",
+      headerName: "Above Capacity",
+      width: 150,
+      format: (value: number) => `${value}%`,
+    },
   ];
 
   const fetchProvinceIds = async () => {
@@ -92,50 +115,56 @@ const InsightsPanel: React.FC = () => {
 
   const fetchSummariesFromIds = async (
     ids: number[],
-    endpoint: "province" | "county",
+    entityType: "province" | "county",
     setSummaries: React.Dispatch<React.SetStateAction<SummaryData[]>>
   ) => {
     try {
       setLoading(true);
-      const promises = ids.map(async (id) => {
+      const promises = ids.map(async (entityID) => {
         try {
           const response = await fetch(
-            `http://localhost:8080/api/${endpoint}/${id}/carrying_capacity/cell-summary`
+            `http://localhost:8080/api/cell/${entityType}/${entityID}/carrying_capacity/2022`
           );
           const text = await response.text();
 
-          if (response.headers.get("content-type")?.includes("application/json")) {
+          if (
+            response.headers.get("content-type")?.includes("application/json")
+          ) {
             const jsonData = JSON.parse(text);
-            return { id, data: jsonData.data };
+            return { entityID, data: jsonData.data };
           } else {
-            console.error(`Unexpected format for ${endpoint} ${id}:`, text);
+            console.error(
+              `Unexpected format for ${entityType} ${entityID}:`,
+              text
+            );
             return null;
           }
         } catch (error) {
-          console.error(`Error fetching summary for ${endpoint} ${id}:`, error);
+          console.error(
+            `Error fetching summary for ${entityType} ${entityID}:`,
+            error
+          );
           return null;
         }
       });
 
       const results = await Promise.all(promises);
       const validResults = results.filter(
-        (result): result is { id: number; data: any } =>
+        (result): result is { entityID: number; data: any } =>
           result !== null && result.data && result.data.length > 0
       );
 
       const formattedSummaries = validResults.map((result, index) => {
         const record = result.data[0];
-        const id = result.id;
+        const id = result.entityID;
 
         const name =
-          endpoint === "province"
+          entityType === "province"
             ? getProvinceNameById(id)
             : getSoumNameById(id);
 
         const aimag =
-          endpoint === "province"
-            ? ""
-            : getProvinceNameFromCountyId(id);
+          entityType === "province" ? "" : getProvinceNameFromCountyId(id);
 
         return {
           ranking: index + 1,
@@ -156,7 +185,9 @@ const InsightsPanel: React.FC = () => {
           return a.belowCapacity - b.belowCapacity; // Ascending
         }
       });
-      formattedSummaries.forEach((summary, index) => (summary.ranking = index + 1));
+      formattedSummaries.forEach(
+        (summary, index) => (summary.ranking = index + 1)
+      );
 
       setSummaries(formattedSummaries);
     } catch (error) {
@@ -164,7 +195,6 @@ const InsightsPanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
-
   };
 
   useEffect(() => {
@@ -190,15 +220,19 @@ const InsightsPanel: React.FC = () => {
         const allData: { [key: string]: LivestockData[] } = {};
         await Promise.all(
           livestockTypes.map(async (type) => {
-            const response = await fetch(`http://localhost:8080/api/provincebyclass/${type}`);
+            const response = await fetch(
+              `http://localhost:8080/api/provincebyclass/${type}`
+            );
             const json = await response.json();
-            const formattedData = [{
-              aimag: type,
-              data: json.data.map((item: any) => ({
-                x: item.year,
-                y: item.livestock_count,
-              })),
-            }];
+            const formattedData = [
+              {
+                aimag: type,
+                data: json.data.map((item: any) => ({
+                  x: item.year,
+                  y: item.livestock_count,
+                })),
+              },
+            ];
             allData[type] = formattedData;
           })
         );
@@ -213,24 +247,37 @@ const InsightsPanel: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ backgroundColor: '#F3F4F6', py: 8 }}>
+    <Box sx={{ backgroundColor: "#F3F4F6", py: 8 }}>
       <Container maxWidth="xl">
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, padding: { xs: 2, md: 4 } }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827', mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            padding: { xs: 2, md: 4 },
+          }}
+        >
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 700, color: "#111827", mb: 4 }}
+          >
             Key Conclusions
           </Typography>
 
           <Box sx={{ p: 4, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 600, color: "#111827", mb: 3 }}
+            >
               Regions by Carrying Capacity & Breakdown
             </Typography>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
               <Tabs
                 value={tabValue}
                 onChange={handleTabChange}
                 sx={{
-                  '& .Mui-selected': { color: '#2563EB' },
-                  '& .MuiTabs-indicator': { backgroundColor: '#2563EB' },
+                  "& .Mui-selected": { color: "#2563EB" },
+                  "& .MuiTabs-indicator": { backgroundColor: "#2563EB" },
                 }}
               >
                 <Tab label="Aimags" />
@@ -247,19 +294,22 @@ const InsightsPanel: React.FC = () => {
           </Box>
 
           <Box sx={{ p: 4, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 600, color: "#111827", mb: 3 }}
+            >
               Livestock Population by Type and Year
             </Typography>
             <Box
               sx={{
-                width: '100%',
-                overflowX: 'auto',
+                width: "100%",
+                overflowX: "auto",
                 mx: -4,
                 px: 4,
-                '& > div': {
-                  minWidth: '1500px',
-                  width: '100%',
-                  height: '600px',
+                "& > div": {
+                  minWidth: "1500px",
+                  width: "100%",
+                  height: "600px",
                 },
               }}
             >

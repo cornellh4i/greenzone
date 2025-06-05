@@ -182,8 +182,7 @@ const MapComponent: React.FC = () => {
       const geojsonData = json_object.data;
       const deckProvinceProj = geojsonData.map((feature: any) => {
         const bounds: Bounds = [Infinity, Infinity, -Infinity, -Infinity];
-
-        feature.province_geometry.coordinates[0][0].forEach(
+        feature.wkb_geometry.coordinates[0][0].forEach(
           ([lng, lat]: [number, number]) => {
             bounds[0] = Math.min(bounds[0], lng); // Min longitude
             bounds[1] = Math.min(bounds[1], lat); // Min latitude
@@ -191,11 +190,11 @@ const MapComponent: React.FC = () => {
             bounds[3] = Math.max(bounds[3], lat); // Max latitude
           }
         );
-        provViews[feature.province_id] = bounds;
+        provViews[feature.id] = bounds;
         return {
           type: "Polygon",
-          coordinates: feature.province_geometry.coordinates[0],
-          ID: feature.province_id,
+          coordinates: feature.wkb_geometry.coordinates[0],
+          ID: feature.id,
           view: bounds,
           areaType: SelectedType.Province,
         };
@@ -219,7 +218,7 @@ const MapComponent: React.FC = () => {
       const deckSoumProj = geojsonData.map((feature: any) => {
         const bounds: Bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
-        feature.county_geometry.coordinates[0].forEach(
+        feature.wkb_geometry.coordinates[0].forEach(
           ([lng, lat]: [number, number]) => {
             bounds[0] = Math.min(bounds[0], lng); // Min longitude
             bounds[1] = Math.min(bounds[1], lat); // Min latitude
@@ -230,7 +229,7 @@ const MapComponent: React.FC = () => {
         soumViews[feature.county_id] = bounds;
         return {
           type: "Polygon",
-          coordinates: feature.county_geometry.coordinates[0],
+          coordinates: feature.wkb_geometry.coordinates[0],
           ID: feature.county_id,
           view: bounds,
           areaType: SelectedType.County,
