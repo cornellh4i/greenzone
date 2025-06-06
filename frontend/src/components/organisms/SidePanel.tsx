@@ -117,12 +117,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
       );
       const response_json = await response.json();
       const livestock_data = {
-        number_of_livestock: response_json.data[0].yearly_agg.total,
-        number_of_cattle: response_json.data[0].yearly_agg.cattle,
-        number_of_goat: response_json.data[0].yearly_agg.goat,
-        number_of_sheep: response_json.data[0].yearly_agg.sheep,
-        number_of_camel: response_json.data[0].yearly_agg.camel,
-        number_of_horse: response_json.data[0].yearly_agg.horse,
+        number_of_livestock: response_json.data[0].total,
+        number_of_cattle: response_json.data[0].cattle,
+        number_of_goat: response_json.data[0].goat,
+        number_of_sheep: response_json.data[0].sheep,
+        number_of_camel: response_json.data[0].camel,
+        number_of_horse: response_json.data[0].horse,
       };
       const formattedData = livestockTypes.map((livestockType) => ({
         x: livestockType,

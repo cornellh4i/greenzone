@@ -3,8 +3,6 @@ import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
 
-/** edited */
-
 interface LivestockData {
   aimag: string;
   data: { x: number; y: number }[];
@@ -76,7 +74,7 @@ const InsightsPanel: React.FC = () => {
       const response = await fetch("http://localhost:8080/api/province");
       const json = await response.json();
       if (json.data) {
-        setProvinceIds(json.data.map((province: any) => province.province_id));
+        setProvinceIds(json.data.map((province: any) => province.id));
         setProvinces(json.data);
       }
     } catch (error) {
@@ -89,8 +87,7 @@ const InsightsPanel: React.FC = () => {
       const response = await fetch("http://localhost:8080/api/county");
       const json = await response.json();
       if (json.data) {
-        const ids = json.data.map((county: any) => county.county_id);
-        setCountyIds(json.data.map((county: any) => county.county_id));
+        setCountyIds(json.data.map((county: any) => county.id));
         setCounties(json.data);
       }
     } catch (error) {
@@ -99,18 +96,18 @@ const InsightsPanel: React.FC = () => {
   };
 
   const getProvinceNameById = (id: number): string => {
-    const province = provinces.find((p) => p.province_id === id);
-    return province?.province_data?.province_name ?? "Unknown Province";
+    const province = provinces.find((p) => p.id === id);
+    return province?.name ?? "Unknown Province";
   };
 
   const getSoumNameById = (id: number): string => {
-    const county = counties.find((c) => c.county_id === id);
-    return county?.county_data?.soum_name ?? "Unknown Soum";
+    const county = counties.find((c) => c.id === id);
+    return county?.name ?? "Unknown Soum";
   };
 
   const getProvinceNameFromCountyId = (id: number): string => {
-    const county = counties.find((c) => c.county_id === id);
-    return county?.county_data?.province_name ?? "Unknown Province";
+    const county = counties.find((c) => c.id === id);
+    return county?.province_name ?? "Unknown Province";
   };
 
   const fetchSummariesFromIds = async (
@@ -120,62 +117,62 @@ const InsightsPanel: React.FC = () => {
   ) => {
     try {
       setLoading(true);
-      const promises = ids.map(async (entityID) => {
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/cell/${entityType}/${entityID}/carrying_capacity/2022`
-          );
-          const text = await response.text();
-
-          if (
-            response.headers.get("content-type")?.includes("application/json")
-          ) {
-            const jsonData = JSON.parse(text);
-            return { entityID, data: jsonData.data };
-          } else {
+      const promises: Promise<{ entityID: number; data: any } | null>[] =
+        ids.map(async (entityID) => {
+          try {
+            const response = await fetch(
+              `http://localhost:8080/api/cell/${entityType}/${entityID}/carrying_capacity/2022`
+            );
+            const data = await response.json();
+            return { entityID, data };
+          } catch (error) {
             console.error(
-              `Unexpected format for ${entityType} ${entityID}:`,
-              text
+              `Error fetching data for ${entityType} ID ${entityID}:`,
+              error
             );
             return null;
           }
-        } catch (error) {
-          console.error(
-            `Error fetching summary for ${entityType} ${entityID}:`,
-            error
-          );
-          return null;
-        }
-      });
+        });
 
       const results = await Promise.all(promises);
+      console.log(results);
       const validResults = results.filter(
         (result): result is { entityID: number; data: any } =>
           result !== null && result.data && result.data.length > 0
       );
+      console.log("Valid Results:", validResults);
+      const formattedSummaries = results.map((result, index) => {
+        const record = result?.data.data[0];
+        const id = result?.entityID;
 
-      const formattedSummaries = validResults.map((result, index) => {
-        const record = result.data[0];
-        const id = result.entityID;
-
-        const name =
-          entityType === "province"
-            ? getProvinceNameById(id)
-            : getSoumNameById(id);
-
-        const aimag =
-          entityType === "province" ? "" : getProvinceNameFromCountyId(id);
-
-        return {
-          ranking: index + 1,
-          name,
-          aimag,
-          belowCapacity: record?.cat1_percentage ?? 0,
-          atCapacity: record?.cat2_percentage ?? 0,
-          aboveCapacity: record?.cat3_percentage ?? 0,
-        };
+        if (id) {
+          const name =
+            entityType === "province"
+              ? getProvinceNameById(id)
+              : getSoumNameById(id);
+          const aimag =
+            entityType === "province" ? "" : getProvinceNameFromCountyId(id);
+          return {
+            ranking: index + 1,
+            name,
+            aimag,
+            belowCapacity: record?.cat1 ?? 0,
+            atCapacity: record?.cat2 ?? 0,
+            aboveCapacity: record?.cat3 ?? 0,
+          };
+        } else {
+          return {
+            ranking: index + 1,
+            name: "Unknown",
+            aimag: "",
+            belowCapacity: 0,
+            atCapacity: 0,
+            aboveCapacity: 0,
+          };
+        }
       });
 
+      console.log("Formatted Summaries:", formattedSummaries);
       formattedSummaries.sort((a, b) => {
         if (b.aboveCapacity !== a.aboveCapacity) {
           return b.aboveCapacity - a.aboveCapacity; // Descending

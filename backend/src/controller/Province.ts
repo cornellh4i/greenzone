@@ -9,8 +9,8 @@ export const getProvinces = async (
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from("Provinces")
-        .select("province_id,province_data");
+        .from("Province_Data")
+        .select("id,name,province_herders, province_land_area");
       // error handling in case the collection doesn't work
       if (error) {
         res.status(500).json({
@@ -117,12 +117,26 @@ export const getProvinceLivestockByID = async (
   if (supabase) {
     try {
       const { province_id, year } = req.params;
-      const { data, error } = await supabase
-        .from("province_livestock")
-        .select("yearly_agg")
-        .eq("asid_prefix", province_id)
-        .eq("year", year);
-      // error handling in case the insertion doesn't work
+      const selected_year_parse = parseInt(year as string, 10);
+      // check year
+      if (
+        isNaN(selected_year_parse) ||
+        selected_year_parse < 2011 ||
+        selected_year_parse > 2022
+      ) {
+        res.status(400).json({
+          log: "Invalid year. Please provide a valid year.",
+        });
+        return;
+      }
+      const { data, error } = await supabase.rpc(
+        "retrieve_livestock_by_entity",
+        {
+          entity_type: "province",
+          input_entity_id: province_id,
+          selected_year: selected_year_parse,
+        }
+      );
       if (error) {
         res.status(500).json({
           log: "Error while collecting the data",

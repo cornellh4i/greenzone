@@ -29,6 +29,7 @@ import {
 } from "./controller/Cell";
 
 const router = express.Router();
+
 router.get(
   "/cells/:year/:classificationType/:lowerBound/:upperBound",
   getCellValuesbyYearandCtype
@@ -42,9 +43,7 @@ router.get("/cells/yearOptions", getYearOptions);
 // Route to get all provinces
 router.get("/province", getProvinces);
 router.get("/provincegeo", getProvinceGeometry);
-
 router.get("/provincebyclass/:type", getProvinceLivestockByClass);
-
 router.get("/province/:province_id", getProvinceByID);
 router.get("/province/:province_id/:year/livestock", getProvinceLivestockByID);
 
