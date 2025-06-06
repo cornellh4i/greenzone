@@ -103,9 +103,7 @@ export const getYearOptions = async (
 ): Promise<void> => {
   if (supabase) {
     try {
-      const { data, error } = await supabase
-        .from("new_yearly_cell_data")
-        .select("year");
+      const { data, error } = await supabase.rpc("get_years", {});
 
       if (error) {
         res.status(500).json({
