@@ -26,6 +26,7 @@ import {
   getCellValuesbyYearandCtype,
   getYearOptions,
   getCellCategorySummary,
+  getMaps,
 } from "./controller/Cell";
 
 const router = express.Router();
@@ -54,6 +55,7 @@ router.get("/county/geom/:province_id", getCountiesGeomInProvince);
 router.get("/county/:county_id", getCountyByID);
 router.get("/countygeo/:county_id", getCountyGeometryByID);
 router.get("/county/:county_id/:year/livestock", getCountyLivestockByID);
+router.get("/maps", getMaps);
 
 router.post("/signup", async (req, res) => {
   const { email, password, firstName, lastName, role } = req.body;

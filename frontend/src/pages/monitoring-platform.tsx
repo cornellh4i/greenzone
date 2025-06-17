@@ -3,6 +3,7 @@ import Map from "../components/organisms/Map";
 import TopPanel from "../components/organisms/TopPanel";
 import SidePanel from "../components/organisms/SidePanel";
 import { LayerType, Context } from "../utils/global";
+import { backendUrl } from "../utils/const";
 const MonitoringPlatform: React.FC = () => {
   const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
   const [selectedCounty, setSelectedCounty] = useState<number | null>(null);
@@ -82,9 +83,7 @@ const MonitoringPlatform: React.FC = () => {
 
   const loadYearOptions = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/cells/yearOptions"
-      );
+      const response = await fetch(`${backendUrl}/cells/yearOptions`);
       const response_json = await response.json();
       const years = response_json.data.map((year: { year: number }) =>
         year.year.toString()

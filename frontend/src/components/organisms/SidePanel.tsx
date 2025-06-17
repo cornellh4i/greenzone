@@ -6,11 +6,11 @@ import RadioButton from "@/components/atoms/RadioButton";
 import Slide from "@/components/molecules/Slide";
 import { LayerType, Context } from "../../utils/global";
 import SidePanelPercentageModal from "../molecules/SidePanelPercentageModal";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
 import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { backendUrl } from "../../utils/const";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   buttonStyle,
@@ -91,10 +91,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   ) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
+        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
       );
       console.log(
-        `http://localhost:8080/api/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
+        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
       );
       const response_json = await response.json();
       const percentages = [
@@ -113,7 +113,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const loadEntityLivestock = async (entityType: string, entityID: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/${entityType}/${entityID}/${selectedYear}/livestock`
+        `${backendUrl}/${entityType}/${entityID}/${selectedYear}/livestock`
       );
       const response_json = await response.json();
       const livestock_data = {
@@ -143,9 +143,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const loadEntityStats = async (entityType: string, entityID: number) => {
     try {
       // will be fixed later! for now we fix the values
-      const response = await fetch(
-        `http://localhost:8080/api/${entityType}/${entityID}`
-      );
+      const response = await fetch(`${backendUrl}/${entityType}/${entityID}`);
       const response_json = await response.json();
       const entityData = {
         entityName:
