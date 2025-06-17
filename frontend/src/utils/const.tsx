@@ -159,3 +159,5 @@ export const WheatIcon = () => (
     </defs>
   </svg>
 );
+
+export const backendUrl = "https://greenzone-gpsi.onrender.com/api";

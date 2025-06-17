@@ -5,6 +5,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Context, LayerType, SelectedType } from "../../utils/global";
+import { backendUrl } from "../../utils/const";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -39,8 +40,9 @@ interface CountyView {
   [countyId: number]: Bounds;
 }
 const INITIAL_VIEW_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
-const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+// const MAP_STYLE =
+//   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
 
 const MapComponent: React.FC = () => {
   const [provinces, setProvinces] = useState<Geometry[]>([]);
@@ -54,6 +56,7 @@ const MapComponent: React.FC = () => {
   const [negativeCells, setNegativeCells] = useState<CellGeometry[]>([]);
   const [zeroCells, setZeroCells] = useState<CellGeometry[]>([]);
   const [positiveCells, setPositiveCells] = useState<CellGeometry[]>([]);
+  const [mapLink, setMapLink] = useState<string | null>(null);
   // Removed grazingTrueCells and grazingFalseCells states
 
   const context = useContext(Context);
@@ -83,16 +86,28 @@ const MapComponent: React.FC = () => {
     selectedYear,
   } = context;
 
+  const fetchMapStyle = async () => {
+    const res = await fetch(`${backendUrl}/getMaps`);
+    const { data } = await res.json();
+    if (data && data.style) {
+      setMapLink(data.style);
+    } else {
+      console.error("Failed to fetch map style data");
+    }
+  };
+  useEffect(() => {
+    fetchMapStyle();
+  }, []);
   const loadCarryingCapacityCells = async () => {
     try {
       const below_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0/0.4`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0/0.4`
       );
       const at_cap_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.4/0.6`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.4/0.6`
       );
       const above_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/carrying_capacity/0.6/1`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.6/1`
       );
 
       const [json_below_response, json_at_cap_response, json_above_response] =
@@ -130,13 +145,13 @@ const MapComponent: React.FC = () => {
   const loadZScoreCells = async () => {
     try {
       const negative_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/z_score/0/0.4`
+        `${backendUrl}/cells/${selectedYear}/z_score/0/0.4`
       );
       const zero_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.4/0.6`
+        `${backendUrl}/cells/${selectedYear}/z_score/0.4/0.6`
       );
       const positive_response = await fetch(
-        `http://localhost:8080/api/cells/${selectedYear}/z_score/0.6/1`
+        `${backendUrl}/cells/${selectedYear}/z_score/0.6/1`
       );
 
       const [
@@ -176,7 +191,7 @@ const MapComponent: React.FC = () => {
 
   const loadProvinceGeometries = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/provincegeo");
+      const response = await fetch(`${backendUrl}/provincegeo`);
       const provViews: ProvinceView = {};
       const json_object = await response.json();
       const geojsonData = json_object.data;
@@ -209,9 +224,7 @@ const MapComponent: React.FC = () => {
   //  change  to load countie for specific province
   const loadCountiesGeometriesByProvince = async (province_id: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/county/geom/${province_id}`
-      );
+      const response = await fetch(`${backendUrl}/county/geom/${province_id}`);
       const json_object = await response.json();
       const soumViews: CountyView = {};
       const geojsonData = json_object.data;
@@ -304,6 +317,17 @@ const MapComponent: React.FC = () => {
         setSelectedProvince(object.ID);
       }
     },
+  });
+
+  const countyHighlightLayer = new PolygonLayer({
+    id: "county-highlight-layer",
+    data: soums.filter((soum) => soum.ID === selectedCounty),
+    getPolygon: (d) => d.coordinates,
+    filled: true,
+    getLineColor: [0, 0, 0],
+    getFillColor: [255, 100, 100, 100],
+    lineWidthMinPixels: 1,
+    pickable: false,
   });
 
   const provinceMaskLayer = new PolygonLayer({
@@ -411,6 +435,9 @@ const MapComponent: React.FC = () => {
     if (selectedProvince && soums) {
       layers.push(soumLayer);
       layers.push(provinceMaskLayer);
+      if (selectedCounty) {
+        layers.push(countyHighlightLayer);
+      }
     }
 
     const overlay = new MapboxOverlay({ layers });
@@ -444,7 +471,7 @@ const MapComponent: React.FC = () => {
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}
-        mapStyle={MAP_STYLE}
+        mapStyle={mapLink ? mapLink : MAP_STYLE}
         onLoad={handleMapLoad}
       ></Map>
     </>

@@ -170,3 +170,27 @@ export const getCellCategorySummary = async (
     }
   }
 };
+
+export const getMaps = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const response = await fetch(
+      "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch style: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    res.status(200).json({
+      log: "Map style data fetched successfully",
+      data: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      log: "Failed to fetch map style",
+      error: (error as Error).message,
+    });
+  }
+};

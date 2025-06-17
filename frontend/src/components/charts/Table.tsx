@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
   Table as MUITable,
   TableBody,
@@ -10,29 +10,30 @@ import {
   Box,
   TablePagination,
   styled,
-} from '@mui/material';
+  TableFooter,
+} from "@mui/material";
 
 const StyledTablePagination = styled(TablePagination)({
-  '& .MuiToolbar-root': {
-    padding: '0 8px',
-    minHeight: '52px',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    width: '100%',
+  "& .MuiToolbar-root": {
+    padding: "0 8px",
+    minHeight: "52px",
+    display: "flex",
+    justifyContent: "flex-start",
+    width: "100%",
   },
-  '& .MuiTablePagination-spacer': {
-    display: 'none',
+  "& .MuiTablePagination-spacer": {
+    display: "none",
   },
-  '& .MuiTablePagination-displayedRows': {
+  "& .MuiTablePagination-displayedRows": {
     margin: 0,
     order: 1,
   },
-  '& .MuiTablePagination-actions': {
-    marginLeft: '8px',
+  "& .MuiTablePagination-actions": {
+    marginLeft: "8px",
     order: 2,
   },
-  '& .MuiTablePagination-select, & .MuiTablePagination-selectLabel': {
-    display: 'none',
+  "& .MuiTablePagination-select, & .MuiTablePagination-selectLabel": {
+    display: "none",
   },
 });
 
@@ -49,11 +50,17 @@ interface TableProps {
   onPageChange?: (newPage: number) => void;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: propPage, onPageChange }) => {
+const Table: React.FC<TableProps> = ({
+  columns,
+  rows,
+  loading = false,
+  page: propPage,
+  onPageChange,
+}) => {
   const [internalPage, setInternalPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [sortField, setSortField] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const page = propPage ?? internalPage;
   const setPage = onPageChange ?? setInternalPage;
@@ -62,13 +69,17 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   const handleSort = (field: string) => {
-    setSortOrder(prev => (sortField === field ? (prev === 'asc' ? 'desc' : 'asc') : 'asc'));
+    setSortOrder((prev) =>
+      sortField === field ? (prev === "asc" ? "desc" : "asc") : "asc"
+    );
     setSortField(field);
   };
 
@@ -79,15 +90,23 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
       const valA = a[sortField];
       const valB = b[sortField];
 
-      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
 
     return sorted;
   }, [rows, sortField, sortOrder]);
 
-  const labelDisplayedRows = ({ from, to, count }: { from: number; to: number; count: number }) => {
+  const labelDisplayedRows = ({
+    from,
+    to,
+    count,
+  }: {
+    from: number;
+    to: number;
+    count: number;
+  }) => {
     return `${from}–${to} of ${count}`;
   };
 
@@ -96,32 +115,33 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
   }
 
   return (
-    <Box sx={{ width: '100%', overflowX: 'auto' }}>
+    <Box sx={{ width: "100%", overflowX: "auto" }}>
       <TableContainer
         component={Paper}
         sx={{
-          boxShadow: 'none',
-          border: '1px solid rgba(224, 224, 224, 1)',
-          borderRadius: '8px',
+          boxShadow: "none",
+          border: "1px solid rgba(224, 224, 224, 1)",
+          borderRadius: "8px",
         }}
       >
         <MUITable sx={{ minWidth: 650 }}>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#2F4F4F' }}>
+            <TableRow sx={{ backgroundColor: "#2F4F4F" }}>
               {columns.map((column) => (
                 <TableCell
                   key={column.field}
                   sx={{
-                    color: 'white',
-                    fontWeight: 'bold',
+                    color: "white",
+                    fontWeight: "bold",
                     width: column.width,
-                    cursor: 'pointer',
-                    userSelect: 'none',
+                    cursor: "pointer",
+                    userSelect: "none",
                   }}
                   onClick={() => handleSort(column.field)}
                 >
                   {column.headerName}
-                  {sortField === column.field && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                  {sortField === column.field &&
+                    (sortOrder === "asc" ? " ↑" : " ↓")}
                 </TableCell>
               ))}
             </TableRow>
@@ -140,30 +160,44 @@ const Table: React.FC<TableProps> = ({ columns, rows, loading = false, page: pro
                   <TableRow
                     key={row.ranking || JSON.stringify(row)} // fallback key
                     sx={{
-                      '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
-                      '&:hover': { backgroundColor: '#e8e8e8' },
+                      "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" },
+                      "&:hover": { backgroundColor: "#e8e8e8" },
                     }}
                   >
                     {columns.map((column) => (
                       <TableCell key={column.field}>
-                        {column.format ? column.format(row[column.field]) : row[column.field]}
+                        {column.format
+                          ? column.format(row[column.field])
+                          : row[column.field]}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
             )}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <StyledTablePagination
+                rowsPerPageOptions={[10]}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelDisplayedRows={labelDisplayedRows}
+              />
+            </TableRow>
+          </TableFooter>
         </MUITable>
-        <StyledTablePagination
+        {/* <StyledTablePagination
           rowsPerPageOptions={[10]}
-          component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelDisplayedRows={labelDisplayedRows}
-        />
+        /> */}
       </TableContainer>
     </Box>
   );
