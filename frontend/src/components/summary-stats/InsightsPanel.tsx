@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import LineGraph from "../charts/line-graph";
 import Table from "../charts/Table";
+import { backendUrl } from "../../utils/const";
 
 interface LivestockData {
   aimag: string;
@@ -71,7 +72,7 @@ const InsightsPanel: React.FC = () => {
 
   const fetchProvinceIds = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/province");
+      const response = await fetch(`${backendUrl}/province`);
       const json = await response.json();
       if (json.data) {
         setProvinceIds(json.data.map((province: any) => province.id));
@@ -84,7 +85,7 @@ const InsightsPanel: React.FC = () => {
 
   const fetchCountyIds = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/county");
+      const response = await fetch(`${backendUrl}/county`);
       const json = await response.json();
       if (json.data) {
         setCountyIds(json.data.map((county: any) => county.id));
@@ -121,7 +122,7 @@ const InsightsPanel: React.FC = () => {
         ids.map(async (entityID) => {
           try {
             const response = await fetch(
-              `http://localhost:8080/api/cell/${entityType}/${entityID}/carrying_capacity/2022`
+              `${backendUrl}/cell/${entityType}/${entityID}/carrying_capacity/2022`
             );
             const data = await response.json();
             return { entityID, data };
@@ -218,7 +219,7 @@ const InsightsPanel: React.FC = () => {
         await Promise.all(
           livestockTypes.map(async (type) => {
             const response = await fetch(
-              `http://localhost:8080/api/provincebyclass/${type}`
+              `${backendUrl}/provincebyclass/${type}`
             );
             const json = await response.json();
             const formattedData = [
