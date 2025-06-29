@@ -1,6 +1,6 @@
 import { Map, MapRef } from "react-map-gl/maplibre";
 import React, { useContext, useState, useEffect } from "react";
-import { PolygonLayer, ScatterplotLayer } from "deck.gl";
+import { PolygonLayer, ScatterplotLayer, TextLayer } from "deck.gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -14,6 +14,124 @@ const INITIAL_VIEW_STATE = {
   bearing: 0,
   pitch: 0,
 };
+const MONGOLIAN_CHARSET = [
+  ...new Set(
+    "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүфхцчшщъыьэюяТөв"
+  ),
+];
+
+const LABELS = [
+  {
+    name_en: "Hentii",
+    name_mn: "Хэнтий",
+    coordinates: [110.44557516794877, 47.89003229894901],
+  },
+  {
+    name_en: "Dornogovi",
+    name_mn: "Дорноговь",
+    coordinates: [112.5, 43.5],
+  },
+  {
+    name_en: "Dundgovi",
+    name_mn: "Дундговь",
+    coordinates: [106.5, 45.5],
+  },
+  {
+    name_en: "Zavkhan",
+    name_mn: "Завхан",
+    coordinates: [96.4451815533453, 48.29736177525989],
+  },
+  {
+    name_en: "Govi-Altai",
+    name_mn: "Говь-Алтай",
+    coordinates: [95.94668263630372, 45.3440149923263],
+  },
+  {
+    name_en: "Ulaanbaatar",
+    name_mn: "Улаанбаатар",
+    coordinates: [107.16542432218421, 47.91553020443232],
+  },
+  {
+    name_en: "Bulgan",
+    name_mn: "Булган",
+    coordinates: [103.5, 48.8],
+  },
+  {
+    name_en: "Sukhbaatar",
+    name_mn: "Сүхбаатар",
+    coordinates: [113.54263601561543, 46.22267225866883],
+  },
+  {
+    name_en: "Omnogovi",
+    name_mn: "Өмнөговь",
+    coordinates: [104.12157512386474, 43.28572876143857],
+  },
+  {
+    name_en: "Darkhan-Uul",
+    name_mn: "Дархан-Уул",
+    coordinates: [106.0, 49.5],
+  },
+  {
+    name_en: "Uvs",
+    name_mn: "Увс",
+    coordinates: [92.94033127030316, 49.633371610066945],
+  },
+  {
+    name_en: "Selenge",
+    name_mn: "Сэлэнгэ",
+    coordinates: [106.2244648324372, 49.4760827498768],
+  },
+  {
+    name_en: "Dornod",
+    name_mn: "Дорнод",
+    coordinates: [114.0, 49.0],
+  },
+  {
+    name_en: "Govisumber",
+    name_mn: "Говьсүмбэр",
+    coordinates: [108.56856126775833, 46.46869639208894],
+  },
+  {
+    name_en: "Orkhon",
+    name_mn: "Орхон",
+    coordinates: [104.29827665582003, 49.04440025267898],
+  },
+  {
+    name_en: "Arxangai",
+    name_mn: "Архангай",
+    coordinates: [101.5, 47.5],
+  },
+  {
+    name_en: "Bayan-Olgii",
+    name_mn: "Баян-Өлгий",
+    coordinates: [89.5, 48.4],
+  },
+  {
+    name_en: "Ovorkhangai",
+    name_mn: "Өвөрхангай",
+    coordinates: [102.71288177410669, 45.83790962831799],
+  },
+  {
+    name_en: "Khovsgol",
+    name_mn: "Хөвсгөл",
+    coordinates: [99.91207850156681, 50.23493380367856],
+  },
+  {
+    name_en: "To'v",
+    name_mn: "Төв",
+    coordinates: [106.5664145642356, 47.67749923323126],
+  },
+  {
+    name_en: "Khovd",
+    name_mn: "Ховд",
+    coordinates: [92.28920904924195, 46.90155627028161],
+  },
+  {
+    name_en: "Bayankhongor",
+    name_mn: "Баянхонгор",
+    coordinates: [99.0, 45.5],
+  },
+];
 
 // For the Geometrical Shapes on the Maps like Province And Counties
 interface Geometry {
@@ -87,16 +205,19 @@ const MapComponent: React.FC = () => {
   } = context;
 
   const fetchMapStyle = async () => {
-    const res = await fetch(`${backendUrl}/getMaps`);
+    const res = await fetch(`${backendUrl}/maps`);
+
     const { data } = await res.json();
-    if (data && data.style) {
-      setMapLink(data.style);
+    console.log("got the map", data);
+    if (data) {
+      setMapLink(data);
     } else {
       console.error("Failed to fetch map style data");
     }
   };
   useEffect(() => {
     fetchMapStyle();
+    console.log("GOTTT");
   }, []);
   const loadCarryingCapacityCells = async () => {
     try {
@@ -301,6 +422,20 @@ const MapComponent: React.FC = () => {
     loadZScoreCells();
   }, [selectedYear]);
 
+  const labelLayer = new TextLayer({
+    id: "TextLayer",
+    data: LABELS,
+    getPosition: (d) => d.coordinates,
+    getAlignmentBaseline: "center",
+    getText: (d) => d.name_mn,
+    getColor: [120, 120, 130],
+    getSize: 10,
+    getTextAnchor: "middle",
+    pickable: true,
+    // fontFamily: "Noto Sans Mongolian",
+    fontFamily: "Noto Sans Mongolian, Arial, sans-serif",
+    characterSet: MONGOLIAN_CHARSET,
+  });
   const provinceLayer = new PolygonLayer({
     id: "province-layer",
     data: provinces,
@@ -432,6 +567,7 @@ const MapComponent: React.FC = () => {
       if (showAboveCells) layers.push(cellsAboveLayer);
     }
     layers.push(provinceLayer);
+    layers.push(labelLayer);
     if (selectedProvince && soums) {
       layers.push(soumLayer);
       layers.push(provinceMaskLayer);
@@ -462,12 +598,13 @@ const MapComponent: React.FC = () => {
     selectedLayerType,
   ]);
 
-  if (!provinces || provinces.length === 0) {
+  if (!provinces || provinces.length === 0 || !mapLink) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
+      <div style={{ fontFamily: "Noto Sans Mongolian" }}>Төв</div>
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}

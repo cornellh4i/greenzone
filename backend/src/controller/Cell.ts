@@ -174,7 +174,7 @@ export const getCellCategorySummary = async (
 export const getMaps = async (req: Request, res: Response): Promise<void> => {
   try {
     const response = await fetch(
-      "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+      "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json"
     );
 
     if (!response.ok) {
