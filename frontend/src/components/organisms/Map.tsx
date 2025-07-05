@@ -1,11 +1,14 @@
 import { Map, MapRef } from "react-map-gl/maplibre";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import { PolygonLayer, ScatterplotLayer, TextLayer } from "deck.gl";
+import { Box } from "@mui/material";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Context, LayerType, SelectedType } from "../../utils/global";
 import { backendUrl } from "../../utils/const";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 const INITIAL_VIEW_STATE = {
   latitude: 46.8625,
@@ -19,6 +22,32 @@ const MONGOLIAN_CHARSET = [
     "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүфхцчшщъыьэюяТөв"
   ),
 ];
+const ascii = Array.from({ length: 0x7f }, (_, i) => String.fromCharCode(i));
+const fullCharSet = [...ascii, ...MONGOLIAN_CHARSET];
+const COORDS = {
+  Dornod: [114.0, 49.0],
+  "Bayan-Ulgii": [89.5, 48.4],
+  Khovd: [92.28920904924195, 46.90155627028161],
+  "Govi-Altai": [95.94668263630372, 45.3440149923263],
+  Bayankhongor: [99.0, 45.5],
+  Umnugovi: [104.12157512386474, 43.28572876143857],
+  Khuvsgul: [99.91207850156681, 50.23493380367856],
+  Selenge: [106.2244648324372, 49.4760827498768],
+  Tuv: [106.5664145642356, 47.67749923323126],
+  Orkhon: [104.29827665582003, 49.04440025267898],
+  Ulaanbaatar: [107.16542432218421, 47.91553020443232],
+  "Darkhan-Uul": [106.0, 49.5],
+  Sukhbaatar: [113.54263601561543, 46.22267225866883],
+  Dornogovi: [112.5, 43.5],
+  Bulgan: [103.5, 48.8],
+  Uvs: [92.94033127030316, 49.633371610066945],
+  Zavkhan: [96.4451815533453, 48.29736177525989],
+  Khentii: [110.44557516794877, 47.89003229894901],
+  Govisumber: [108.56856126775833, 46.46869639208894],
+  Arkhangai: [101.5, 47.5],
+  Dundgovi: [106.5, 45.5],
+  Uvurkhangai: [102.71288177410669, 45.83790962831799],
+};
 
 const LABELS = [
   {
@@ -138,6 +167,7 @@ interface Geometry {
   view: [number, number, number, number] | null;
   type: string;
   ID: number;
+  name: string;
   coordinates: number[];
   areaType: SelectedType | null;
 }
@@ -175,6 +205,14 @@ const MapComponent: React.FC = () => {
   const [zeroCells, setZeroCells] = useState<CellGeometry[]>([]);
   const [positiveCells, setPositiveCells] = useState<CellGeometry[]>([]);
   const [mapLink, setMapLink] = useState<string | null>(null);
+
+  const [lang, setLang] = useState<String>("en");
+  const toggleLanguage = () => {
+    let newLang = lang == "en" ? "mn" : "en";
+    i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
+    setLang(newLang);
+  };
+  const { t: tp } = useTranslation("mapprovince");
   // Removed grazingTrueCells and grazingFalseCells states
 
   const context = useContext(Context);
@@ -329,6 +367,7 @@ const MapComponent: React.FC = () => {
         provViews[feature.id] = bounds;
         return {
           type: "Polygon",
+          name: feature.name,
           coordinates: feature.wkb_geometry.coordinates[0],
           ID: feature.id,
           view: bounds,
@@ -423,19 +462,20 @@ const MapComponent: React.FC = () => {
   }, [selectedYear]);
 
   const labelLayer = new TextLayer({
-    id: "TextLayer",
-    data: LABELS,
-    getPosition: (d) => d.coordinates,
+    id: `TextLayer-${i18n.language}`,
+    data: provinces,
+    getPosition: (d) =>
+      COORDS[d.name as keyof typeof COORDS] as [number, number],
+    getText: (d) => tp(d.name),
     getAlignmentBaseline: "center",
-    getText: (d) => d.name_mn,
-    getColor: [120, 120, 130],
-    getSize: 10,
+    getColor: [130, 120, 130],
+    getSize: 11,
     getTextAnchor: "middle",
     pickable: true,
-    // fontFamily: "Noto Sans Mongolian",
     fontFamily: "Noto Sans Mongolian, Arial, sans-serif",
-    characterSet: MONGOLIAN_CHARSET,
+    characterSet: fullCharSet,
   });
+
   const provinceLayer = new PolygonLayer({
     id: "province-layer",
     data: provinces,
@@ -593,7 +633,7 @@ const MapComponent: React.FC = () => {
     showNegativeCells,
     showZeroCells,
     showPositiveCells,
-
+    labelLayer,
     selectedYear,
     selectedLayerType,
   ]);
@@ -603,15 +643,69 @@ const MapComponent: React.FC = () => {
   }
 
   return (
-    <>
-      <div style={{ fontFamily: "Noto Sans Mongolian" }}>Төв</div>
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        height: "100vh", // or whatever height you need
+      }}
+    >
+      {/* 1) Your map fills the parent */}
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}
-        mapStyle={mapLink ? mapLink : MAP_STYLE}
+        mapStyle={mapLink ?? MAP_STYLE}
         onLoad={handleMapLoad}
-      ></Map>
-    </>
+        style={{ width: "100%", height: "100%" }}
+      />
+
+      {/* 2) Overlay container, bottom-right */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+          zIndex: 999, // above the map
+          display: "inline-flex",
+          border: 1,
+          borderColor: "divider",
+          borderRadius: 1,
+          overflow: "hidden",
+          backgroundColor: "background.paper", // ensure contrast
+        }}
+      >
+        <Box
+          onClick={() => toggleLanguage()}
+          sx={{
+            p: 1,
+            cursor: "pointer",
+            bgcolor: lang === "en" ? "success.main" : "background.paper",
+            color: lang === "en" ? "success.contrastText" : "text.primary",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <img src="/flags_en.png" width={20} alt="EN" />
+          EN
+        </Box>
+        <Box
+          onClick={() => toggleLanguage()}
+          sx={{
+            p: 1,
+            cursor: "pointer",
+            bgcolor: lang === "mn" ? "success.main" : "background.paper",
+            color: lang === "mn" ? "success.contrastText" : "text.primary",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <img src="/flags_mn.png" width={20} alt="MN" />
+          MN
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
