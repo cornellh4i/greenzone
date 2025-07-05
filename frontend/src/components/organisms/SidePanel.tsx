@@ -12,6 +12,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { backendUrl } from "../../utils/const";
 import { useTheme, useMediaQuery } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
+
 import {
   buttonStyle,
   LeafIcon,
@@ -76,6 +79,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   ];
   const zScoreLabels = ["Positive", "Zero", "Negative"];
   const [showGuide, setShowGuide] = useState(false);
+
+  const { t: ts } = useTranslation("sidepanel");
 
   // You can adjust or refine these colors as needed
   const carryingCapacityColors = ["#3CB371", "#FFA500", "#DC143C"];
@@ -441,7 +446,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                   mb: 1,
                 }}
               >
-                Carrying Capacity Early Warning System
+                {ts("systemTitle")}
               </Typography>
               <Divider sx={{ mb: 2 }} />
               <Typography
@@ -449,7 +454,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 color="#111"
                 fontFamily="Poppins, sans-serif"
               >
-                Please select a province or adjust the year slider to view data.
+                {ts("instruction")}
               </Typography>
 
               <Slide
@@ -461,7 +466,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                 options={yearOptions}
               />
               <div style={{ fontFamily: "Poppins, sans-serif" }}>
-                <h2>Data Layers</h2>
+                <h2>{ts("dataLayers")}</h2>
                 <RadioButton
                   options={options}
                   selectedOption={
@@ -617,30 +622,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             </div>
           )}
         </Box>
-
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-          {/*<AgricultureIcon sx={{ mr: 1 }} />
-          
-            <Typography variant="h6" component="h2" sx={{ mr: "auto" }}>
-            Grazing Range
-          </Typography>
-          <Switch
-            checked={grazingRange ?? false}
-            onChange={(e) => setGrazingRange(e.target.checked)}
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "#2E7D32",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#ffffff",
-              },
-            }}
-          />*/}
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          View data only in land categorized as a grazing range.
-        </Typography>
       </Drawer>
       {showGuide && (
         <Box

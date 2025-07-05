@@ -13,7 +13,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const notoSans = localFont({
+const notoSans = localFont({
   src: "./fonts/NotoSansMongolianRegular.ttf",
   display: "swap",
   variable: "--font-noto-sans",

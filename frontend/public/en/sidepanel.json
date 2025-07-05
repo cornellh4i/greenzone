@@ -1,0 +1,14 @@
+{
+  "systemTitle": "Carrying Capacity Early Warning System",
+  "instruction": "Please select a province or adjust the year slider to view data.",
+  "year": "Year",
+  "dataLayers": "Data Layers",
+  "carryingCapacity": "Carrying Capacity",
+  "zScore": "Z-Score",
+  "below": "Below",
+  "atCapacity": "At Capacity",
+  "above": "Above",
+  "positive": "Positive",
+  "zero": "Zero",
+  "negative": "Negative"
+}
