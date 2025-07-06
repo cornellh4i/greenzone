@@ -57,5 +57,7 @@ export type GlobalContext = {
 
   grazingRange: boolean | null;
   setGrazingRange: SetState<boolean>;
+  selectedLanguage: string | null;
+  setSelectedLanguage: SetState<string>;
 };
 export const Context = createContext<GlobalContext | undefined>(undefined);

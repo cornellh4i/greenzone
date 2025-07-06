@@ -207,8 +207,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     }
   };
 
-  /**** STATE MANAGEMENT ****/
-  // When a Province is selected/searched activates and SetPanel Open
   useEffect(() => {
     if (selectedYear && selectedProvince) {
       loadEntityData();
@@ -418,9 +416,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           },
         }}
         sx={{
-          zIndex: 1200, // Lower than top panel
+          zIndex: 1200,
           position: "fixed",
-          top: "70px", // Start below top panel
+          top: "70px",
           left: 0,
           bottom: 0,
         }}
