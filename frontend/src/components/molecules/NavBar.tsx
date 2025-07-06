@@ -1,27 +1,45 @@
-
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/router";
-import { AppBar, Toolbar, Box, Typography, Button, MenuItem, Select, Collapse, IconButton } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Typography,
+  Button,
+  MenuItem,
+  Select,
+  Collapse,
+  IconButton,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 const NavBar: React.FC = () => {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'mn'>('en');
+  const [selectedLanguage, setSelectedLanguage] = useState<String>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLanguageChange = (event: any) => {
     setSelectedLanguage(event.target.value);
   };
-  const handleNavigate = (path: string) => {
-    router.push(path);
+  const toggleLanguage = () => {
+    let newLang = selectedLanguage == "en" ? "mn" : "en";
+    i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
+    setSelectedLanguage(newLang);
   };
+  // const handleNavigate = (path: string) => {
+  //   router.push(path);
+  // };
 
+  // const { selectedLanguage, setSelectedLanguage } = context;
+  const { t: tn } = useTranslation("navbar");
   const pages = [
-    { name: "Home", path: "/landing" },
-    { name: "About", path: "/about" },
-    { name: "Insights", path: "/summary-stats" },
-    { name: "Methodologies", path: "/methodology" },
+    { name: "Home", path: "/landing", id: "home" },
+    { name: "About", path: "/about", id: "about" },
+    { name: "Insights", path: "/summary-stats", id: "insights" },
+    { name: "Methodologies", path: "/methodology", id: "methods" },
   ];
 
   return (
@@ -29,24 +47,32 @@ const NavBar: React.FC = () => {
       position="static"
       color="transparent"
       elevation={0}
-      sx={{ backgroundColor: '#E6EEEC' }}
+      sx={{ backgroundColor: "#E6EEEC" }}
     >
-
-      <Toolbar sx={{ justifyContent: 'space-between', py: 4 }}>
-        <Box onClick={() => handleNavigate('/landing')} sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "1200px",
-          px: 3,
-          mx: "auto",
-        }}>
-          <Typography variant="h6" component="div" sx={{
-            color: '#065143', fontWeight: 'bold',
-            fontSize: isMobile ? '24px' : '30px',
-          }}>
-            GreenZone Analytics
+      <Toolbar sx={{ justifyContent: "space-between", py: 4 }}>
+        <Box
+          // onClick={() => handleNavigate("/landing")}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "1200px",
+            px: 3,
+            mx: "auto",
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              color: "#065143",
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: "bold",
+              fontSize: isMobile ? "24px" : "30px",
+            }}
+          >
+            {tn("appname")}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {isMobile ? (
@@ -63,47 +89,49 @@ const NavBar: React.FC = () => {
                       cursor: "pointer",
                       color: "#065143",
                       "&:hover": { textDecoration: "underline" },
+                      fontFamily: "'Poppins', sans-serif",
                     }}
-                    onClick={() => handleNavigate(page.path)}
                   >
-                    {page.name}
+                    {tn(page.id)}
                   </Typography>
                 ))}
                 <Select
                   value={selectedLanguage}
-                  onChange={handleLanguageChange}
+                  // onChange={handleLanguageChange}
                   variant="standard"
                   disableUnderline
                   sx={{
-                    backgroundColor: '#E6EEEC',
-                    borderRadius: '12px',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '16px',
-                    paddingY: '4px',
-                    paddingX: '8px',
-                    '& .MuiSelect-icon': {
+                    backgroundColor: "#E6EEEC",
+                    borderRadius: "12px",
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "16px",
+                    paddingY: "4px",
+                    paddingX: "8px",
+                    "& .MuiSelect-icon": {
                       right: 10,
                     },
                   }}
                   renderValue={() => (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <img
-                        src={`/flags_${selectedLanguage === 'en' ? 'en' : 'mn'}.png`}
+                        src={`/flags_${
+                          selectedLanguage === "en" ? "en" : "mn"
+                        }.png`}
                         width={20}
                         alt="flag"
                       />
-                      <span>{selectedLanguage === 'en' ? 'EN' : 'MN'}</span>
+                      <span>{selectedLanguage === "en" ? "EN" : "MN"}</span>
                     </Box>
                   )}
                 >
-                  <MenuItem value="en">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <MenuItem value="en" onClick={() => toggleLanguage()}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <img src="/flags_en.png" width={20} alt="EN" />
                       EN
                     </Box>
                   </MenuItem>
-                  <MenuItem value="mn">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <MenuItem value="mn" onClick={() => toggleLanguage()}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <img src="/flags_mn.png" width={20} alt="MN" />
                       MN
                     </Box>
@@ -135,7 +163,7 @@ const NavBar: React.FC = () => {
                   cursor: "pointer",
                   color: "#000",
                 }}
-                onClick={() => handleNavigate(page.path)}
+                // onClick={() => handleNavigate(page.path)}
               >
                 {page.name}
               </Typography>
@@ -143,31 +171,33 @@ const NavBar: React.FC = () => {
 
             <Box
               sx={{
-                display: 'flex',
-                border: '2px solid #065143',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                width: 'fit-content',
+                display: "flex",
+                border: "2px solid #065143",
+                borderRadius: "12px",
+                overflow: "hidden",
+                width: "fit-content",
               }}
             >
               <Button
-                onClick={() => setSelectedLanguage('en')}
+                onClick={() => setSelectedLanguage("en")}
                 disableRipple
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1,
                   px: 2,
                   py: 1,
                   minWidth: 120,
-                  fontSize: '14px',
-                  fontWeight: 'bold',
+                  fontSize: "14px",
+                  fontWeight: "bold",
                   borderRadius: 0,
-                  backgroundColor: selectedLanguage === 'en' ? '#065143' : 'transparent',
-                  color: selectedLanguage === 'en' ? 'white' : '#000',
-                  textTransform: 'none',
-                  '&:hover': {
-                    backgroundColor: selectedLanguage === 'en' ? '#043f33' : 'transparent',
+                  backgroundColor:
+                    selectedLanguage === "en" ? "#065143" : "transparent",
+                  color: selectedLanguage === "en" ? "white" : "#000",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor:
+                      selectedLanguage === "en" ? "#043f33" : "transparent",
                   },
                 }}
               >
@@ -176,23 +206,25 @@ const NavBar: React.FC = () => {
               </Button>
 
               <Button
-                onClick={() => setSelectedLanguage('mn')}
+                onClick={() => setSelectedLanguage("mn")}
                 disableRipple
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1,
                   px: 2,
                   py: 1,
                   minWidth: 120,
-                  fontSize: '14px',
-                  fontWeight: 'bold',
+                  fontSize: "14px",
+                  fontWeight: "bold",
                   borderRadius: 0,
-                  backgroundColor: selectedLanguage === 'mn' ? '#065143' : 'transparent',
-                  color: selectedLanguage === 'mn' ? 'white' : '#000',
-                  textTransform: 'none',
-                  '&:hover': {
-                    backgroundColor: selectedLanguage === 'mn' ? '#043f33' : 'transparent',
+                  backgroundColor:
+                    selectedLanguage === "mn" ? "#065143" : "transparent",
+                  color: selectedLanguage === "mn" ? "white" : "#000",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor:
+                      selectedLanguage === "mn" ? "#043f33" : "transparent",
                   },
                 }}
               >
