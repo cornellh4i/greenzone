@@ -1,7 +1,7 @@
 import { Map, MapRef } from "react-map-gl/maplibre";
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { PolygonLayer, ScatterplotLayer, TextLayer } from "deck.gl";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -49,119 +49,6 @@ const COORDS = {
   Uvurkhangai: [102.71288177410669, 45.83790962831799],
 };
 
-const LABELS = [
-  {
-    name_en: "Hentii",
-    name_mn: "Хэнтий",
-    coordinates: [110.44557516794877, 47.89003229894901],
-  },
-  {
-    name_en: "Dornogovi",
-    name_mn: "Дорноговь",
-    coordinates: [112.5, 43.5],
-  },
-  {
-    name_en: "Dundgovi",
-    name_mn: "Дундговь",
-    coordinates: [106.5, 45.5],
-  },
-  {
-    name_en: "Zavkhan",
-    name_mn: "Завхан",
-    coordinates: [96.4451815533453, 48.29736177525989],
-  },
-  {
-    name_en: "Govi-Altai",
-    name_mn: "Говь-Алтай",
-    coordinates: [95.94668263630372, 45.3440149923263],
-  },
-  {
-    name_en: "Ulaanbaatar",
-    name_mn: "Улаанбаатар",
-    coordinates: [107.16542432218421, 47.91553020443232],
-  },
-  {
-    name_en: "Bulgan",
-    name_mn: "Булган",
-    coordinates: [103.5, 48.8],
-  },
-  {
-    name_en: "Sukhbaatar",
-    name_mn: "Сүхбаатар",
-    coordinates: [113.54263601561543, 46.22267225866883],
-  },
-  {
-    name_en: "Omnogovi",
-    name_mn: "Өмнөговь",
-    coordinates: [104.12157512386474, 43.28572876143857],
-  },
-  {
-    name_en: "Darkhan-Uul",
-    name_mn: "Дархан-Уул",
-    coordinates: [106.0, 49.5],
-  },
-  {
-    name_en: "Uvs",
-    name_mn: "Увс",
-    coordinates: [92.94033127030316, 49.633371610066945],
-  },
-  {
-    name_en: "Selenge",
-    name_mn: "Сэлэнгэ",
-    coordinates: [106.2244648324372, 49.4760827498768],
-  },
-  {
-    name_en: "Dornod",
-    name_mn: "Дорнод",
-    coordinates: [114.0, 49.0],
-  },
-  {
-    name_en: "Govisumber",
-    name_mn: "Говьсүмбэр",
-    coordinates: [108.56856126775833, 46.46869639208894],
-  },
-  {
-    name_en: "Orkhon",
-    name_mn: "Орхон",
-    coordinates: [104.29827665582003, 49.04440025267898],
-  },
-  {
-    name_en: "Arxangai",
-    name_mn: "Архангай",
-    coordinates: [101.5, 47.5],
-  },
-  {
-    name_en: "Bayan-Olgii",
-    name_mn: "Баян-Өлгий",
-    coordinates: [89.5, 48.4],
-  },
-  {
-    name_en: "Ovorkhangai",
-    name_mn: "Өвөрхангай",
-    coordinates: [102.71288177410669, 45.83790962831799],
-  },
-  {
-    name_en: "Khovsgol",
-    name_mn: "Хөвсгөл",
-    coordinates: [99.91207850156681, 50.23493380367856],
-  },
-  {
-    name_en: "To'v",
-    name_mn: "Төв",
-    coordinates: [106.5664145642356, 47.67749923323126],
-  },
-  {
-    name_en: "Khovd",
-    name_mn: "Ховд",
-    coordinates: [92.28920904924195, 46.90155627028161],
-  },
-  {
-    name_en: "Bayankhongor",
-    name_mn: "Баянхонгор",
-    coordinates: [99.0, 45.5],
-  },
-];
-
 // For the Geometrical Shapes on the Maps like Province And Counties
 interface Geometry {
   view: [number, number, number, number] | null;
@@ -187,7 +74,7 @@ interface ProvinceView {
 interface CountyView {
   [countyId: number]: Bounds;
 }
-const INITIAL_VIEW_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
+// const INITIAL_VIEW_BOUNDS: [number, number, number, number] = [87, 41, 119, 52];
 // const MAP_STYLE =
 //   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
@@ -205,10 +92,11 @@ const MapComponent: React.FC = () => {
   const [zeroCells, setZeroCells] = useState<CellGeometry[]>([]);
   const [positiveCells, setPositiveCells] = useState<CellGeometry[]>([]);
   const [mapLink, setMapLink] = useState<string | null>(null);
+  const [loadingCells, setLoadingCells] = useState(false);
 
-  const [lang, setLang] = useState<String>("en");
+  const [lang, setLang] = useState<string>("en");
   const toggleLanguage = () => {
-    let newLang = lang == "en" ? "mn" : "en";
+    const newLang = lang == "en" ? "mn" : "en";
     i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
     setLang(newLang);
   };
@@ -225,20 +113,16 @@ const MapComponent: React.FC = () => {
     selectedProvince,
     setSelectedCounty,
     setSelectedProvince,
-    setShowBelowCells,
-    setShowAtCapCells,
-    setShowAboveCells,
+
     showAboveCells,
     showBelowCells,
     showAtCapCells,
-    setShowPositiveCells,
-    setShowNegativeCells,
-    setShowZeroCells,
+
     showPositiveCells,
     showNegativeCells,
     showZeroCells,
     selectedLayerType,
-    setSelectedLayerType,
+
     selectedYear,
   } = context;
 
@@ -255,7 +139,6 @@ const MapComponent: React.FC = () => {
   };
   useEffect(() => {
     fetchMapStyle();
-    console.log("GOTTT");
   }, []);
   const loadCarryingCapacityCells = async () => {
     try {
@@ -355,15 +238,20 @@ const MapComponent: React.FC = () => {
       const json_object = await response.json();
       const geojsonData = json_object.data;
       const deckProvinceProj = geojsonData.map((feature: any) => {
-        const bounds: Bounds = [Infinity, Infinity, -Infinity, -Infinity];
-        feature.wkb_geometry.coordinates[0][0].forEach(
-          ([lng, lat]: [number, number]) => {
-            bounds[0] = Math.min(bounds[0], lng); // Min longitude
-            bounds[1] = Math.min(bounds[1], lat); // Min latitude
-            bounds[2] = Math.max(bounds[2], lng); // Max longitude
-            bounds[3] = Math.max(bounds[3], lat); // Max latitude
-          }
+        type Bounds = [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
+
+        const ring: [number, number][] = feature.wkb_geometry.coordinates[0][0];
+
+        const [minLng, minLat, maxLng, maxLat]: Bounds = ring.reduce(
+          ([minX, minY, maxX, maxY], [lng, lat]) => [
+            Math.min(minX, lng),
+            Math.min(minY, lat),
+            Math.max(maxX, lng),
+            Math.max(maxY, lat),
+          ],
+          [Infinity, Infinity, -Infinity, -Infinity] as Bounds
         );
+        const bounds: Bounds = [minLng, minLat, maxLng, maxLat];
         provViews[feature.id] = bounds;
         return {
           type: "Polygon",
@@ -418,9 +306,9 @@ const MapComponent: React.FC = () => {
   const handleZoom = (bounds: [number, number, number, number] | null) => {
     if (map && bounds) {
       map.fitBounds(bounds, {
-        padding: 50,
+        padding: 40,
         maxZoom: selectedCounty ? 9 : selectedProvince ? 8 : 5.5,
-        duration: 1000, // Smooth animation duration (in ms)
+        duration: 800, // Smooth animation duration (in ms)
       });
     }
   };
@@ -456,10 +344,20 @@ const MapComponent: React.FC = () => {
   }, [selectedCounty, selectedProvince]);
 
   useEffect(() => {
-    loadProvinceGeometries();
-    loadCarryingCapacityCells();
-    loadZScoreCells();
-  }, [selectedYear]);
+    setLoadingCells(true);
+    const loaders: Promise<any>[] = [];
+    loaders.push(loadProvinceGeometries());
+    if (selectedLayerType == LayerType.CarryingCapacity) {
+      loaders.push(loadCarryingCapacityCells());
+    } else if (selectedLayerType == LayerType.ZScore) {
+      loaders.push(loadZScoreCells());
+    }
+    Promise.all(loaders)
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setLoadingCells(false);
+      });
+  }, [selectedYear, selectedLayerType]);
 
   const labelLayer = new TextLayer({
     id: `TextLayer-${i18n.language}`,
@@ -468,11 +366,12 @@ const MapComponent: React.FC = () => {
       COORDS[d.name as keyof typeof COORDS] as [number, number],
     getText: (d) => tp(d.name),
     getAlignmentBaseline: "center",
-    getColor: [130, 120, 130],
-    getSize: 11,
+    getColor: [130, 120, 130, 180],
+    getSize: 10,
     getTextAnchor: "middle",
     pickable: true,
-    fontFamily: "Noto Sans Mongolian, Arial, sans-serif",
+    fontFamily: "Poppins, sans-serif",
+    fontWeight: "bold",
     characterSet: fullCharSet,
   });
 
@@ -539,7 +438,7 @@ const MapComponent: React.FC = () => {
     data: belowCells, // No longer filtering by grazing_range
     getPosition: (d) => d.vertices,
     getRadius: 3000,
-    getFillColor: [0, 170, 60, 200],
+    getFillColor: [0, 170, 60, 160],
     pickable: true,
   });
 
@@ -607,7 +506,6 @@ const MapComponent: React.FC = () => {
       if (showAboveCells) layers.push(cellsAboveLayer);
     }
     layers.push(provinceLayer);
-    layers.push(labelLayer);
     if (selectedProvince && soums) {
       layers.push(soumLayer);
       layers.push(provinceMaskLayer);
@@ -615,6 +513,7 @@ const MapComponent: React.FC = () => {
         layers.push(countyHighlightLayer);
       }
     }
+    layers.push(labelLayer);
 
     const overlay = new MapboxOverlay({ layers });
     map.addControl(overlay);
@@ -636,6 +535,12 @@ const MapComponent: React.FC = () => {
     labelLayer,
     selectedYear,
     selectedLayerType,
+    belowCells,
+    atCapCells,
+    aboveCells,
+    negativeCells,
+    zeroCells,
+    positiveCells,
   ]);
 
   if (!provinces || provinces.length === 0 || !mapLink) {
@@ -647,10 +552,9 @@ const MapComponent: React.FC = () => {
       sx={{
         position: "relative",
         width: "100%",
-        height: "100vh", // or whatever height you need
+        height: "100vh",
       }}
     >
-      {/* 1) Your map fills the parent */}
       <Map
         id="map"
         initialViewState={INITIAL_VIEW_STATE}
@@ -658,8 +562,25 @@ const MapComponent: React.FC = () => {
         onLoad={handleMapLoad}
         style={{ width: "100%", height: "100%" }}
       />
+      {loadingCells && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            bgcolor: "rgba(255,255,255,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000, // above the map, below other UI
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
 
-      {/* 2) Overlay container, bottom-right */}
       <Box
         sx={{
           position: "absolute",

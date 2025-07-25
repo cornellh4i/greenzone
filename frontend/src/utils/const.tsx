@@ -40,11 +40,7 @@ export const ControlIcon = ({
   </svg>
 );
 
-export const buttonStyle = (
-  isActive: boolean | null,
-  color: string,
-  icon?: string
-) => ({
+export const buttonStyle = (isActive: boolean | null, color: string) => ({
   backgroundColor: isActive ? color : "transparent",
   border: isActive ? "none" : `1px solid ${color}`,
   color: isActive ? "white" : color,

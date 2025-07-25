@@ -21,7 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   options,
   value,
   onChange,
-  onInputChange,
+
   sx,
 }) => {
   return (
