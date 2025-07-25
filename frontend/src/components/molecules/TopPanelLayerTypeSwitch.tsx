@@ -6,6 +6,7 @@ import Button from "@/components/atoms/Button";
 import Dropdown from "../atoms/DropDown";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { buttonStyle, LeafIcon, ControlIcon } from "../../utils/const";
+import { Box } from "@mui/material";
 
 const TopPanelLayerTypeSwitch = () => {
   const context = useContext(Context);
@@ -77,17 +78,7 @@ const TopPanelLayerTypeSwitch = () => {
         }}
       />
 
-      {/*<Button
-        onClick={() => setGrazingRange((prev) => !prev)}
-        label="Grazing Range"
-        sx={{
-          ...buttonStyle(grazingRange, "#065143"),
-          minWidth: "250px",   // CHANGED: Increased from 100px
-          maxWidth: "300px"    // CHANGED: Increased from 200px
-        }}
-      />*/}
-
-      <div
+      <Box
         style={{
           backgroundColor: "#E6EEEC",
           padding: "12px 24px 12px 24px",
@@ -98,6 +89,8 @@ const TopPanelLayerTypeSwitch = () => {
           overflowX: "auto",
           width: "70%",
           gap: "10px",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
         {selectedLayerType == LayerType.CarryingCapacity && (
@@ -208,7 +201,7 @@ const TopPanelLayerTypeSwitch = () => {
           }}
           startIcon={<SwapHorizIcon />}
         />
-      </div>
+      </Box>
     </div>
   );
 };

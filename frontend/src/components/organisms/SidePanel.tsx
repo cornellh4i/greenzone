@@ -13,7 +13,6 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { backendUrl } from "../../utils/const";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import i18n from "@/i18n";
 
 import {
   buttonStyle,
@@ -46,7 +45,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     selectedLayerType,
     setSelectedLayerType,
 
-    showGeneralPanel,
     setShowGeneralPanel,
 
     isPanelOpen,
@@ -241,10 +239,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     setShowGeneralPanel(false);
   };
   // Closes the County SidePanel --> moves to Province SidePanel
-  const handleCountyToProvince = () => {
-    setCountyData(null);
-    setSelectedCounty(null);
-  };
+  // const handleCountyToProvince = () => {
+  //   setCountyData(null);
+  //   setSelectedCounty(null);
+  // };
   // Toggles (Open/Close) the SidePanel as a while regardless if its Prov/Count/General
   const handlePanelToggle = () => {
     setIsPanelOpen(!isPanelOpen);
@@ -436,10 +434,10 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             <div>
               <Typography
                 variant="h4"
+                fontFamily="Poppins, sans-serif"
                 sx={{
                   fontWeight: 700,
                   color: "#111",
-                  fontFamily: "Inter, Roboto, sans-serif",
                   mt: 2,
                   mb: 1,
                 }}
@@ -493,7 +491,18 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                   <ArrowBackIosNewIcon fontSize="small" />
                 </IconButton>
               </div>
-              <h1>{provinceData.provinceStats.entityName}</h1>
+              <Typography
+                variant="h4"
+                fontFamily="Poppins, sans-serif"
+                sx={{
+                  fontWeight: 700,
+                  color: "#111",
+                  mt: 2,
+                  mb: 1,
+                }}
+              >
+                <h1>{provinceData.provinceStats.entityName}</h1>
+              </Typography>
               <p
                 style={{
                   fontFamily: "Poppins, sans-serif",
@@ -564,7 +573,18 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
                   <ArrowBackIosNewIcon fontSize="small" />
                 </IconButton>
               </div>
-              <h1>{countyData.countyStats.entityName}</h1>
+              <Typography
+                variant="h4"
+                fontFamily="Poppins, sans-serif"
+                sx={{
+                  fontWeight: 700,
+                  color: "#111",
+                  mt: 2,
+                  mb: 1,
+                }}
+              >
+                <h1>{countyData.countyStats.entityName}</h1>
+              </Typography>
               <p
                 style={{
                   fontFamily: "Poppins, sans-serif",
@@ -636,7 +656,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             width: { xs: "90%", sm: "70%", md: "50%", lg: "40%" },
             maxHeight: "80vh",
             overflowY: "auto",
-            "& *": { fontFamily: "Poppins, sans-serif" }, // This applies to all child elements
+            "& *": { fontFamily: "Poppins, sans-serif" },
           }}
         >
           <Box
@@ -664,11 +684,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
           <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
             Usage
           </Typography>
-          <Typography variant="body2">
-            im a thousand miles away, but tonight you look so pretty. <br />
-            <strong>yes you do</strong> times square don't shine as bright as
-            you, i swear it's true.
-          </Typography>
+          <Typography variant="body2">YO</Typography>
         </Box>
       )}
     </div>

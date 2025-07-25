@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import Fuse from "fuse.js";
-import { Box, debounce } from "@mui/material";
+import { debounce } from "@mui/material";
 import SearchBarDropdown from "../atoms/SearchBarDropDown";
 import { IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -27,6 +27,7 @@ const SearchBar: React.FC<SearchBarParams> = ({ entityMap, onValueSelect }) => {
   const [searchCounty, setSearchCounty] = useState<boolean | undefined>(
     undefined
   );
+  console.log(searchCounty);
 
   const entityOptions = useMemo(
     () =>

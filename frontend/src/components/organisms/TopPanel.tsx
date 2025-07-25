@@ -1,14 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import SearchBar from "@/components/molecules/SearchBar";
 import Button from "@/components/atoms/Button";
-import Dropdown from "../atoms/DropDown";
+
 import { useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
 import { Avatar } from "@mui/material";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import { Context, LayerType } from "../../utils/global";
+
+import { Context } from "../../utils/global";
 import TopPanelLayerTypeSwitch from "../molecules/TopPanelLayerTypeSwitch";
 import CircularProgress from "@mui/material/CircularProgress";
 import { backendUrl } from "../../utils/const";
@@ -31,7 +31,7 @@ interface EntityMap {
 const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
   const context = useContext(Context);
   const isMobile = useMediaQuery("(max-width:600px)");
-
+  console.log(yearOptions);
   if (!context) {
     throw new Error("Context must be used within a ContextProvider");
   }
@@ -42,10 +42,8 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
     router.push(path);
   };
 
-  // State to store counties dictionary
   const [entityMap, setEntityMap] = useState<EntityMap | undefined>(undefined);
 
-  // Fetch counties from `getCounties` function
   const loadCountyData = async () => {
     try {
       const response = await fetch(`${backendUrl}/county`);
@@ -69,11 +67,11 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           province_herders: number;
           province_land_area: number;
         }) => {
-          var entityId = province.id;
-          var entityName = province.name;
-          var entityType = "Province";
-          var entitySubId = null;
-          var entitySubName = null;
+          const entityId = province.id;
+          const entityName = province.name;
+          const entityType = "Province";
+          const entitySubId = null;
+          const entitySubName = null;
           if (entityId && entityName) {
             entityDict[entityId] = {
               entity_id: entityId,
@@ -92,11 +90,11 @@ const TopPanel: React.FC<TopPanelProps> = ({ yearOptions }) => {
           province_id: number;
           province_name: string;
         }) => {
-          var entityId = county.id;
-          var entityName = county.name;
-          var entityType = "Soum";
-          var entitySubId = county.province_id;
-          var entitySubName = county.province_name;
+          const entityId = county.id;
+          const entityName = county.name;
+          const entityType = "Soum";
+          const entitySubId = county.province_id;
+          const entitySubName = county.province_name;
 
           if (entityId && entityName && entitySubName) {
             entityDict[entityId] = {

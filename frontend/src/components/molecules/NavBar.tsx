@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { useRouter } from "next/router";
+import React, { useState } from "react";
+// import { useRouter } from "next/router";
 import {
   AppBar,
   Toolbar,
@@ -17,15 +17,15 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 
 const NavBar: React.FC = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const [selectedLanguage, setSelectedLanguage] = useState<String>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const handleLanguageChange = (event: any) => {
-    setSelectedLanguage(event.target.value);
-  };
+  // const handleLanguageChange = (event: any) => {
+  //   setSelectedLanguage(event.target.value);
+  // };
   const toggleLanguage = () => {
-    let newLang = selectedLanguage == "en" ? "mn" : "en";
+    const newLang = selectedLanguage == "en" ? "mn" : "en";
     i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
     setSelectedLanguage(newLang);
   };

@@ -1,4 +1,3 @@
-import { Class } from "leaflet";
 import { SetStateAction, createContext } from "react";
 
 export type SetState<T> = React.Dispatch<SetStateAction<T>>;
@@ -55,8 +54,6 @@ export type GlobalContext = {
   showPositiveCells: boolean | null;
   setShowPositiveCells: SetState<boolean>;
 
-  grazingRange: boolean | null;
-  setGrazingRange: SetState<boolean>;
   selectedLanguage: string | null;
   setSelectedLanguage: SetState<string>;
 };

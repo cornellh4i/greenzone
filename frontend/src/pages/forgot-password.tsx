@@ -33,8 +33,10 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [suscess, setSuccess] = useState(false);
   const handleContinue = async () => {
-    console.log('clickl')
-    const response = await fetch("http://localhost:8080/api/can-reset-password", {
+    console.log("clickl");
+    const response = await fetch(
+      "http://localhost:8080/api/can-reset-password",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,16 +44,16 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({
           email,
         }),
-      })
-  
-      if (response.ok) {
-        console.log("Password reset email sent successfully")
-        setSuccess(true)
-        const data = await response.json()
-      } else {
-        const errorData = await response.json()
-        console.error("Error signing up:", errorData)
       }
+    );
+
+    if (response.ok) {
+      console.log("Password reset email sent successfully");
+      setSuccess(true);
+    } else {
+      const errorData = await response.json();
+      console.error("Error signing up:", errorData);
+    }
   };
 
   return (
@@ -74,11 +76,12 @@ export default function ForgotPasswordPage() {
             GreenZone Analytics
           </Typography>
 
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
             Forgot your password?
           </Typography>
           <Typography variant="body2" sx={{ mb: 3 }}>
-            Enter the email address associated with your account and we'll send you a code to reset your password.
+            Enter the email address associated with your account and well send
+            you a code to reset your password.
           </Typography>
           {!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length > 0 && (
             <Typography variant="body2" color="error" sx={{ mb: 2 }}>
@@ -96,11 +99,11 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             sx={{ mb: 2 }}
           />
-            {suscess && (
+          {suscess && (
             <Typography variant="body2" sx={{ mb: 3, fontWeight: "bold" }}>
-                Check your email to reset your password.
+              Check your email to reset your password.
             </Typography>
-            )}
+          )}
           <Button
             variant="contained"
             color="primary"
@@ -117,8 +120,11 @@ export default function ForgotPasswordPage() {
 
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2">
-              Return to{' '}
-              <Link href="/sign-up" style={{ color: "#2a5548", fontWeight: 500 }}>
+              Return to{" "}
+              <Link
+                href="/sign-up"
+                style={{ color: "#2a5548", fontWeight: 500 }}
+              >
                 Sign In
               </Link>
             </Typography>

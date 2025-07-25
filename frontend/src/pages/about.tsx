@@ -1,7 +1,5 @@
 import React from "react";
-import "../app/about.css";
-import MapComponent from "@/components/organisms/Map";
-import TopPanel from "@/components/organisms/TopPanel";
+
 import NavBar from "../components/molecules/NavBar"; // Adjusted the path to match the relative structure
 import Footer from "@/components/molecules/Footer"; // Adjusted the path to match your project structure
 // import SimpleMap from "@/components/MapWrapper";
@@ -56,56 +54,57 @@ const About = () => {
   return (
     <div>
       <NavBar />
-    <div className="container">
-      <section className="hero">
-        <div className="hero-text">
-          <h1 className="text-3xl font-bold about-heading">About GreenZone</h1>
-          <div className="header-subtext">
-            <h2 className="text-xl about-section-title">
-              Our Purpose and Mission
-            </h2>
-            <p className="about-subtext">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-              eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-              elit sed do eiusmod tempor.
-            </p>
-            <p className="about-subtext">
-              Lorem ipsum dolor sit amet sed do eiusmod tempor.
-            </p>
+      <div className="container">
+        <section className="hero">
+          <div className="hero-text">
+            <h1 className="text-3xl font-bold about-heading">
+              About GreenZone
+            </h1>
+            <div className="header-subtext">
+              <h2 className="text-xl about-section-title">
+                Our Purpose and Mission
+              </h2>
+              <p className="about-subtext">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+                eiusmod tempor. Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit sed do eiusmod tempor.
+              </p>
+              <p className="about-subtext">
+                Lorem ipsum dolor sit amet sed do eiusmod tempor.
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="image-wrapper">
-  <Image
-    src="/Landscape.png"
-    alt="Landscape"
-    width={605}
-    height={346.13}
-    className="landscape-image"
-  />
-</div>
+          <div className="image-wrapper">
+            <Image
+              src="/Landscape.png"
+              alt="Landscape"
+              width={605}
+              height={346.13}
+              className="landscape-image"
+            />
+          </div>
+        </section>
 
-      </section>
+        <section className="who-we-are">
+          <h2 className="about-section-title">Who We Are</h2>
+          <p className="about-subtext">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit sed do eiusmod tempor.
+          </p>
+          <p className="about-subtext">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit sed do eiusmod tempor.
+          </p>
+          <p className="about-subtext">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
+            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit sed do eiusmod tempor.
+          </p>
+        </section>
 
-      <section className="who-we-are">
-        <h2 className="about-section-title">Who We Are</h2>
-        <p className="about-subtext">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
-          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-          eiusmod tempor.
-        </p>
-        <p className="about-subtext">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
-          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-          eiusmod tempor.
-        </p>
-        <p className="about-subtext">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod
-          tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-          eiusmod tempor.
-        </p>
-      </section>
-
-      <section className="contact-container">
+        <section className="contact-container">
           {teamMembers.map((member) => (
             <div className="member-card" key={member.name}>
               <Image
@@ -115,15 +114,17 @@ const About = () => {
                 height={250}
                 className="contact-photo"
               />
-              <h3 className="mt-4 about-section-title contact-name">{member.name}</h3>
+              <h3 className="mt-4 about-section-title contact-name">
+                {member.name}
+              </h3>
               <p className="text-sm text-gray-600 mt-1 contact-description">
                 {member.description}
               </p>
             </div>
           ))}
-      </section>
-    </div>
-    <Footer />
+        </section>
+      </div>
+      <Footer />
     </div>
   );
 };

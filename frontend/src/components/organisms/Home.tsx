@@ -1,8 +1,7 @@
 import NavBar from "../molecules/NavBar";
 import LeftRightSection from "../molecules/HomeInfo";
-import { Typography, Box, useTheme, useMediaQuery, Paper } from "@mui/material";
-import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import { Typography, Box, Paper } from "@mui/material";
+import React from "react";
 import Footer from "@/components/molecules/Footer";
 import { useTranslation } from "react-i18next";
 

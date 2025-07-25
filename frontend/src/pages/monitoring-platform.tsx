@@ -26,13 +26,13 @@ const MonitoringPlatform: React.FC = () => {
   const [showNegativeCells, setShowNegativeCells] = useState(false);
   const [showPositiveCells, setShowPositiveCells] = useState(false);
   const [showZeroCells, setShowZeroCells] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
 
   const [selectedYear, setSelectedYear] = useState<number>(2014);
   const [grazingRange, setGrazingRange] = useState(false);
   const [selectedOption, setSelectedOption] =
     useState<string>("carryingCapacity");
   const [displayName, setDisplayName] = useState<string>("");
-  const [isGrazingRangeSelected, setIsGrazingRangeSelected] = useState(false); // Define the variable
 
   const contextDict = {
     // Province & Selection
@@ -79,6 +79,8 @@ const MonitoringPlatform: React.FC = () => {
     setSelectedOption,
     displayName,
     setDisplayName,
+    selectedLanguage,
+    setSelectedLanguage,
   };
 
   const loadYearOptions = async () => {
