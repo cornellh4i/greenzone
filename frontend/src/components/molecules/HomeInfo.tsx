@@ -3,7 +3,6 @@ import { Box, Button, SxProps, Theme } from "@mui/material";
 // components/LeftRightSection.tsx
 
 interface LeftRightSectionProps {
-  /** style overrides for the outer container */
   containerSx?: SxProps<Theme>;
   bgColor?: string;
   paddingY?: number;
@@ -26,8 +25,6 @@ interface LeftRightSectionProps {
     | "info";
   buttonSide?: "left" | "right";
   buttonSx?: SxProps<Theme>;
-
-  /** NEW: style overrides for the grid itself */
   gridSx?: SxProps<Theme>;
 }
 
@@ -64,7 +61,7 @@ export const LeftRightSection: React.FC<LeftRightSectionProps> = ({
         gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
         gap,
         alignItems: "center",
-        ...gridSx, // <-- your overrides here
+        ...gridSx,
       }}
     >
       <Box sx={{ order: { xs: 1, md: reverseOnDesktop ? 2 : 1 } }}>

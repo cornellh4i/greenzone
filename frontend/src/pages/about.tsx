@@ -2,127 +2,193 @@ import React from "react";
 
 import NavBar from "../components/molecules/NavBar"; // Adjusted the path to match the relative structure
 import Footer from "@/components/molecules/Footer"; // Adjusted the path to match your project structure
-// import SimpleMap from "@/components/MapWrapper";
-/** An About page */
-/*const About = () => {
-  return <>Hello there</>;
-};
-
-export default About;*/
-
-// // Uncomment for Button Onboarding
-// import React from "react";
-// import Button from "@/components/Button";
-
-/** An About page */
-/*const About = () => {
-  console.log("about!");
-  return (
-    <div>
-
-    </div>
-  );
-};
-
-export default About;*/
-// app/about/page.tsx (or your preferred path)
+import LeftRightSection from "@/components/molecules/HomeInfo";
 
 import Image from "next/image";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import { useTranslation } from "react-i18next";
 
 const teamMembers = [
   {
-    name: "Oyut Armarjargal",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/Oyut.png", // Replace with actual path if needed
+    name: "oyut_armarjargal",
+    description: "oyut_armarjargal_text",
+    image: "/Oyut.png",
   },
   {
-    name: "Khusel Avirmed",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/Khusel.png", // Replace with actual path if needed
+    name: "khusel_avirmed",
+    description: "khusel_avirmed_text",
+    image: "/Khusel.png",
   },
   {
-    name: "Turbold Baatarchuluu",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.",
-    image: "/Turbold.png", // Replace with actual path if needed
+    name: "turbold_baatarchuluu",
+    description: "turbold_baatarchuluu_text",
+    image: "/Turbold.png",
   },
 ];
 
 const About = () => {
+  const { t: ta } = useTranslation("about");
   return (
     <div>
       <NavBar />
       <div className="container">
-        <section className="hero">
-          <div className="hero-text">
-            <h1 className="text-3xl font-bold about-heading">
-              About GreenZone
-            </h1>
-            <div className="header-subtext">
-              <h2 className="text-xl about-section-title">
-                Our Purpose and Mission
-              </h2>
-              <p className="about-subtext">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-                eiusmod tempor. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit sed do eiusmod tempor.
-              </p>
-              <p className="about-subtext">
-                Lorem ipsum dolor sit amet sed do eiusmod tempor.
-              </p>
-            </div>
-          </div>
-          <div className="image-wrapper">
-            <Image
-              src="/Landscape.png"
-              alt="Landscape"
-              width={605}
-              height={346.13}
-              className="landscape-image"
-            />
-          </div>
-        </section>
+        <div className="hero-text">
+          <LeftRightSection
+            bgColor="#F0F5F0"
+            paddingY={10}
+            maxWidth="none"
+            containerSx={{ px: { xs: 2, md: 8 } }}
+            left={
+              <Box>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  mb={2}
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    color: "#000000",
+                  }}
+                >
+                  {ta("about_subtitle_1")}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "15px",
+                    fontStyle: "normal",
+                    fontWeight: 400,
+                    lineHeight: "143%",
+                    letterSpacing: "0.17px",
+                    color: "#000000",
+                  }}
+                >
+                  {ta("about_section_text_1")}
+                </Typography>
+              </Box>
+            }
+            right={
+              <Paper elevation={0} sx={{ bgcolor: "transparent" }}>
+                <Box
+                  component="img"
+                  src="/Landscape.png"
+                  sx={{
+                    width: "100%",
+                    aspectRatio: "16 / 9",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    borderRadius: 3,
+                  }}
+                ></Box>
+              </Paper>
+            }
+          />
+        </div>
 
-        <section className="who-we-are">
-          <h2 className="about-section-title">Who We Are</h2>
-          <p className="about-subtext">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-          <p className="about-subtext">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-          <p className="about-subtext">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do
-            eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit sed do eiusmod tempor.
-          </p>
-        </section>
+        <Box
+          sx={{
+            p: 10,
+            bgcolor: "#fff",
+            borderRadius: 2,
+          }}
+        >
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            mb={2}
+            sx={{
+              fontFamily: "Poppins, sans-serif",
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#000000",
+            }}
+          >
+            {ta("about_subtitle_2")}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: "Poppins, sans-serif",
+              fontSize: "15px",
+              fontStyle: "normal",
+              fontWeight: 400,
+              lineHeight: "143%",
+              letterSpacing: "0.17px",
+              color: "#000000",
+            }}
+          >
+            {ta("about_section_text_2")}
+          </Typography>
+        </Box>
 
-        <section className="contact-container">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "stretch",
+            gap: 10,
+            width: "100%",
+            py: 4,
+          }}
+        >
           {teamMembers.map((member) => (
-            <div className="member-card" key={member.name}>
+            <Box
+              key={member.name}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: { xs: "100%", sm: 250 },
+                px: 2,
+                py: 3,
+                bgcolor: "#fff",
+              }}
+            >
               <Image
                 src={member.image}
                 alt={member.name}
-                width={250}
-                height={250}
+                width={180}
+                height={180}
+                style={{
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  marginBottom: 18,
+                }}
                 className="contact-photo"
               />
-              <h3 className="mt-4 about-section-title contact-name">
-                {member.name}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1 contact-description">
-                {member.description}
-              </p>
-            </div>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 700,
+                  mt: 2,
+                  mb: 1,
+                  textAlign: "center",
+                }}
+                className="about-section-title contact-name"
+              >
+                {ta(member.name)}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "1rem",
+                  color: "text.secondary",
+                  textAlign: "center",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+                className="contact-description"
+              >
+                {ta(member.description)}
+              </Typography>
+            </Box>
           ))}
-        </section>
+        </Box>
       </div>
       <Footer />
     </div>

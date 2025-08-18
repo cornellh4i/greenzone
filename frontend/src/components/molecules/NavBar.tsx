@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import {
   AppBar,
   Toolbar,
@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 
 const NavBar: React.FC = () => {
-  // const router = useRouter();
+  const router = useRouter();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,17 +29,22 @@ const NavBar: React.FC = () => {
     i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
     setSelectedLanguage(newLang);
   };
-  // const handleNavigate = (path: string) => {
-  //   router.push(path);
-  // };
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
 
   // const { selectedLanguage, setSelectedLanguage } = context;
   const { t: tn } = useTranslation("navbar");
   const pages = [
-    { name: "Home", path: "/landing", id: "home" },
+    { name: "Home", path: "/", id: "home" },
     { name: "About", path: "/about", id: "about" },
-    { name: "Insights", path: "/summary-stats", id: "insights" },
-    { name: "Methodologies", path: "/methodology", id: "methods" },
+    { name: "Insights", path: "/test", id: "insights" },
+    { name: "Methodologies", path: "/test", id: "methods" },
+    {
+      name: "Paltform",
+      path: "/test",
+      id: "launch_platform",
+    },
   ];
 
   return (
@@ -51,7 +56,6 @@ const NavBar: React.FC = () => {
     >
       <Toolbar sx={{ justifyContent: "space-between", py: 4 }}>
         <Box
-          // onClick={() => handleNavigate("/landing")}
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -83,6 +87,7 @@ const NavBar: React.FC = () => {
               <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
                 {pages.map((page) => (
                   <Typography
+                    onClick={() => handleNavigate(page.path)}
                     key={page.name}
                     sx={{
                       fontSize: "18px",
@@ -163,7 +168,7 @@ const NavBar: React.FC = () => {
                   cursor: "pointer",
                   color: "#000",
                 }}
-                // onClick={() => handleNavigate(page.path)}
+                onClick={() => handleNavigate(page.path)}
               >
                 {page.name}
               </Typography>
