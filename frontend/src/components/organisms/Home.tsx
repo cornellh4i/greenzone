@@ -64,7 +64,7 @@ const Home: React.FC = () => {
                 ></Box>
               </Paper>
             }
-            buttonText={th("buttontext")}
+            buttonText={th("launch_platform")}
             buttonVariant="text"
             buttonColor="success"
             buttonSx={{
