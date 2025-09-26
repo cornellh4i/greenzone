@@ -21,9 +21,6 @@ const NavBar: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // const handleLanguageChange = (event: any) => {
-  //   setSelectedLanguage(event.target.value);
-  // };
   const toggleLanguage = () => {
     const newLang = selectedLanguage == "en" ? "mn" : "en";
     i18n.changeLanguage(i18n.language === "en" ? "mn" : "en");
@@ -33,7 +30,6 @@ const NavBar: React.FC = () => {
     router.push(path);
   };
 
-  // const { selectedLanguage, setSelectedLanguage } = context;
   const { t: tn } = useTranslation("navbar");
   const pages = [
     { name: "Home", path: "/", id: "home" },
@@ -102,7 +98,6 @@ const NavBar: React.FC = () => {
                 ))}
                 <Select
                   value={selectedLanguage}
-                  // onChange={handleLanguageChange}
                   variant="standard"
                   disableUnderline
                   sx={{
@@ -170,7 +165,7 @@ const NavBar: React.FC = () => {
                 }}
                 onClick={() => handleNavigate(page.path)}
               >
-                {page.name}
+                {tn(page.id)}
               </Typography>
             ))}
 
@@ -184,7 +179,7 @@ const NavBar: React.FC = () => {
               }}
             >
               <Button
-                onClick={() => setSelectedLanguage("en")}
+                onClick={() => toggleLanguage()}
                 disableRipple
                 sx={{
                   display: "flex",
@@ -211,7 +206,7 @@ const NavBar: React.FC = () => {
               </Button>
 
               <Button
-                onClick={() => setSelectedLanguage("mn")}
+                onClick={() => toggleLanguage()}
                 disableRipple
                 sx={{
                   display: "flex",

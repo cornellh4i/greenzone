@@ -4,8 +4,13 @@ import { Typography, Box, Paper } from "@mui/material";
 import React from "react";
 import Footer from "@/components/molecules/Footer";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
 
 const Home: React.FC = () => {
+  const router = useRouter();
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
   const { t: th } = useTranslation("landing");
   return (
     <div>
@@ -65,6 +70,7 @@ const Home: React.FC = () => {
               </Paper>
             }
             buttonText={th("launch_platform")}
+            onButtonClick={() => handleNavigate("/test")}
             buttonVariant="text"
             buttonColor="success"
             buttonSx={{
@@ -296,6 +302,7 @@ const Home: React.FC = () => {
               </Paper>
             }
             buttonText={th("buttontext")}
+            onButtonClick={() => handleNavigate("/test")}
             buttonVariant="outlined"
             buttonColor="success"
             buttonSx={{
@@ -357,6 +364,7 @@ const Home: React.FC = () => {
               </Box>
             }
             buttonText={th("buttontext")}
+            onButtonClick={() => handleNavigate("/test")}
             buttonVariant="outlined"
             buttonColor="success"
             buttonSx={{
@@ -419,6 +427,7 @@ const Home: React.FC = () => {
               </Paper>
             }
             buttonText={th("buttontext")}
+            onButtonClick={() => handleNavigate("/test")}
             buttonVariant="outlined"
             buttonColor="success"
             buttonSx={{
