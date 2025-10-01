@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { supabase } from "../db/postgresconn";
+import NodeCache from "node-cache";
+const cache = new NodeCache({ stdTTL: 60 * 10 });
 
 export const getCellValuesbyYearandCtype = async (
   req: Request,
@@ -8,6 +10,15 @@ export const getCellValuesbyYearandCtype = async (
   if (supabase) {
     try {
       const { year, classificationType, lowerBound, upperBound } = req.params;
+      const cacheKey = `${year}-${classificationType}-${lowerBound}-${upperBound}`;
+
+      if (cache.has(cacheKey)) {
+        res.status(200).json({
+          log: "Cache hit",
+          data: cache.get(cacheKey),
+        });
+        return;
+      }
 
       const selected_year = parseInt(year as string, 10);
       const gte = parseFloat(lowerBound as string);
@@ -86,7 +97,7 @@ export const getCellValuesbyYearandCtype = async (
       }
 
       console.log("Total rows returned from Supabase:", allData.length);
-
+      cache.set(cacheKey, allData);
       res.status(201).json({
         log: "Data was successfully collected",
         data: allData,

@@ -1,5 +1,5 @@
 import { Map, MapRef } from "react-map-gl/maplibre";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import { PolygonLayer, ScatterplotLayer, TextLayer } from "deck.gl";
 import { Box, CircularProgress } from "@mui/material";
 import { MapboxOverlay } from "@deck.gl/mapbox";
@@ -305,10 +305,11 @@ const MapComponent: React.FC = () => {
 
   const handleZoom = (bounds: [number, number, number, number] | null) => {
     if (map && bounds) {
-      map.fitBounds(bounds, {
-        padding: 40,
-        maxZoom: selectedCounty ? 9 : selectedProvince ? 8 : 5.5,
-        duration: 800, // Smooth animation duration (in ms)
+      map.flyTo({
+        center: [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2],
+        zoom: 6,
+        duration: 1000,
+        essential: true,
       });
     }
   };
@@ -574,7 +575,7 @@ const MapComponent: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 1000, // above the map, below other UI
+            zIndex: 1000,
           }}
         >
           <CircularProgress />

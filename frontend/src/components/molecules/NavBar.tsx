@@ -38,7 +38,7 @@ const NavBar: React.FC = () => {
     { name: "Methodologies", path: "/test", id: "methods" },
     {
       name: "Paltform",
-      path: "/test",
+      path: "/monitoring-platform",
       id: "launch_platform",
     },
   ];
