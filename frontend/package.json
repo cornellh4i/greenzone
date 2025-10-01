@@ -34,7 +34,7 @@
     "next": "^15.3.4",
     "proj4": "^2.19.5",
     "react": "^19",
-    "react-dom": "^18",
+    "react-dom": "^19",
     "react-i18next": "^15.5.3",
     "react-leaflet": "^4.2.1",
     "react-map-gl": "^8.0.4"
