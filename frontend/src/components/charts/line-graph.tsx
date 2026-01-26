@@ -212,7 +212,7 @@ const LineGraph: React.FC<Prop> = ({
       .style("fill", "#000")
       .style("font-family", "Roboto, sans-serif")
       .text("Privatization Periods");
-  }, [datasets, dzudYears]);
+  }, [datasets, dzudYears, privatizationPeriods]);
 
   return (
     <div

@@ -1,5 +1,5 @@
 import { Map, MapRef } from "react-map-gl/maplibre";
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { PolygonLayer, ScatterplotLayer, TextLayer } from "deck.gl";
 import { Box, CircularProgress } from "@mui/material";
 import { MapboxOverlay } from "@deck.gl/mapbox";
@@ -19,7 +19,7 @@ const INITIAL_VIEW_STATE = {
 };
 const MONGOLIAN_CHARSET = [
   ...new Set(
-    "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүфхцчшщъыьэюяТөв"
+    "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмноөпрстуүфхцчшщъыьэюяТөв",
   ),
 ];
 const ascii = Array.from({ length: 0x7f }, (_, i) => String.fromCharCode(i));
@@ -143,13 +143,13 @@ const MapComponent: React.FC = () => {
   const loadCarryingCapacityCells = async () => {
     try {
       const below_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0/0.4`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0/0.4`,
       );
       const at_cap_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.4/0.6`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.4/0.6`,
       );
       const above_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.6/1`
+        `${backendUrl}/cells/${selectedYear}/carrying_capacity/0.6/1`,
       );
 
       const [json_below_response, json_at_cap_response, json_above_response] =
@@ -163,21 +163,21 @@ const MapComponent: React.FC = () => {
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
       setAtCapCells(
         json_at_cap_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
       setAboveCells(
         json_above_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
     } catch (error) {
       console.error("Error fetching data from Express:", error);
@@ -187,13 +187,13 @@ const MapComponent: React.FC = () => {
   const loadZScoreCells = async () => {
     try {
       const negative_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/z_score/0/0.4`
+        `${backendUrl}/cells/${selectedYear}/z_score/0/0.4`,
       );
       const zero_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/z_score/0.4/0.6`
+        `${backendUrl}/cells/${selectedYear}/z_score/0.4/0.6`,
       );
       const positive_response = await fetch(
-        `${backendUrl}/cells/${selectedYear}/z_score/0.6/1`
+        `${backendUrl}/cells/${selectedYear}/z_score/0.6/1`,
       );
 
       const [
@@ -210,21 +210,21 @@ const MapComponent: React.FC = () => {
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
       setZeroCells(
         json_zero_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
       setPositiveCells(
         json_positive_response.data.map((feature: any) => ({
           vertices: feature.wkb_geometry.coordinates,
           z_score: feature.z_score,
           // Removed grazing_range property
-        }))
+        })),
       );
     } catch (error) {
       console.error("Error fetching z-score data:", error);
@@ -249,7 +249,7 @@ const MapComponent: React.FC = () => {
             Math.max(maxX, lng),
             Math.max(maxY, lat),
           ],
-          [Infinity, Infinity, -Infinity, -Infinity] as Bounds
+          [Infinity, Infinity, -Infinity, -Infinity] as Bounds,
         );
         const bounds: Bounds = [minLng, minLat, maxLng, maxLat];
         provViews[feature.id] = bounds;
@@ -285,7 +285,7 @@ const MapComponent: React.FC = () => {
             bounds[1] = Math.min(bounds[1], lat); // Min latitude
             bounds[2] = Math.max(bounds[2], lng); // Max longitude
             bounds[3] = Math.max(bounds[3], lat); // Max latitude
-          }
+          },
         );
         soumViews[feature.county_id] = bounds;
         return {

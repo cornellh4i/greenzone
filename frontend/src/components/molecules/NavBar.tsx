@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import {
   AppBar,
   Toolbar,
@@ -113,11 +114,12 @@ const NavBar: React.FC = () => {
                   }}
                   renderValue={() => (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <img
+                      <Image
                         src={`/flags_${
                           selectedLanguage === "en" ? "en" : "mn"
                         }.png`}
                         width={20}
+                        height={20}
                         alt="flag"
                       />
                       <span>{selectedLanguage === "en" ? "EN" : "MN"}</span>
@@ -126,13 +128,23 @@ const NavBar: React.FC = () => {
                 >
                   <MenuItem value="en" onClick={() => toggleLanguage()}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <img src="/flags_en.png" width={20} alt="EN" />
+                      <Image
+                        src="/flags_en.png"
+                        width={20}
+                        height={20}
+                        alt="EN"
+                      />
                       EN
                     </Box>
                   </MenuItem>
                   <MenuItem value="mn" onClick={() => toggleLanguage()}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <img src="/flags_mn.png" width={20} alt="MN" />
+                      <Image
+                        src="/flags_mn.png"
+                        width={20}
+                        height={20}
+                        alt="MN"
+                      />
                       MN
                     </Box>
                   </MenuItem>
@@ -201,7 +213,7 @@ const NavBar: React.FC = () => {
                   },
                 }}
               >
-                <img src="/flags_en.png" alt="EN" width={20} />
+                <Image src="/flags_en.png" alt="EN" width={20} height={20} />
                 English
               </Button>
 
@@ -228,7 +240,7 @@ const NavBar: React.FC = () => {
                   },
                 }}
               >
-                <img src="/flags_mn.png" alt="MN" width={20} />
+                <Image src="/flags_mn.png" alt="MN" width={20} height={20} />
                 Mongolian
               </Button>
             </Box>
