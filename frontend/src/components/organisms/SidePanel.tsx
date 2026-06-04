@@ -90,14 +90,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
     entityType: string,
     entityID: number,
     categoryType: LayerType | null,
-    selectedYear: number
+    selectedYear: number,
   ) => {
     try {
       const response = await fetch(
-        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
+        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`,
       );
       console.log(
-        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`
+        `${backendUrl}/cell/${entityType}/${entityID}/${categoryType}/${selectedYear}`,
       );
       const response_json = await response.json();
       const percentages = [
@@ -116,7 +116,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
   const loadEntityLivestock = async (entityType: string, entityID: number) => {
     try {
       const response = await fetch(
-        `${backendUrl}/${entityType}/${entityID}/${selectedYear}/livestock`
+        `${backendUrl}/${entityType}/${entityID}/${selectedYear}/livestock`,
       );
       const response_json = await response.json();
       const livestock_data = {
@@ -174,7 +174,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               "province",
               selectedProvince,
               selectedLayerType,
-              selectedYear
+              selectedYear,
             ),
             loadEntityLivestock("province", selectedProvince),
           ]);
@@ -194,7 +194,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               "county",
               selectedCounty,
               selectedLayerType,
-              selectedYear
+              selectedYear,
             ),
             loadEntityLivestock("county", selectedCounty),
           ]);
@@ -398,19 +398,21 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
         open={isPanelOpen ?? false}
         onClose={handlePanelToggle}
         variant="persistent"
-        PaperProps={{
-          sx: {
-            width: isMobile ? "100%" : "35vw",
-            height: isMobile ? "75vh" : "calc(100% - 70px)",
-            maxWidth: isMobile ? "100%" : "400px",
-            boxSizing: "border-box",
-            p: 2,
-            paddingTop: "10px",
-            display: "flex",
-            flexDirection: "column",
-            marginTop: isMobile ? 0 : "78px",
-            borderTopLeftRadius: isMobile ? "12px" : 0,
-            borderTopRightRadius: isMobile ? "12px" : 0,
+        slotProps={{
+          paper: {
+            sx: {
+              width: isMobile ? "100%" : "35vw",
+              height: isMobile ? "75vh" : "calc(100% - 70px)",
+              maxWidth: isMobile ? "100%" : "400px",
+              boxSizing: "border-box",
+              p: 2,
+              paddingTop: "10px",
+              display: "flex",
+              flexDirection: "column",
+              marginTop: isMobile ? 0 : "78px",
+              borderTopLeftRadius: isMobile ? "12px" : 0,
+              borderTopRightRadius: isMobile ? "12px" : 0,
+            },
           },
         }}
         sx={{
@@ -434,8 +436,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
             <div>
               <Typography
                 variant="h4"
-                fontFamily="Poppins, sans-serif"
                 sx={{
+                  fontFamily: "Poppins, sans-serif",
                   fontWeight: 700,
                   color: "#111",
                   mt: 2,
@@ -448,7 +450,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               <Typography
                 variant="body2"
                 color="#111"
-                fontFamily="Poppins, sans-serif"
+                sx={{ fontFamily: "Poppins, sans-serif" }}
               >
                 {ts("instruction")}
               </Typography>
@@ -493,8 +495,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               </div>
               <Typography
                 variant="h4"
-                fontFamily="Poppins, sans-serif"
                 sx={{
+                  fontFamily: "Poppins, sans-serif",
                   fontWeight: 700,
                   color: "#111",
                   mt: 2,
@@ -575,8 +577,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               </div>
               <Typography
                 variant="h4"
-                fontFamily="Poppins, sans-serif"
                 sx={{
+                  fontFamily: "Poppins, sans-serif",
                   fontWeight: 700,
                   color: "#111",
                   mt: 2,
@@ -667,21 +669,29 @@ const SidePanel: React.FC<SidePanelProps> = ({ yearOptions }) => {
               mb: 3,
             }}
           >
-            <Typography variant="h6" fontWeight="bold">
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               Map Guide
             </Typography>
             <IconButton onClick={() => setShowGuide(false)}>
               <CloseIcon />
             </IconButton>
           </Box>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ fontWeight: "bold" }}
+          >
             Summary
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" sx={{ mb: 2 }}>
             hey there delilah, how is it like in new york city?
           </Typography>
 
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ fontWeight: "bold" }}
+          >
             Usage
           </Typography>
           <Typography variant="body2">YO</Typography>
