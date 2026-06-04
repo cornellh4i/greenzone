@@ -6,17 +6,17 @@ import { useTranslation } from "react-i18next";
 
 import NavBar from "../components/molecules/NavBar";
 import Footer from "@/components/molecules/Footer";
-import { getAllPostsMeta } from "@/content/insights";
-import type { InsightMeta } from "@/content/insights";
+import { getAllCards } from "@/content/insights";
+import type { InsightCard } from "@/content/insights";
 import { formatDate, type Lang } from "@/content/dates";
 
 const headingFont = "Poppins, sans-serif";
 
-export const getStaticProps: GetStaticProps<{ posts: InsightMeta[] }> = () => ({
-  props: { posts: getAllPostsMeta() },
+export const getStaticProps: GetStaticProps<{ posts: InsightCard[] }> = () => ({
+  props: { posts: getAllCards() },
 });
 
-const Insights = ({ posts }: { posts: InsightMeta[] }) => {
+const Insights = ({ posts }: { posts: InsightCard[] }) => {
   const { t: ti, i18n } = useTranslation("insights");
   const lang: Lang = i18n.language === "mn" ? "mn" : "en";
 
@@ -70,7 +70,9 @@ const Insights = ({ posts }: { posts: InsightMeta[] }) => {
               gap: 4,
             }}
           >
-            {posts.map((post) => (
+            {posts.map((post) => {
+              const c = lang === "mn" && post.mn ? post.mn : post.en;
+              return (
               <Link
                 key={post.slug}
                 href={`/insights/${post.slug}`}
@@ -96,7 +98,7 @@ const Insights = ({ posts }: { posts: InsightMeta[] }) => {
                     <Box
                       component="img"
                       src={post.thumbnail}
-                      alt={post.title}
+                      alt={c.title}
                       sx={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover" }}
                     />
                   ) : (
@@ -118,7 +120,7 @@ const Insights = ({ posts }: { posts: InsightMeta[] }) => {
                         mb: 1,
                       }}
                     >
-                      {post.title}
+                      {c.title}
                     </Typography>
                     <Typography
                       sx={{
@@ -129,7 +131,7 @@ const Insights = ({ posts }: { posts: InsightMeta[] }) => {
                         mb: 2,
                       }}
                     >
-                      {post.excerpt}
+                      {c.excerpt}
                     </Typography>
                     <Typography
                       sx={{
@@ -145,7 +147,8 @@ const Insights = ({ posts }: { posts: InsightMeta[] }) => {
                   </Box>
                 </Box>
               </Link>
-            ))}
+              );
+            })}
           </Box>
         )}
       </Box>

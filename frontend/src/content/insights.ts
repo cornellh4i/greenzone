@@ -1,59 +1,76 @@
 /**
  * Server-side loader for Insights blog posts.
  *
- * Each post is a single Markdown file in  frontend/content/insights/  — see the
- * `_TEMPLATE.md` in that folder for the format. To publish a post, drop its .md
- * file into that folder; it appears automatically (sorted newest first).
+ * Each post is a Markdown file in  frontend/content/insights/  — see
+ * `_TEMPLATE.md` there for the format. Drop a .md file into that folder and it
+ * publishes automatically (newest date first).
  *
- * NOTE: this module uses Node's `fs` and is only safe to call from
- * getStaticProps / getStaticPaths (server/build time). Pages import the loader
- * functions there, and `import type` the interfaces — so this never ends up in
- * the browser bundle.
+ * BILINGUAL: a post is English by default (`my-post.md`). To add a Mongolian
+ * version, add a sibling file `my-post.mn.md`. When the site language is set to
+ * Mongolian, the .mn.md content is shown; otherwise (or if it's missing) the
+ * English file is used. Shared fields (date, author, thumbnail, linkedin) come
+ * from the English file.
+ *
+ * NOTE: uses Node `fs`; only call from getStaticProps / getStaticPaths.
  */
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 
-export interface InsightMeta {
-  /** Derived from the filename: "winter-2026.md" -> "winter-2026" -> /insights/winter-2026 */
-  slug: string;
+/** Per-language text for a post. */
+export interface LocalizedText {
   title: string;
-  author: string;
-  /** Normalized to "YYYY-MM-DD". */
-  date: string;
-  /** Path under /public, e.g. "/insights/foo.jpg". */
-  thumbnail: string;
-  /** URL of the original LinkedIn post. */
-  linkedin: string;
-  /** Short blurb for the card (front matter `excerpt`, or first paragraph). */
   excerpt: string;
+  body: string; // raw Markdown
 }
 
-export interface InsightPost extends InsightMeta {
-  /** Raw Markdown body (rendered with react-markdown on the page). */
-  body: string;
+/** Card metadata for the index (no body). */
+export interface InsightCard {
+  slug: string;
+  author: string;
+  date: string; // YYYY-MM-DD
+  thumbnail: string;
+  linkedin: string;
+  en: { title: string; excerpt: string };
+  mn?: { title: string; excerpt: string };
+}
+
+/** Full post for the article page. */
+export interface InsightPost {
+  slug: string;
+  author: string;
+  date: string;
+  thumbnail: string;
+  linkedin: string;
+  en: LocalizedText;
+  mn?: LocalizedText;
 }
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "insights");
 
-function listMarkdownFiles(): string[] {
+function listFiles(): string[] {
   try {
-    return fs.readdirSync(CONTENT_DIR).filter(isPostFile);
+    return fs.readdirSync(CONTENT_DIR);
   } catch {
     return [];
   }
 }
 
-/** Published posts are *.md, excluding templates/partials (names starting with "_" or "."). */
-function isPostFile(file: string): boolean {
-  return file.endsWith(".md") && !file.startsWith("_") && !file.startsWith(".");
+/** Canonical (English) post files: *.md, excluding *.mn.md, templates and dotfiles. */
+function isCanonical(file: string): boolean {
+  return (
+    file.endsWith(".md") &&
+    !file.endsWith(".mn.md") &&
+    !file.startsWith("_") &&
+    !file.startsWith(".")
+  );
 }
 
-function fileToSlug(file: string): string {
+function slugOf(file: string): string {
   return file.replace(/\.md$/, "");
 }
 
-/** YAML parses an unquoted `date: 2026-05-20` into a Date — normalize back to YYYY-MM-DD. */
+/** YAML parses an unquoted `date: 2026-05-20` into a Date — normalize to YYYY-MM-DD. */
 function normalizeDate(value: unknown): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   return String(value ?? "");
@@ -66,50 +83,79 @@ function deriveExcerpt(body: string): string {
       .map((s) => s.trim())
       .find((s) => s.length > 0 && !s.startsWith("#") && !s.startsWith(">")) ?? "";
   const plain = firstParagraph
-    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // [text](url) / ![alt](src) -> text
-    .replace(/[*_`#>~]/g, "") // strip common Markdown symbols
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`#>~]/g, "")
     .replace(/\s+/g, " ")
     .trim();
   return plain.length > 180 ? `${plain.slice(0, 177).trimEnd()}…` : plain;
 }
 
-function parseFile(file: string): InsightPost {
+function parse(file: string): { data: Record<string, unknown>; body: string } {
   const raw = fs.readFileSync(path.join(CONTENT_DIR, file), "utf8");
   const { data, content } = matter(raw);
-  const slug = fileToSlug(file);
-  const body = content.trim();
+  return { data: data as Record<string, unknown>, body: content.trim() };
+}
+
+function localizedFrom(data: Record<string, unknown>, body: string, fallbackTitle: string): LocalizedText {
   return {
-    slug,
-    title: String(data.title ?? slug),
-    author: String(data.author ?? ""),
-    date: normalizeDate(data.date),
-    thumbnail: String(data.thumbnail ?? ""),
-    linkedin: String(data.linkedin ?? data.linkedInUrl ?? ""),
+    title: String(data.title ?? fallbackTitle),
     excerpt: data.excerpt ? String(data.excerpt) : deriveExcerpt(body),
     body,
   };
 }
 
-export function getAllSlugs(): string[] {
-  return listMarkdownFiles().map(fileToSlug);
+function buildPost(slug: string): InsightPost | null {
+  const enFile = `${slug}.md`;
+  if (!isCanonical(enFile)) return null;
+
+  let en: { data: Record<string, unknown>; body: string };
+  try {
+    en = parse(enFile);
+  } catch {
+    return null;
+  }
+
+  const post: InsightPost = {
+    slug,
+    author: String(en.data.author ?? ""),
+    date: normalizeDate(en.data.date),
+    thumbnail: String(en.data.thumbnail ?? ""),
+    linkedin: String(en.data.linkedin ?? en.data.linkedInUrl ?? ""),
+    en: localizedFrom(en.data, en.body, slug),
+  };
+
+  const mnFile = `${slug}.mn.md`;
+  if (fs.existsSync(path.join(CONTENT_DIR, mnFile))) {
+    const mn = parse(mnFile);
+    post.mn = localizedFrom(mn.data, mn.body, post.en.title);
+  }
+
+  return post;
 }
 
-export function getAllPostsMeta(): InsightMeta[] {
-  return listMarkdownFiles()
-    .map((file) => {
-      const { body, ...meta } = parseFile(file);
-      void body;
-      return meta;
+export function getAllSlugs(): string[] {
+  return listFiles().filter(isCanonical).map(slugOf);
+}
+
+export function getAllCards(): InsightCard[] {
+  return getAllSlugs()
+    .map(buildPost)
+    .filter((p): p is InsightPost => p !== null)
+    .map((p) => {
+      const card: InsightCard = {
+        slug: p.slug,
+        author: p.author,
+        date: p.date,
+        thumbnail: p.thumbnail,
+        linkedin: p.linkedin,
+        en: { title: p.en.title, excerpt: p.en.excerpt },
+      };
+      if (p.mn) card.mn = { title: p.mn.title, excerpt: p.mn.excerpt };
+      return card;
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1)); // newest first
 }
 
 export function getPostBySlug(slug: string): InsightPost | null {
-  const file = `${slug}.md`;
-  if (!isPostFile(file)) return null;
-  try {
-    return parseFile(file);
-  } catch {
-    return null;
-  }
+  return buildPost(slug);
 }

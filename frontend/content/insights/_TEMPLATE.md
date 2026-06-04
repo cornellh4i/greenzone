@@ -32,6 +32,13 @@
          frontend/content/insights/
      and the post publishes automatically (newest date first).
 
+  BILINGUAL (optional): to publish a Mongolian version of a post, add a second
+  file with the SAME name plus ".mn" — e.g.  winter-dzud-2026.mn.md  — with the
+  Mongolian title/excerpt in its front matter and the Mongolian text in the
+  body. It is shown when the site's language toggle is set to MN; otherwise the
+  English (.md) file is used. (Date, author, thumbnail and linkedin are taken
+  from the English file, so you don't need to repeat them.)
+
   This file (named "_TEMPLATE.md") is IGNORED by the site because its name
   starts with "_", so you can leave these notes here in the template.
 -->

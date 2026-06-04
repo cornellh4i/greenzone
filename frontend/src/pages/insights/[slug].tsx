@@ -36,6 +36,7 @@ const Article = ({
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const { t: ti, i18n } = useTranslation("insights");
   const lang: Lang = i18n.language === "mn" ? "mn" : "en";
+  const c = lang === "mn" && post.mn ? post.mn : post.en;
 
   return (
     <div>
@@ -71,7 +72,7 @@ const Article = ({
             mb: 2,
           }}
         >
-          {post.title}
+          {c.title}
         </Typography>
 
         <Typography
@@ -85,7 +86,7 @@ const Article = ({
           <Box
             component="img"
             src={post.thumbnail}
-            alt={post.title}
+            alt={c.title}
             sx={{
               width: "100%",
               aspectRatio: "16 / 9",
@@ -125,7 +126,7 @@ const Article = ({
             },
           }}
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{c.body}</ReactMarkdown>
         </Box>
 
         {post.linkedin && (

@@ -11,6 +11,8 @@ Every spring, herders across Mongolia ask the same question: will there be enoug
 
 Our models look at vegetation indices like **NDVI** alongside precipitation, temperature, snow cover, and soil characteristics. Where the signal points to vegetation falling short of what the land can normally support, we flag it — long before the shortfall becomes visible on the ground.
 
+![A view across the Mongolian steppe](/countrymap.png)
+
 This is the first in a series where we'll share:
 
 - what the data is telling us about this season,
