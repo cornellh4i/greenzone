@@ -70,7 +70,7 @@ const Home: React.FC = () => {
               </Paper>
             }
             buttonText={th("launch_platform")}
-            onButtonClick={() => handleNavigate("/test")}
+            onButtonClick={() => handleNavigate("/monitoring-platform")}
             buttonVariant="text"
             buttonColor="success"
             buttonSx={{

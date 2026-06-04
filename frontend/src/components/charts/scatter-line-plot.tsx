@@ -14,15 +14,15 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
 
     // Adjust dimensions for better mobile display
     const w = 1000; // Fixed width
-    const h = 500;  // Fixed height
-    const m = { 
-      top: 40, 
+    const h = 500; // Fixed height
+    const m = {
+      top: 40,
       right: 120, // Increased right margin for legend
-      bottom: 50, 
-      left: 80  // Increased left margin for y-axis labels
+      bottom: 50,
+      left: 80, // Increased left margin for y-axis labels
     };
 
-    const allData = datasets.flatMap(d => d.data);
+    const allData = datasets.flatMap((d) => d.data);
 
     const d3svg = d3
       .select(svgRef.current)
@@ -35,24 +35,25 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
     //setting the scales of the graph
     const xScale = d3
       .scaleLinear()
-      .domain([d3.min(allData, d => d.x)!, d3.max(allData, d => d.x)!])
+      .domain([d3.min(allData, (d) => d.x)!, d3.max(allData, (d) => d.x)!])
       .range([m.left, w - m.right]);
 
     const yScale = d3
       .scaleLinear()
-      .domain([d3.min(allData, d => d.y)!, d3.max(allData, d => d.y)!])
+      .domain([d3.min(allData, (d) => d.y)!, d3.max(allData, (d) => d.y)!])
       .range([h - m.bottom, m.top]);
 
     const makeXGridlines = () => d3.axisBottom(xScale).ticks(5);
     const makeYGridlines = () => d3.axisLeft(yScale).ticks(5);
 
+    const colorScale = d3
+      .scaleOrdinal(d3.schemeCategory10)
+      .domain(datasets.map((d) => d.aimag));
 
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(datasets.map(d => d.aimag));
-
-    d3svg.append("g")
+    d3svg
+      .append("g")
       .attr("transform", `translate(0, ${h - m.bottom})`)
-      .call(d3.axisBottom(xScale))
+      .call(d3.axisBottom(xScale));
 
     d3svg
       .append("text")
@@ -75,9 +76,9 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
       .style("stroke-dasharray", "3,3")
       .style("stroke", "#e0e0e0")
       .style("stroke-opacity", "0.3");
-      
 
-    d3svg.append("g")
+    d3svg
+      .append("g")
       .attr("transform", `translate(${m.left}, 0)`)
       .call(d3.axisLeft(yScale));
 
@@ -103,23 +104,24 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
       .style("stroke-dasharray", "3,3")
       .style("stroke", "#e0e0e0")
       .style("stroke-opacity", "0.3");
-  
-    datasets.forEach(dataset => {
+
+    datasets.forEach((dataset) => {
       const color = colorScale(dataset.aimag);
-    
+
       d3svg
         .selectAll(`circle-${dataset.aimag}`)
         .data(dataset.data)
         .enter()
         .append("circle")
-        .attr("cx", d => xScale(d.x))
-        .attr("cy", d => yScale(d.y))
+        .attr("cx", (d) => xScale(d.x))
+        .attr("cy", (d) => yScale(d.y))
         .attr("r", 4)
         .attr("fill", color);
 
-      const lineGenerator = d3.line<{ x: number, y: number }>()
-        .x(d => xScale(d.x))
-        .y(d => yScale(d.y))
+      const lineGenerator = d3
+        .line<{ x: number; y: number }>()
+        .x((d) => xScale(d.x))
+        .y((d) => yScale(d.y))
         .curve(d3.curveMonotoneX);
 
       d3svg
@@ -129,7 +131,7 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
         .attr("stroke", colorScale(dataset.aimag))
         .attr("stroke-width", 2)
         .attr("d", lineGenerator); // Comment out for scatter plot
-      });
+    });
 
     const legend = d3svg
       .append("g")
@@ -137,32 +139,36 @@ const LineGraph: React.FC<Prop> = ({ datasets, livestock }) => {
       .attr("transform", `translate(${w}, ${m.top})`);
 
     colorScale.domain().forEach((aimag, i) => {
-      const legendRow = legend.append("g")
+      const legendRow = legend
+        .append("g")
         .attr("transform", `translate(0, ${i * 20})`);
-    
-      legendRow.append("rect")
+
+      legendRow
+        .append("rect")
         .attr("width", 10)
         .attr("height", 10)
         .attr("fill", colorScale(aimag));
-    
-      legendRow.append("text")
+
+      legendRow
+        .append("text")
         .attr("x", 20)
         .attr("y", 10)
         .attr("text-anchor", "start")
         .style("font-size", "12px")
         .text(aimag);
     });
-
-    }, [datasets]);
-
+  }, [datasets, livestock]);
 
   return (
-    <div className="line-graph" style={{ 
-      width: "100%", 
-      height: "auto",
-      minHeight: "300px",
-      maxHeight: "600px"
-    }}>
+    <div
+      className="line-graph"
+      style={{
+        width: "100%",
+        height: "auto",
+        minHeight: "300px",
+        maxHeight: "600px",
+      }}
+    >
       <svg ref={svgRef}></svg>
     </div>
   );
