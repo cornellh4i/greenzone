@@ -26,9 +26,8 @@ const Home: React.FC = () => {
               <Box>
                 <Typography
                   variant="h4"
-                  fontWeight="bold"
-                  mb={2}
                   sx={{
+                    mb: 2,
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "24px",
                     fontWeight: "bold",
@@ -141,8 +140,8 @@ const Home: React.FC = () => {
                 />
                 <Typography
                   variant="h6"
-                  mb={2}
                   sx={{
+                    mb: 2,
                     color: "#065143",
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "24px",
@@ -183,8 +182,8 @@ const Home: React.FC = () => {
                 />
                 <Typography
                   variant="h6"
-                  mb={2}
                   sx={{
+                    mb: 2,
                     color: "#065143",
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "24px",
@@ -225,8 +224,8 @@ const Home: React.FC = () => {
                 />
                 <Typography
                   variant="h6"
-                  mb={2}
                   sx={{
+                    mb: 2,
                     color: "#065143",
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "24px",
@@ -260,8 +259,8 @@ const Home: React.FC = () => {
             left={
               <Box>
                 <Typography
-                  mb={2}
                   sx={{
+                    mb: 2,
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "32px",
                     fontStyle: "normal",
@@ -337,8 +336,8 @@ const Home: React.FC = () => {
             right={
               <Box>
                 <Typography
-                  mb={2}
                   sx={{
+                    mb: 2,
                     color: "#FFF",
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "32px",
@@ -386,8 +385,8 @@ const Home: React.FC = () => {
             left={
               <Box>
                 <Typography
-                  mb={2}
                   sx={{
+                    mb: 2,
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "32px",
                     fontStyle: "normal",

@@ -21,10 +21,10 @@ const Methodology = () => {
             }}
           >
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Typography variant="h4" fontWeight="bold">
+              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                 Methodologies
               </Typography>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                 About our data
               </Typography>
               <Typography variant="body1" color="text.secondary">
@@ -57,7 +57,7 @@ const Methodology = () => {
 
       <section className="w-[1600px] mx-auto flex flex-col gap-[140px]">
         <Box sx={{ mx: "auto", px: 2, maxWidth: "lg" }}>
-          <Typography variant="h5" fontWeight="bold" sx={{ py: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold", py: 2 }}>
             Additional Information
           </Typography>
         </Box>
@@ -91,15 +91,13 @@ const Methodology = () => {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Typography
                   variant="subtitle2"
-                  fontWeight="medium"
-                  sx={{ color: "black", mb: -1 }}
+                  sx={{ fontWeight: "medium", color: "black", mb: -1 }}
                 >
                   Nov. 20, 2024
                 </Typography>
                 <Typography
                   variant="h6"
-                  fontWeight="bold"
-                  sx={{ color: "black" }}
+                  sx={{ fontWeight: "bold", color: "black" }}
                 >
                   Article Title
                 </Typography>
@@ -157,15 +155,13 @@ const Methodology = () => {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Typography
                   variant="subtitle2"
-                  fontWeight="medium"
-                  sx={{ color: "black", mb: -1 }}
+                  sx={{ fontWeight: "medium", color: "black", mb: -1 }}
                 >
                   Nov. 20, 2024
                 </Typography>
                 <Typography
                   variant="h6"
-                  fontWeight="bold"
-                  sx={{ color: "black" }}
+                  sx={{ fontWeight: "bold", color: "black" }}
                 >
                   Article Title
                 </Typography>
@@ -222,15 +218,13 @@ const Methodology = () => {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Typography
                   variant="subtitle2"
-                  fontWeight="medium"
-                  sx={{ color: "black", mb: -1 }}
+                  sx={{ fontWeight: "medium", color: "black", mb: -1 }}
                 >
                   Nov. 20, 2024
                 </Typography>
                 <Typography
                   variant="h6"
-                  fontWeight="bold"
-                  sx={{ color: "black" }}
+                  sx={{ fontWeight: "bold", color: "black" }}
                 >
                   Article Title
                 </Typography>
