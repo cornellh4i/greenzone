@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
   const pages = [
     { name: "Home", path: "/", id: "home" },
     { name: "About", path: "/about", id: "about" },
-    { name: "Insights", path: "/test", id: "insights" },
+    { name: "Insights", path: "/insights", id: "insights" },
     { name: "Methodologies", path: "/test", id: "methods" },
     { name: "Paltform", path: "/test", id: "launch_platform" },
   ];

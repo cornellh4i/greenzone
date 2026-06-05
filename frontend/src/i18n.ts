@@ -14,6 +14,8 @@ import about_en from "../public/en/about.json";
 import about_mn from "../public/mn/about.json";
 import footer_en from "../public/en/footer.json";
 import footer_mn from "../public/mn/footer.json";
+import insights_en from "../public/en/insights.json";
+import insights_mn from "../public/mn/insights.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -24,6 +26,7 @@ i18n.use(initReactI18next).init({
       navbar: navbar_en,
       about: about_en,
       footer: footer_en,
+      insights: insights_en,
     },
     mn: {
       mapprovince: mapprovince_mn,
@@ -32,11 +35,12 @@ i18n.use(initReactI18next).init({
       navbar: navbar_mn,
       about: about_mn,
       footer: footer_mn,
+      insights: insights_mn,
     },
   },
   fallbackLng: "en",
 
-  ns: ["mapprovince", "sidepanel", "landing", "navbar", "about", "footer"],
+  ns: ["mapprovince", "sidepanel", "landing", "navbar", "about", "footer", "insights"],
   defaultNS: "mapprovince",
 
   interpolation: { escapeValue: false },
