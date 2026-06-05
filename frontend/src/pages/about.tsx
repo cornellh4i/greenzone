@@ -44,9 +44,8 @@ const About = () => {
               <Box>
                 <Typography
                   variant="h4"
-                  fontWeight="bold"
-                  mb={2}
                   sx={{
+                    mb: 2,
                     fontFamily: "Poppins, sans-serif",
                     fontSize: "24px",
                     fontWeight: "bold",
@@ -98,9 +97,8 @@ const About = () => {
         >
           <Typography
             variant="h4"
-            fontWeight="bold"
-            mb={2}
             sx={{
+              mb: 2,
               fontFamily: "Poppins, sans-serif",
               fontSize: "24px",
               fontWeight: "bold",

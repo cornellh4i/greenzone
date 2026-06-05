@@ -64,8 +64,8 @@ const SidePanelPercentageModal: React.FC<SidePanelPercentageModalProps> = ({
       >
         <Typography
           variant="h6"
-          fontFamily="Poppins, sans-serif"
           sx={{
+            fontFamily: "Poppins, sans-serif",
             display: "flex",
             alignItems: "center",
             gap: 0.8,
@@ -104,8 +104,8 @@ const SidePanelPercentageModal: React.FC<SidePanelPercentageModalProps> = ({
             >
               <Typography
                 variant="h5"
-                fontFamily="Poppins, sans-serif"
                 sx={{
+                  fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                   color,
                   textAlign: "center",
@@ -116,8 +116,8 @@ const SidePanelPercentageModal: React.FC<SidePanelPercentageModalProps> = ({
               </Typography>
               <Typography
                 variant="body2"
-                fontFamily="Poppins, sans-serif"
                 sx={{
+                  fontFamily: "Poppins, sans-serif",
                   fontWeight: 900,
                   color,
                   textAlign: "center",
