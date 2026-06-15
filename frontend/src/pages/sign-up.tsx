@@ -86,15 +86,15 @@ export default function SignUpPage() {
           }}
         >
           <Typography variant="h5" component="h1" sx={{ color: "primary.main", fontWeight: "bold", mb: 4 }}>
-            GreenZone Analytics
+            GreenZun Analytics
           </Typography>
 
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 0.5 }}>
-              Sign Up for GreenZone
+              Sign Up for GreenZun
             </Typography>
             <Typography variant="body2" sx={{ mb: 3 }}>
-              Welcome to GreenZone&apos;s Early Warning Carrying Capacity System!
+              Welcome to GreenZun&apos;s Early Warning Carrying Capacity System!
             </Typography>
 
             <Stack spacing={2.5}>
@@ -198,7 +198,7 @@ export default function SignUpPage() {
                 </Button>
 
               <Typography variant="caption" sx={{ mt: 1 }}>
-                By signing up, you accept GreenZone Analytics&apos;
+                By signing up, you accept GreenZun Analytics&apos;
                 <Link href="#" style={{ color: "#2a5548", marginLeft: "4px", marginRight: "4px" }}>
                   Terms of Service
                 </Link>
