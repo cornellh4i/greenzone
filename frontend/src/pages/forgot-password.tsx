@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
             component="h1"
             sx={{ color: "primary.main", fontWeight: "bold", mb: 4 }}
           >
-            GreenZone Analytics
+            GreenZun Analytics
           </Typography>
 
           <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
